@@ -1,5 +1,5 @@
 'use strict';
-import userService from '../services/userService.js';
+import * as userService from '../services/userService.js';
 // ==================== GET ALL USERS ====================
 export const getAllUsers = async (req, res) => {
   try {

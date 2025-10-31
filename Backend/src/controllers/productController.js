@@ -1,5 +1,5 @@
 'use strict';
-import apiService from '../services/cartService.js';
+import * as apiService from '../services/cartService.js';
 
 const postProduct = async (req, res) => {
     try {

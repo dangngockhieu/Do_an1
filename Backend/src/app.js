@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
 import './jobs/cleanupJob.js';
+import { seedDatabase } from './lib/seed.js';
 const app = express()
 const PORT = +process.env.PORT || 3000
 
@@ -21,17 +22,28 @@ app.use(cors({
   credentials: true,
 }));
 
-// connect database
-getConnection();
+const startServer = async () => {
+  try {
+    // connect database
+    await getConnection();
 
+    // seed database
+    await seedDatabase();
 
-// routes
-authRoutes(app);
-userRoutes(app);
+    // routes
+    authRoutes(app);
+    userRoutes(app);
 
-// check
-app.get('/', (req, res) => res.send('Server is running...'));
+    // test route
+    app.get('/', (req, res) => res.send('Server is running...'));
 
-app.listen(PORT, () => {
-    console.log(`Example app listening on PORT ${PORT}`)
-})
+    // listen
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+  }
+}
+
+startServer();
