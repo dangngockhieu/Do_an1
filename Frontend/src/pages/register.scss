@@ -1,0 +1,262 @@
+:root {
+  --blue: #69a9b7;
+  --muted: #555;
+  --card-bg: #fff;
+}
+
+.register-wrap {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(180deg, #f5f7fa 0%, #ffffff 100%);
+  padding: 40px 20px;
+  overflow-y: auto;
+  align-items: flex-start;
+
+  .register-card {
+    width: 100%;
+    min-height: 88vh;
+    max-width: 1000px;
+    display: flex;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    /* ========= PANEL XANH ========= */
+    &__info {
+      flex: 1;
+      background: var(--blue);
+      color: #fff;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 40px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.95;
+        line-height: 1.4;
+        font-size: 20px;
+      }
+
+      .benefits {
+        list-style: none;
+        margin: 8px 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        li {
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+      }
+    }
+
+    /* ========= FORM PANEL ========= */
+    &__form {
+      flex: 1;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+
+      .form-header {
+        margin-bottom: 8px;
+
+        h2 {
+          margin: 0;
+          font-size: 24px;
+        }
+
+        p {
+          color: var(--muted);
+          margin-top: 4px;
+          font-size: 15px;
+          line-height: 1.4;
+        }
+      }
+
+      .form {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .field {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+
+          span {
+            font-weight: 600;
+            font-size: 14px;
+          }
+
+          /* ✅ CHỈNH ĐỒ CAO INPUT GỌN LẠI */
+          &__input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f3f4f6;
+            padding: 8px 12px; /* giảm từ 10px -> 8px */
+            border-radius: 8px;
+
+            i {
+              color: var(--muted);
+              font-size: 16px;
+            }
+
+            input {
+              border: none;
+              background: transparent;
+              outline: none;
+              flex: 1;
+              font-size: 15px;
+              padding: 2px 0;
+              height: 32px; /* ✅ cố định chiều cao, giúp các ô bằng nhau */
+            }
+
+            /* Nút hiện/ẩn mật khẩu */
+            button {
+              border: none;
+              background: transparent;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 50%;
+              width: 28px;
+              height: 28px;
+
+              .eye {
+                font-size: 17px;
+                color: var(--muted);
+                transition: color 0.2s, transform 0.2s;
+
+                &:hover {
+                  color: #000;
+                  transform: scale(1.1);
+                }
+              }
+            }
+          }
+        }
+
+        .submit {
+          margin-top: 8px;
+          background: #111;
+          color: #fff;
+          padding: 12px;
+          border-radius: 8px;
+          border: none;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background 0.2s;
+
+          &:hover {
+            background: #000;
+          }
+        }
+
+        .divider {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 14px 0;
+          font-size: 14px;
+
+          &:before,
+          &:after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e6e6e6;
+          }
+
+          span {
+            color: var(--muted);
+            font-size: 13px;
+          }
+        }
+
+        /* ✅ TĂNG CỠ CHỮ CHO PHẦN “Đăng nhập tại đây” */
+        .signup {
+          color: var(--muted);
+          text-align: center;
+          font-size: 15px; /* tăng từ 13px -> 15px */
+          font-weight: 500;
+          margin-top: 4px;
+
+          a {
+            color: #000;
+            font-weight: 700;
+            text-decoration: underline;
+
+            &:hover {
+              opacity: 0.8;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* ========= FULLSCREEN ========= */
+  @media (min-height: 800px) and (min-width: 1000px) {
+    align-items: center;
+
+    .register-card {
+      height: 85vh;
+    }
+  }
+
+  /* ========= RESPONSIVE ========= */
+  @media (max-width: 900px) {
+    .register-card {
+      flex-direction: column;
+
+      &__info {
+        order: 1;
+        padding: 24px;
+        text-align: center;
+        gap: 8px;
+      }
+
+      &__form {
+        order: 2;
+        padding: 24px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .register-card {
+      border-radius: 10px;
+
+      &__info,
+      &__form {
+        padding: 18px;
+      }
+
+      .form-header h2 {
+        font-size: 20px;
+      }
+    }
+  }
+}

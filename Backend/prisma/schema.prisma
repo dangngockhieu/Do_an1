@@ -1,0 +1,197 @@
+//schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  DELIVERED
+  CANCELED
+}
+
+enum CategoryType {
+  LAPTOP
+  PHONE
+}
+
+enum FactoryType {
+  DELL
+  ACER
+  MSI
+  LENOVO
+  HP
+  ASUS
+  GIGABYTE
+  MACBOOK
+  IPHONE
+  SAMSUNG
+  XIAOMI
+  OPPO
+  REALME
+  VIVO
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  name              String    @db.VarChar(100)
+  email             String    @unique @db.VarChar(100)
+  password          String    @db.VarChar(255)
+  role              String    @db.VarChar(100)
+  isVerified        Boolean   @default(false)
+  refresh_token     String?   @db.VarChar(255)
+  sent_at           DateTime?
+  verification_code String?   @db.VarChar(255)
+  code_expired      DateTime?
+
+  cart    Cart?    @relation("UserCart")
+  orders  Order[]
+  reviews Review[]
+
+  @@map("users")
+}
+
+model Cart {
+  id          Int        @id @default(autoincrement())
+  userID      Int        @unique
+  total_price Int
+  user        User       @relation("UserCart", fields: [userID], references: [id])
+  cartItems   CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int @id @default(autoincrement())
+  cartID    Int
+  productID Int
+  quantity  Int
+
+  cart    Cart    @relation(fields: [cartID], references: [id])
+  product Product @relation(fields: [productID], references: [id])
+
+  @@map("cart_items")
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  userID        Int
+  totalPrice    Int
+  recipientName String      @db.VarChar(100)
+  address       String      @db.VarChar(255)
+  phone         String      @db.VarChar(20)
+  status        OrderStatus
+  orderDate     DateTime
+  trackingCode  String      @db.VarChar(100)
+  deliveryDate  DateTime?
+  receivedDate  DateTime?
+
+  user       User        @relation(fields: [userID], references: [id])
+  orderItems OrderItem[]
+  payments   Payment[]
+
+  @@map("orders")
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  orderID       Int
+  amount        Int
+  method        String   @db.VarChar(50) // COD, VNPay, Momo...
+  status        String   @db.VarChar(50) // PENDING, SUCCESS, FAILED, REFUNDED
+  transactionId String?  @db.VarChar(100) // mã giao dịch từ cổng thanh toán
+  createdAt     DateTime @default(now())
+
+  order Order @relation(fields: [orderID], references: [id])
+
+  @@map("payments")
+}
+
+model OrderItem {
+  id        Int @id @default(autoincrement())
+  orderID   Int
+  productID Int
+  quantity  Int
+  price     Int
+
+  order   Order   @relation(fields: [orderID], references: [id])
+  product Product @relation(fields: [productID], references: [id])
+
+  @@map("order_items")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userID    Int
+  productID Int
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userID], references: [id])
+  product Product @relation(fields: [productID], references: [id])
+
+  @@map("reviews")
+}
+
+model Product {
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(255)
+  originalPrice Int
+  price         Int?
+  coupon        Int?
+  images        ProductImage[]
+  detailDesc    String         @db.VarChar(255)
+  shortDesc     String         @db.VarChar(255)
+  quantity      Int
+  sold          Int            @default(0)
+  warranty      String         @db.VarChar(100)
+  infor         String         @db.VarChar(255)
+  cpu           String         @db.VarChar(100)
+  ram           String         @db.VarChar(100)
+  storage       String         @db.VarChar(100)
+  screen        String         @db.VarChar(100)
+  graphicsCard  String         @db.VarChar(100)
+  os            String         @db.VarChar(100)
+  battery       String         @db.VarChar(100)
+  weight        String         @db.VarChar(100)
+  releaseYear   String         @db.VarChar(100)
+  categoryID    Int
+  factoryID     Int
+
+  category   Category    @relation(fields: [categoryID], references: [id])
+  factory    Factory     @relation(fields: [factoryID], references: [id])
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+}
+
+model Category {
+  id       Int          @id @default(autoincrement())
+  name     CategoryType
+  products Product[]
+
+  @@map("categories")
+}
+
+model Factory {
+  id       Int         @id @default(autoincrement())
+  name     FactoryType
+  products Product[]
+
+  @@map("factories")
+}
