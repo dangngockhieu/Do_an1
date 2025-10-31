@@ -7,6 +7,8 @@ import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
 import './jobs/cleanupJob.js';
 import { seedDatabase } from './lib/seed.js';
+import * as authController from './controllers/authController.js';
+
 const app = express()
 const PORT = +process.env.PORT || 3000
 
@@ -29,7 +31,8 @@ const startServer = async () => {
 
     // seed database
     await seedDatabase();
-
+    // Route xác thực email (GET /auth/verify)
+    app.get('/auth/verify', authController.verifyEmail);
     // routes
     authRoutes(app);
     userRoutes(app);

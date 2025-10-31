@@ -85,6 +85,10 @@ export const verifyEmail = async (req, res) => {
         const { email, token } = req.query;
         const data = await authService.verifyByToken(token, email);
         if (data === 'Email verified') {
+        res.setHeader(
+        'Content-Security-Policy',
+        "default-src * 'self' data: blob:; connect-src *; img-src * data:; style-src * 'unsafe-inline';"
+      );
         res.send(`
 <!doctype html>
 <html lang="vi">
