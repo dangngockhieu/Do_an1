@@ -4,12 +4,17 @@ import { RiDeleteBin6Fill } from "react-icons/ri";
 import { BsFillPencilFill, BsFillCameraFill, BsArrowRightCircleFill } from "react-icons/bs";
 
 const TableUserPaginate = (props) => {
-  const { listUsers, pageCount, searchTerm } = props;
+  const { listUsers, pageCount} = props;
 
   const handlePageClick = (event) => {
     const newPage = +event.selected + 1;
+    
+    const newSearchTerm = ""; 
+    
     props.setCurrentPage(newPage);
-    props.fetchListUsersWithPaginate(newPage, searchTerm || "");
+    props.fetchListUsersWithPaginate(newPage, newSearchTerm);
+    
+    props.resetSearchTerm(); 
   };
 
   return (

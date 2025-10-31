@@ -13,11 +13,15 @@ export const jwtAuth = (req, res, next) => {
 
     // Xác thực token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; 
-
-    next(); 
+    req.user = decoded;
+    return next();
   } catch (err) {
+    // If token is expired, return 401 so client can attempt to refresh using refresh_token
+    if (err && err.name === 'TokenExpiredError') {
+      console.warn('JWT Auth TokenExpiredError:', err.message);
+      return res.status(401).json({ EM: 'Access token expired', EC: -1 });
+    }
     console.error('JWT Auth Error:', err.message);
-    return res.status(403).json({ EM: 'Invalid or expired token', EC: -1 });
+    return res.status(403).json({ EM: 'Invalid token', EC: -1 });
   }
 };

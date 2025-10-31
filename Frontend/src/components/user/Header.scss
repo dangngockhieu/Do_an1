@@ -3,7 +3,7 @@
   color: #333;
   background: #fff;
   position: relative;
-  overflow: hidden;
+  z-index: 1000;
 
   /* ===== TOP BAR ===== */
   &__top {
@@ -95,18 +95,21 @@
       display: flex;
       gap: 2rem;
 
-      a {
+      // Sử dụng selector cho các NavLink
+      .nav-item { 
         text-decoration: none;
         font-size: 1.2rem;
         color: #333;
         font-weight: 500;
         position: relative;
-
+    
+      // Selector mà NavLink tự thêm vào khi đường dẫn khớp
         &.active,
         &:hover {
           color: #67b438;
         }
 
+        // Gạch chân cho trạng thái active
         &.active::after {
           content: "";
           position: absolute;
@@ -242,7 +245,7 @@
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 1rem;
     display: flex;
     flex-direction: column;
     min-width: 180px;
@@ -283,8 +286,8 @@
   button + button,
   .setting-menu + button {
     border-top: 1px solid #bcafaf;
-    margin-top: 0.3rem;
-    padding-top: 0.6rem;
+    margin-top: 0.1rem;
+    padding-top: 0.2rem;
   }
 
     /* ===== Setting Menu ===== */
@@ -300,7 +303,7 @@
         border: none;
         font-size: 1rem;
         cursor: pointer;
-        padding: 0.5rem 0;
+        padding: 0.1rem 0;
       }
 
       .dropdown-icon1 {
@@ -314,8 +317,8 @@
       }
 
       .setting-dropdown {
-        margin-left: 15px; 
-        margin-top: 4px;
+        margin-left: 10px; 
+        margin-top: 1px;
         display: flex;
         flex-direction: column;
         gap: 5px;
@@ -453,28 +456,6 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-      }
-    }
-  }
-
-  .header__hero {
-    padding: 18px 12px;
-    flex-direction: column-reverse;
-
-    &-image img {
-      width: 100%;
-      height: auto;
-    }
-
-    &-content {
-      padding: 0;
-
-      h1 {
-        font-size: 1.25rem;
-      }
-
-      h4 {
-        font-size: 0.95rem;
       }
     }
   }

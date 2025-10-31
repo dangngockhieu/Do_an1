@@ -1,11 +1,12 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import '../../styles/global.scss';
+import { Outlet } from "react-router-dom";
 const Homepage = () => {
     return (
         <div>
             <Header />
-            Homepage Content
+            <Outlet />
             <Footer />
         </div>
     );

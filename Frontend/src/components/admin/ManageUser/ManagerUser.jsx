@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FcPlus } from 'react-icons/fc';
 import { FaSearch } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io"; 
 import { toast } from 'react-toastify';
 import TableUserPaginate from "./TableUserPaginate";
 import ModelCreateUser from "./ModelCreateUser";
@@ -17,7 +18,6 @@ const ManagerUser = () => {
   const [listUsers, setListUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Modal state
   const [showModelCreateUser, setShowModelCreateUser] = useState(false);
   const [showModelUpdateUser, setShowModelUpdateUser] = useState(false);
   const [showModelViewUser, setShowModelViewUser] = useState(false);
@@ -27,12 +27,8 @@ const ManagerUser = () => {
   const [dataDelete, setDataDelete] = useState({});
 
   useEffect(() => {
-    const delaySearch = setTimeout(() => {
-      fetchListUsersWithPaginate(1, searchTerm);
-    }, 5);
-
-    return () => clearTimeout(delaySearch);
-  }, [searchTerm]);
+    fetchAndNotify(currentPage, searchTerm);
+  }, []); 
 
   const fetchAndNotify = async (page, keyword = "") => {
     try {
@@ -42,7 +38,6 @@ const ManagerUser = () => {
         setListUsers(users);
         setPageCount(Math.ceil((res.DT?.total || 0) / LIMIT));
         if (users.length === 0 && keyword && keyword.trim() !== '') {
-          toast.error('Không tìm thấy người dùng');
         }
       } else {
         setListUsers([]);
@@ -56,12 +51,20 @@ const ManagerUser = () => {
     }
   };
 
-  // preserve original function name used by child components
   const fetchListUsersWithPaginate = fetchAndNotify;
+
+  const resetSearchTerm = () => {
+    setSearchTerm("");
+  };
+
+  const handleClearSearch = async () => {
+    setCurrentPage(1); 
+    setSearchTerm("");
+    await fetchAndNotify(1, "");
+  };
 
   const handleChangeSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
   };
 
   const handleSearchSubmit = async () => {
@@ -72,17 +75,14 @@ const ManagerUser = () => {
       return;
     }
 
-    // Ask backend which page contains the matched user, then fetch that page
     try {
       const res = await findUserPage(keyword, LIMIT);
-      // our axios instance unwraps response.data and returns it directly
       if (res && res.EC === 0) {
         const page = res.DT?.page || 1;
         if (page && page > 0) {
           setCurrentPage(page);
           await fetchAndNotify(page, keyword);
         } else {
-          // not found
           setListUsers([]);
           setPageCount(0);
           toast.error('Không tìm thấy người dùng');
@@ -134,9 +134,19 @@ const ManagerUser = () => {
         <div className="title">Quản lý người dùng</div>
         <div className="actions">
           <div className="search-box">
-            <button className="search-icon-btn" onClick={handleSearchSubmit} aria-label="search">
-              <FaSearch className="search-icon" style={{color: '#636262ff'}} />
-            </button>
+            
+            {searchTerm ? (
+              // HIỂN THỊ NÚT X (CLEAR) KHI CÓ SEARCHTERM
+              <button className="search-clear-btn" onClick={handleClearSearch} aria-label="clear search">
+                <IoMdClose className="clear-icon" style={{color: '#636262ff'}} />
+              </button>
+            ) : (
+              // HIỂN THỊ NÚT SEARCH KHI KHÔNG CÓ SEARCHTERM
+              <button className="search-icon-btn" onClick={handleSearchSubmit} aria-label="search">
+                <FaSearch className="search-icon" style={{color: '#636262ff'}} />
+              </button>
+            )}
+
             <input
               type="text"
               placeholder="Nhập email hoặc tên để tìm kiếm..."
@@ -166,7 +176,7 @@ const ManagerUser = () => {
             pageCount={pageCount}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
-            searchTerm={searchTerm}
+            resetSearchTerm={resetSearchTerm}
           />
         </div>
 

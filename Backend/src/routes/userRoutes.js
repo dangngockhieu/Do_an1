@@ -27,7 +27,7 @@ const userRoutes = (app) => {
   router.patch('/update-role-user/:id', jwtAuth, authorizeRole(['ADMIN']), changeRoleUser);
   router.delete('/delete-user/:id', jwtAuth, authorizeRole(['ADMIN']), deleteUser);
 
-app.use('/api/user', router);
+app.use('/user', router);
 };
 
 export default userRoutes;

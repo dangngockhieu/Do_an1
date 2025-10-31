@@ -13,7 +13,7 @@ NProgress.configure({
 
 // ================== KHỞI TẠO INSTANCE ==================
 const instance = axios.create({
-  baseURL: 'http://localhost:8080/api/'
+  baseURL: 'http://localhost:8080/'
 });
 
 // ================== QUẢN LÝ REFRESH TOKEN ==================
@@ -87,7 +87,7 @@ instance.interceptors.response.use(
 
       try {
         // Gọi API refresh token (refresh_token nằm trong cookie)
-        const res = await instance.post('auth/refresh-token');
+        const res = await instance.post('auth/refresh-token', {}, { withCredentials: true });
         if (res?.EC === 0 && res?.DT) {
           const { access_token: newAccess, user } = res.DT;
 

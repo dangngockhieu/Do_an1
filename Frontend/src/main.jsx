@@ -1,5 +1,5 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot } from 'react-dom/client' // Import createRoot
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,12 +13,25 @@ import AdminRoute from './pages/admin.private.route.jsx';
 import NotFound from './pages/error.jsx';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
+import LandingPage from './components/user/LandingPage.jsx';
+import Product from './components/user/Product.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
 import ManagerUser from './components/admin/ManageUser/ManagerUser.jsx';
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Homepage />,
+    children: [
+      {
+      index: true,
+      element: <LandingPage />,
+    },
+    {
+      path: "product",
+      element: <Product />,
+    }
+    ],
     errorElement: <NotFound />,
   },
   {
@@ -66,11 +79,15 @@ const router = createBrowserRouter([
   }
 ]);
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-      <ToastContainer position="top-right" autoClose={3000} />
-    </Provider>
-  </StrictMode>,
-)
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <StrictMode>
+      <Provider store={store}>
+        <RouterProvider router={router} />
+        <ToastContainer position="top-right" autoClose={3000} />
+      </Provider>
+    </StrictMode>,
+  );
+}

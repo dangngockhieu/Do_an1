@@ -15,6 +15,8 @@ const authRoutes = (app) => {
   router.post('/logout', jwtAuth, logout);
   // Refresh token
   router.post('/refresh-token', refreshToken);
+
+  router.get('/verify', verifyEmail);
   // Resend verification email
   router.post('/resend', resendVerificationEmail);
   // Send Reset Password Email
@@ -22,7 +24,7 @@ const authRoutes = (app) => {
   // Reset Password - accept PATCH (preferred) and POST for frontend compatibility
   router.patch('/reset-password', resetPassword);
 
-  app.use('/api/auth', router);
+  app.use('/auth', router);
 };
 
 export default authRoutes;

@@ -2,16 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { FaUserCircle, FaMapMarkerAlt } from "react-icons/fa";
 import { BsCartPlusFill, BsEnvelopeFill } from "react-icons/bs";
-import banner1 from "../../assets/banner_header1.jpg";
-import banner2 from "../../assets/banner_header2.jpg";
-import banner3 from "../../assets/banner_header3.jpg";
-import banner4 from "../../assets/banner_header4.png";
 import { USER_LOGOUT_SUCCESS } from "../../redux/action/userAction";
 import { logout } from "../../services/apiServices";
 import { BsCaretDownFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import "./Header.scss";
 import ChangePassword from './ChangePassword';
+import { NavLink } from "react-router-dom";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -24,16 +21,6 @@ const Header = () => {
 
   const menuRef = useRef(null);
 
-  // ========== Xử lý banner tự động đổi ==========
-  const banners = [banner1, banner2, banner3, banner4];
-  const [currentBanner, setCurrentBanner] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBanner((prev) => (prev + 1) % banners.length);
-    }, 20000); 
-
-    return () => clearInterval(interval);
-  }, []);
   // Ẩn menu khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -86,12 +73,14 @@ const Header = () => {
           </h2>
         </div>
 
-        <nav className="header__menu">
-          <a href="#" className="active">
+        <div className="header__menu">
+          <NavLink to="/" className="nav-item">
             Trang chủ
-          </a>
-          <a href="#">Sản phẩm</a>
-        </nav>
+          </NavLink>
+          <NavLink to="/product" className="nav-item">
+            Sản phẩm
+          </NavLink>
+        </div>
 
         <div className="header__icons" ref={menuRef}>
           <button className="icon-btn cart left">
@@ -144,20 +133,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* ===== HERO / BANNER ===== */}
-      <section className="header__hero">
-        <div className="header__hero-content">
-          <h4>100% Sản Phẩm Chính Hãng</h4>
-          <h1>
-            Trải nghiệm khác biệt <br />
-            <span>Deal hot mỗi ngày</span>
-          </h1>
-          <button className="hero-btn">Mua ngay</button>
-        </div>
-        <div className="header__hero-image">
-          <img src={banners[currentBanner]} alt="Laptop Gaming" />
-        </div>
-      </section>
       {showChangePassword && (
         <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}

@@ -29,12 +29,12 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
   const offset = (page - 1) * limit;
 
   const whereCondition = {
-    isVerified: true, 
+    isVerified: true,
     ...(search
       ? {
           OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
+            { name: { equals: search } },
+            { email: { equals: search } },
           ],
         }
       : {}),
@@ -63,23 +63,25 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
 export const findUserPage = async (search, limit = 10) => {
   if (!search) return -1;
 
-  let user = null;
-  if (search.includes('@')) {
-    user = await prisma.user.findUnique({ where: { email: search } });
-  }
-
-  if (!user) {
-    user = await prisma.user.findFirst({
-      where: { name: { contains: search }, isVerified: true },
-      orderBy: { id: 'asc' },
-    });
-  }
+  const user = await prisma.user.findFirst({
+    where: {
+      isVerified: true,
+      OR: [
+        { name: { equals: search } },
+        { email: { equals: search } },
+      ],
+    },
+    orderBy: { id: 'asc' },
+  });
 
   if (!user) return -1;
 
-  const countBefore = await prisma.user.count({ where: { id: { lt: user.id }, isVerified: true } });
-  const page = Math.floor(countBefore / (+limit || 10)) + 1;
-  return page;
+  // Đếm số user có id nhỏ hơn user được tìm thấy
+  const countBefore = await prisma.user.count({
+    where: { isVerified: true, id: { lt: user.id } },
+  });
+
+  return Math.floor(countBefore / (+limit || 10)) ;
 };
 
 // ==================== GET USER BY ID ====================

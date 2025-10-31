@@ -103,16 +103,23 @@
 
 .btn-logout {
   background: #fff;
-  color: black;
+  color: #000;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; // đậm vừa phải, rõ nét
+  font-size: 0.875rem;
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
-  font-size: 0.875rem;
   cursor: pointer;
-  font-weight: 500;
+  transition: color 0.2s ease, transform 0.15s ease;
 
   &:hover {
-    color: red;
+    color: #e53935;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 }
 
