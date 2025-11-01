@@ -45,7 +45,7 @@ export const login = (email, password) => {
 
 export const logout = () =>{
   const URL_BACKEND = 'auth/logout';
-  return axios.post(URL_BACKEND, { withCredentials: true });
+  return axios.post(URL_BACKEND, {}, { withCredentials: true });
 }
 
 

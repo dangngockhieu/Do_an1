@@ -3,6 +3,7 @@ import banner2 from "../../assets/banner_header2.jpg";
 import banner3 from "../../assets/banner_header3.jpg";
 import banner4 from "../../assets/banner_header4.png";
 import { useState, useEffect } from "react";
+import {Link} from "react-router-dom";
 import './LandingPage.scss';
 const LandingPage = () => {
     // ========== Xử lý banner tự động đổi ==========
@@ -34,7 +35,7 @@ const LandingPage = () => {
   <div className="bestseller__header">
     <h2>Bán chạy</h2>
     <p>Sản phẩm bán chạy của chúng tôi</p>
-    <a href="#">Xem tất cả</a>
+    <Link to="#">Xem tất cả</Link>
   </div>
 
   <div className="bestseller__list">
@@ -95,7 +96,7 @@ const LandingPage = () => {
           <h3>{item.title}</h3>
           <div className="price">
             <span className="new">{item.price}</span>
-            <span className="old">{item.oldPrice}</span>
+            {+item.oldPrice > 0 && <span className="old">{item.oldPrice}</span>}
           </div>
           <button>Thêm vào giỏ hàng</button>
         </div>

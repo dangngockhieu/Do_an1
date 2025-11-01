@@ -28,17 +28,22 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
   limit = +limit || 10;
   const offset = (page - 1) * limit;
 
-  const whereCondition = {
-    isVerified: true,
-    ...(search
-      ? {
-          OR: [
-            { name: { equals: search } },
-            { email: { equals: search } },
-          ],
-        }
-      : {}),
-  };
+  // Nếu có search (email là duy nhất)
+  if (search) {
+    const user = await prisma.user.findUnique({
+      where: { email: search },
+      select: { id: true, name: true, email: true, role: true, isVerified: true },
+    });
+
+    if (!user || !user.isVerified) {
+      return { users: [], total: 0 };
+    }
+
+    return { users: [user], total: 1 };
+  }
+
+  // Nếu không có search → phân trang bình thường
+  const whereCondition = { isVerified: true };
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
@@ -46,12 +51,7 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
       skip: offset,
       take: limit,
       orderBy: { id: 'asc' },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
+      select: { id: true, name: true, email: true, role: true },
     }),
     prisma.user.count({ where: whereCondition }),
   ]);
@@ -59,19 +59,18 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
   return { users, total };
 };
 
+
+
 // ==================== FIND PAGE OF USER (BY SEARCH) ====================
 export const findUserPage = async (search, limit = 10) => {
   if (!search) return -1;
 
-  const user = await prisma.user.findFirst({
+  const user = await prisma.user.findUnique({
     where: {
       isVerified: true,
-      OR: [
-        { name: { equals: search } },
-        { email: { equals: search } },
-      ],
+      email: search ,
     },
-    orderBy: { id: 'asc' },
+    select: { id: true, isVerified: true },
   });
 
   if (!user) return -1;
@@ -81,7 +80,7 @@ export const findUserPage = async (search, limit = 10) => {
     where: { isVerified: true, id: { lt: user.id } },
   });
 
-  return Math.floor(countBefore / (+limit || 10)) ;
+  return Math.floor((countBefore) / (+limit || 10)) + 1;
 };
 
 // ==================== GET USER BY ID ====================
@@ -114,15 +113,15 @@ export const findUserByEmail = async (email) => {
 };
 
 // ==================== CREATE USER (ADMIN) ====================
-export const postUserForAdmin = async (name, email, password, role) => {
+export const postUserForAdmin = async (email, name, password, role) => {
   const existingUser = await isEmailExist(email);
   if (existingUser) throw new Error('Email đã được đăng ký!');
 
   const hashPassword = await argon.hash(password);
-  const newUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
-      name,
       email,
+      name,
       password: hashPassword,
       isVerified: true,
       role,

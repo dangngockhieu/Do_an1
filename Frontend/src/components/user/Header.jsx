@@ -8,7 +8,7 @@ import { BsCaretDownFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import "./Header.scss";
 import ChangePassword from './ChangePassword';
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -54,13 +54,13 @@ const Header = () => {
               <FaMapMarkerAlt className="icon" />{" "}
               <span className="top-text">Hồ Chí Minh</span>
             </span>
-            <a href="mailto:laptopshop8386@gmail.com">
+            <span>
               <BsEnvelopeFill className="icon" />{" "}
               <span className="top-text">laptopshop8386@gmail.com</span>
-            </a>
+            </span>
           </div>
           <div className="header__top-right">
-            <a href="#">Điều khoản sử dụng</a> / <a href="#">Hỗ trợ</a>
+            <Link to="#">Điều khoản sử dụng</Link> / <Link to="#">Hỗ trợ</Link>
           </div>
         </div>
       </div>
@@ -100,12 +100,12 @@ const Header = () => {
             <div className="user-menu">
               {!isAuthenticated ? (
                 <>
-                  <a href="/login" onClick={() => setShowMenu(false)}>
+                  <Link to="/login" onClick={() => setShowMenu(false)}>
                     Đăng nhập
-                  </a>
-                  <a href="/register" onClick={() => setShowMenu(false)}>
+                  </Link>
+                  <Link to="/register" onClick={() => setShowMenu(false)}>
                     Đăng ký
-                  </a>
+                  </Link>
                 </>
               ) : (
                 <>

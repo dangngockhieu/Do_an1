@@ -17,6 +17,7 @@ const ManagerUser = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [listUsers, setListUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [search, setSearch] = useState(false);
 
   const [showModelCreateUser, setShowModelCreateUser] = useState(false);
   const [showModelUpdateUser, setShowModelUpdateUser] = useState(false);
@@ -33,6 +34,7 @@ const ManagerUser = () => {
   const fetchAndNotify = async (page, keyword = "") => {
     try {
       const res = await getUserWithPaginate(page, LIMIT, keyword);
+      console.log(res);
       if (res && res.EC === 0) {
         const users = res.DT?.users || [];
         setListUsers(users);
@@ -60,6 +62,7 @@ const ManagerUser = () => {
   const handleClearSearch = async () => {
     setCurrentPage(1); 
     setSearchTerm("");
+    setSearch(false);
     await fetchAndNotify(1, "");
   };
 
@@ -68,6 +71,7 @@ const ManagerUser = () => {
   };
 
   const handleSearchSubmit = async () => {
+    setSearch(true);
     const keyword = searchTerm.trim();
     if (!keyword) {
       setCurrentPage(1);
@@ -103,11 +107,6 @@ const ManagerUser = () => {
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value.trim());
-    setCurrentPage(1);
-  };
-
   const handleClickBtnUpdate = (user) => {
     setShowModelUpdateUser(true);
     setDataUpdate(user);
@@ -135,10 +134,10 @@ const ManagerUser = () => {
         <div className="actions">
           <div className="search-box">
             
-            {searchTerm ? (
+            {search ? (
               // HIỂN THỊ NÚT X (CLEAR) KHI CÓ SEARCHTERM
               <button className="search-clear-btn" onClick={handleClearSearch} aria-label="clear search">
-                <IoMdClose className="clear-icon" style={{color: '#636262ff'}} />
+                <IoMdClose className="clear-icon" style={{color: 'red', fontSize: '1.2rem', fontWeight: "600"}} />
               </button>
             ) : (
               // HIỂN THỊ NÚT SEARCH KHI KHÔNG CÓ SEARCHTERM
@@ -149,7 +148,7 @@ const ManagerUser = () => {
 
             <input
               type="text"
-              placeholder="Nhập email hoặc tên để tìm kiếm..."
+              placeholder="Nhập email để tìm kiếm ..."
               value={searchTerm}
               onChange={handleChangeSearch}
               onKeyDown={onKeyDown}

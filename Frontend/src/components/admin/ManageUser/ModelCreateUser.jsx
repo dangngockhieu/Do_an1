@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { createUserforAdmin } from '../../../services/apiServices';
 import './CreateView.scss';
 const ModelCreateUser = (props) => {
-  const { show, setShow, fetchListUsersWithPaginate, setCurrentPage } = props;
+  const { show, setShow } = props;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,16 +20,16 @@ const ModelCreateUser = (props) => {
       return;
     }
 
-    let res = await createUserforAdmin(email, password, name, role);
+    let res = await createUserforAdmin(email, name, password, role);
     if (res && res.EC === 0) {
       toast.success("Tạo người dùng thành công!");
-      handleClose();
       setEmail("");
       setPassword("");
-      setUsername("");
+      setName("");
       setRole("USER");
-      setCurrentPage(1);
-      await fetchListUsersWithPaginate(1);
+      props.setCurrentPage(1);
+      await props.fetchListUsersWithPaginate(1);
+      handleClose();
     } else {
       toast.error(res.EM);
     }

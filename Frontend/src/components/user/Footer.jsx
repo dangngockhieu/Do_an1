@@ -1,5 +1,5 @@
 import './Footer.scss';
-
+import {Link} from "react-router-dom";
 const Footer = () => {
     const currentYear = new Date().getFullYear();
 
@@ -13,25 +13,25 @@ const Footer = () => {
                         after sales support.
                     </p>
                     <div className="app-footer__contact">
-                        <a href="tel:18001234">Hotline: 1800 1234</a>
-                        <a href="mailto:laptopshop8386@laptopshop.vn">Email: laptopshop8386@laptopshop.vn</a>
-                        <span>Showroom: Ta Quang Buu Street, Dong Hoa Ward , Ho Chi Minh City</span>
+                        <span>Hotline: 1800 1234</span>
+                        <span>Email: laptopshop8386@laptopshop.vn</span>
+                        <span>Showroom: No. 1 Ta Quang Buu Street, Dong Hoa Ward, Ho Chi Minh City, Vietnam</span>
                     </div>
                 </div>
                 <div className="app-footer__column">
                     <h4>Shop</h4>
-                    <a href="#laptops">Performance laptops</a>
-                    <a href="#phones">Flagship phones</a>
-                    <a href="#deals">Bundle deals</a>
-                    <a href="#services">Services</a>
+                    <Link to="#laptops">Performance laptops</Link>
+                    <Link to="#phones">Flagship phones</Link>
+                    <Link to="#deals">Bundle deals</Link>
+                    <Link to="#services">Services</Link>
                 </div>
             </div>
             <div className="container app-footer__bottom">
                 <span>© {currentYear} TechZone. All rights reserved.</span>
                 <div className="app-footer__legal">
-                    <a href="#privacy">Privacy</a>
-                    <a href="#terms">Terms</a>
-                    <a href="#support">Warranty policy</a>
+                    <Link to="#privacy">Privacy</Link>
+                    <Link to="#terms">Terms</Link>
+                    <Link to="#support">Warranty policy</Link>
                 </div>
             </div>
         </footer>

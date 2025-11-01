@@ -17,6 +17,7 @@ import LandingPage from './components/user/LandingPage.jsx';
 import Product from './components/user/Product.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
 import ManagerUser from './components/admin/ManageUser/ManagerUser.jsx';
+import { restoreToken } from './utils/restoreToken.js';
 
 const router = createBrowserRouter([
   {
@@ -80,14 +81,18 @@ const router = createBrowserRouter([
 ]);
 
 const container = document.getElementById('root');
-if (container) {
-  const root = createRoot(container);
-  root.render(
-    <StrictMode>
-      <Provider store={store}>
-        <RouterProvider router={router} />
-        <ToastContainer position="top-right" autoClose={3000} />
-      </Provider>
-    </StrictMode>,
-  );
-}
+(async () => {
+  // Tự động khôi phục access_token mỗi khi F5 (nếu refresh_token còn hạn)
+  await restoreToken();
+  if (container) {
+    const root = createRoot(container);
+    root.render(
+      <StrictMode>
+        <Provider store={store}>
+          <RouterProvider router={router} />
+          <ToastContainer position="top-right" autoClose={3000} />
+        </Provider>
+      </StrictMode>,
+    );
+  }
+})();

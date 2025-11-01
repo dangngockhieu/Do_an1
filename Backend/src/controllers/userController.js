@@ -76,7 +76,7 @@ export const findUserByEmail = async (req, res) => {
 export const createUser = async (req, res) => {
   try {
     const { email, name, password, role } = req.body;
-    const user = await userService.postUserForAdmin(name, email, password, role ?? 'USER');
+    const user = await userService.postUserForAdmin(email, name, password, role ?? 'USER');
     return res.status(201).json({ DT: user, EM: 'Create user successful', EC: 0 });
   } catch (error) {
     return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });

@@ -11,13 +11,13 @@ const ModeldeleteUserforAdmin = (props) => {
       let data = await deleteUserforAdmin(dataDelete.id);
       if(data && data.EC === 0) {
           toast.success("Delete user successfully");
-          handleClose(); 
           props.setCurrentPage(1);
           await props.fetchListUsersWithPaginate(1);
-  } 
-  if(data && data.EC !== 0) {
-    toast.error(data.EM);
-  }
+          handleClose();
+      } 
+      if(data && data.EC !== 0) {
+        toast.error(data.EM);
+      }
 }
 
   return (

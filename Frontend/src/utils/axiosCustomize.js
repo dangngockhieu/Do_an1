@@ -36,6 +36,7 @@ instance.interceptors.request.use(
     if (access_token) {
       config.headers['Authorization'] = 'Bearer ' + access_token;
     }
+
     NProgress.start();
     return config;
   },
@@ -83,7 +84,7 @@ instance.interceptors.response.use(
       }
 
       isRefreshing = true;
-      console.log('[Axios] Đang làm mới access token...');
+      console.log('Đang làm mới access token...');
 
       try {
         // Gọi API refresh token (refresh_token nằm trong cookie)
@@ -101,7 +102,7 @@ instance.interceptors.response.use(
           );
 
           onRefreshed(newAccess);
-          console.log('[Axios] Refresh token thành công.');
+          console.log('Refresh token thành công.');
 
           originalRequest.headers['Authorization'] = 'Bearer ' + newAccess;
           return instance(originalRequest);
@@ -109,7 +110,7 @@ instance.interceptors.response.use(
           throw new Error('Invalid refresh response');
         }
       } catch (err) {
-        console.error('[Axios] Làm mới token thất bại:', err);
+        console.error('Làm mới token thất bại:', err);
         toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!');
         store.dispatch(doLogout());
         window.location.href = '/login';

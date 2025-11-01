@@ -4,7 +4,6 @@ import argon from 'argon2';
 export const seedDatabase = async () => {
   const existingUser = await prisma.user.findFirst();
   if (existingUser) {
-    console.log(' Database already seeded — skipping');
     return;
   }
 
