@@ -7,7 +7,10 @@ const cleanupExpiredUsers = async () => {
     const result = await prisma.user.deleteMany({
       where: {
         isVerified: false,
-        refresh_expired: { lt: now.toISOString() },
+        code_expired: {
+          not: null,
+          lt: now,
+        },
       },
     });
     if (result.count > 0) {

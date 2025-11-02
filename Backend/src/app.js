@@ -4,6 +4,7 @@ import 'dotenv/config'
 import getConnection from './config/database.js'
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 import cors from 'cors';
 import './jobs/cleanupJob.js';
 import { seedDatabase } from './lib/seed.js';
@@ -33,6 +34,7 @@ const startServer = async () => {
     // routes
     authRoutes(app);
     userRoutes(app);
+    productRoutes(app);
 
     // test route
     app.get('/', (req, res) => res.send('Server is running...'));

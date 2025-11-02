@@ -48,8 +48,7 @@
   gap: 12px;
   font-size: 1.05rem;
   font-weight: 600;
-
-  &:hover {
+  &.active {
     background: rgba(255, 255, 255, 0.08);
   }
 }

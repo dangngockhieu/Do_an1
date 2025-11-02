@@ -41,7 +41,6 @@
           box-shadow: 0 0 4px rgba(0, 120, 255, 0.3);
         }
 
-        /* icon button */
         .search-icon-btn,
         .search-clear-btn {
           background: transparent;
@@ -56,7 +55,7 @@
         }
 
         .search-icon,
-        .clear-icon { 
+        .clear-icon {
           font-size: 16px;
           color: #555;
           transition: transform 0.2s ease, color 0.2s ease;
@@ -118,27 +117,38 @@
     margin-top: 1rem;
 
     .table-users-container {
-      background: #fff;
-      border-radius: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-      padding: 1rem;
-      overflow-x: auto;
-      animation: fade-in 0.4s ease-in-out;
+      background: #f9fafb;
+      border-radius: 12px;
 
       table {
         width: 100%;
         border-collapse: collapse;
+        font-size: 0.95rem;
 
         th {
-          background-color: #f1f3f5;
+          background-color: #d1daec;
           color: #333;
           text-align: center;
           font-weight: 600;
+          border-right: 1px solid #bfc0c2;
         }
 
-        td {
+        /* === Hàng chẵn/lẻ khác màu - Ưu tiên cao hơn Bootstrap === */
+        tbody tr:nth-child(odd) td {
+          background-color: #f9fafb !important;
+        }
+        tbody tr:nth-child(even) td {
+          background-color: #dfdede !important;
+        }
+        tbody tr:hover td {
+          background-color: #e0e7ff !important;
+          transition: background-color 0.25s ease;
+        }
+
+        tbody tr td {
           text-align: center;
           vertical-align: middle;
+          border-right: 1px solid #bfc0c2;
         }
 
         button {

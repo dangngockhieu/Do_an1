@@ -1,5 +1,6 @@
 import { USER_LOGIN_SUCCESS,
-        USER_LOGOUT_SUCCESS
+        USER_LOGOUT_SUCCESS,
+        USER_REFRESH_TOKEN
         } from "../action/userAction";
 
 const INITIAL_STATE = {
@@ -25,6 +26,14 @@ const userReducer = (state = INITIAL_STATE, action) => {
                     email: action?.payload?.DT?.user?.email
                 },
                 isAuthenticated: true
+            };
+        case USER_REFRESH_TOKEN:
+            return {
+                ...state,
+                account: {
+                    ...state.account,
+                    access_token: action.payload,
+                },
             };
         case USER_LOGOUT_SUCCESS:
             return {

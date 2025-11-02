@@ -21,7 +21,7 @@ const authRoutes = (app) => {
   router.post('/resend', resendVerificationEmail);
   // Send Reset Password Email
   router.post('/send-reset-password', sendResetPassword);
-  // Reset Password - accept PATCH (preferred) and POST for frontend compatibility
+  // Reset Password 
   router.patch('/reset-password', resetPassword);
 
   app.use('/auth', router);

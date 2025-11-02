@@ -19,18 +19,8 @@ CREATE TABLE `users` (
 CREATE TABLE `carts` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userID` INTEGER NOT NULL,
-    `total_price` INTEGER NOT NULL,
-
-    UNIQUE INDEX `carts_userID_key`(`userID`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `cart_items` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `cartID` INTEGER NOT NULL,
     `productID` INTEGER NOT NULL,
-    `quantity` INTEGER NOT NULL,
+    `number` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -43,7 +33,7 @@ CREATE TABLE `orders` (
     `recipientName` VARCHAR(100) NOT NULL,
     `address` VARCHAR(255) NOT NULL,
     `phone` VARCHAR(20) NOT NULL,
-    `status` ENUM('PENDING', 'PROCESSING', 'DELIVERED', 'CANCELED') NOT NULL,
+    `status` VARCHAR(20) NOT NULL,
     `orderDate` DATETIME(3) NOT NULL,
     `trackingCode` VARCHAR(100) NOT NULL,
     `deliveryDate` DATETIME(3) NULL,
@@ -96,7 +86,6 @@ CREATE TABLE `products` (
     `price` INTEGER NULL,
     `coupon` INTEGER NULL,
     `detailDesc` VARCHAR(255) NOT NULL,
-    `shortDesc` VARCHAR(255) NOT NULL,
     `quantity` INTEGER NOT NULL,
     `sold` INTEGER NOT NULL DEFAULT 0,
     `warranty` VARCHAR(100) NOT NULL,
@@ -106,12 +95,11 @@ CREATE TABLE `products` (
     `storage` VARCHAR(100) NOT NULL,
     `screen` VARCHAR(100) NOT NULL,
     `graphicsCard` VARCHAR(100) NOT NULL,
-    `os` VARCHAR(100) NOT NULL,
     `battery` VARCHAR(100) NOT NULL,
     `weight` VARCHAR(100) NOT NULL,
     `releaseYear` VARCHAR(100) NOT NULL,
-    `categoryID` INTEGER NOT NULL,
-    `factoryID` INTEGER NOT NULL,
+    `category` VARCHAR(100) NOT NULL,
+    `factory` VARCHAR(100) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -125,30 +113,11 @@ CREATE TABLE `ProductImage` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
-CREATE TABLE `categories` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` ENUM('LAPTOP', 'PHONE') NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `factories` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` ENUM('DELL', 'ACER', 'MSI', 'LENOVO', 'HP', 'ASUS', 'GIGABYTE', 'MACBOOK', 'IPHONE', 'SAMSUNG', 'XIAOMI', 'OPPO', 'REALME', 'VIVO') NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 -- AddForeignKey
 ALTER TABLE `carts` ADD CONSTRAINT `carts_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `cart_items` ADD CONSTRAINT `cart_items_cartID_fkey` FOREIGN KEY (`cartID`) REFERENCES `carts`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `cart_items` ADD CONSTRAINT `cart_items_productID_fkey` FOREIGN KEY (`productID`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `carts` ADD CONSTRAINT `carts_productID_fkey` FOREIGN KEY (`productID`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `orders` ADD CONSTRAINT `orders_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -167,12 +136,6 @@ ALTER TABLE `reviews` ADD CONSTRAINT `reviews_userID_fkey` FOREIGN KEY (`userID`
 
 -- AddForeignKey
 ALTER TABLE `reviews` ADD CONSTRAINT `reviews_productID_fkey` FOREIGN KEY (`productID`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `products` ADD CONSTRAINT `products_categoryID_fkey` FOREIGN KEY (`categoryID`) REFERENCES `categories`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `products` ADD CONSTRAINT `products_factoryID_fkey` FOREIGN KEY (`factoryID`) REFERENCES `factories`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ProductImage` ADD CONSTRAINT `ProductImage_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -32,7 +32,7 @@ const AdminHeader = ({ onToggleCollapse, onToggleMobile }) => {
       <div className="admin-header__left">
         {!isMobile && (
           <button className="btn-toggle" onClick={onToggleCollapse} aria-label="Toggle sidebar">
-            <BsJustify size={20} style={{ justifyContent: 'center', alignItems: 'center' }} />
+            <BsJustify style={{ justifyContent: 'center', alignItems: 'center', fontSize: '1.5rem' }} />
           </button>
         )}
 

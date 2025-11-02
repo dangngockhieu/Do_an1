@@ -1,10 +1,11 @@
 import axios from '../utils/axiosCustomize';
-//admin
 
+// ==================== USER API (Admin) ====================
 export const getAllUsersforAdmin = () => {
   const URL_BACKEND = 'user/get-all-users';
   return axios.get(URL_BACKEND);
-}
+};
+
 export const getUserWithPaginate = (page, limit, search = "") => {
   const URL_BACKEND = `user/get-users-paginate?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`;
   return axios.get(URL_BACKEND);
@@ -18,7 +19,7 @@ export const findUserPage = (search = "", limit = 10) => {
 export const createUserforAdmin = (email, name, password, role) => {
   const URL_BACKEND = 'user/create-user';
   const data = { email, name, password, role };
-  return axios.post(URL_BACKEND, data );
+  return axios.post(URL_BACKEND, data);
 };
 
 export const changeRoleUserforAdmin = (id, role) => {
@@ -30,11 +31,12 @@ export const deleteUserforAdmin = (id) => {
   const URL_BACKEND = `user/delete-user/${id}`;
   return axios.delete(URL_BACKEND);
 };
-// for all users
+
+// ==================== AUTH API ====================
 export const register = (email, name, password) => {
   const URL_BACKEND = 'auth/register';
   const data = { email, name, password };
-  return axios.post(URL_BACKEND, data );
+  return axios.post(URL_BACKEND, data);
 };
 
 export const login = (email, password) => {
@@ -43,27 +45,80 @@ export const login = (email, password) => {
   return axios.post(URL_BACKEND, data, { withCredentials: true });
 };
 
-export const logout = () =>{
+export const logout = () => {
   const URL_BACKEND = 'auth/logout';
   return axios.post(URL_BACKEND, {}, { withCredentials: true });
-}
-
+};
 
 export const sendResetPassword = (email) => {
   const URL_BACKEND = 'auth/send-reset-password';
   const data = { email };
-  return axios.post(URL_BACKEND, data );
-}
+  return axios.post(URL_BACKEND, data);
+};
 
 export const resetPassword = (email, code, newPassword) => {
   const URL_BACKEND = 'auth/reset-password';
   const data = { email, code, newPassword };
   return axios.post(URL_BACKEND, data);
-}
+};
 
 export const changePassword = (oldPassword, newPassword) => {
   const URL_BACKEND = 'user/change-password';
   const data = { oldPassword, newPassword };
   return axios.patch(URL_BACKEND, data);
-}
+};
 
+// ==================== PRODUCT API (Admin) ====================
+// Lấy danh sách sản phẩm có phân trang + tìm kiếm
+export const getProductsWithPaginate = (page, limit, search = "", category) => {
+  const URL_BACKEND = `product/get-products-paginate?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}`;
+  return axios.get(URL_BACKEND);
+};
+
+// Lấy chi tiết sản phẩm theo ID
+export const getProductById = (id) => {
+  const URL_BACKEND = `product/get-product/${id}`;
+  return axios.get(URL_BACKEND);
+};
+
+// Tạo mới sản phẩm (có ảnh)
+export const createProduct = (formData) => {
+  const URL_BACKEND = `product/create-product`;
+  return axios.post(URL_BACKEND, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+// Cập nhật thông tin sản phẩm (không bao gồm ảnh)
+export const updateProduct = (id, data) => {
+  const URL_BACKEND = `product/update-product/${id}`;
+  return axios.patch(URL_BACKEND, data);
+};
+
+// Thêm nhiều ảnh cho sản phẩm
+export const addProductImages = (id, formData) => {
+  const URL_BACKEND = `product/add-product-images/${id}`;
+  return axios.post(URL_BACKEND, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+// Cập nhật 1 ảnh
+export const updateProductImage = (imageId, formData) => {
+  const URL_BACKEND = `product/update-product-image/${imageId}`;
+  return axios.patch(URL_BACKEND, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+// Xóa 1 ảnh
+export const deleteProductImage = (imageId) => {
+  const URL_BACKEND = `product/delete-product-image/${imageId}`;
+  return axios.delete(URL_BACKEND);
+};
+
+// Xóa sản phẩm
+export const deleteProduct = (id) => {
+  const URL_BACKEND = `product/delete-product/${id}`;
+  return axios.delete(URL_BACKEND);
+};

@@ -8,35 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum OrderStatus {
-  PENDING
-  PROCESSING
-  DELIVERED
-  CANCELED
-}
-
-enum CategoryType {
-  LAPTOP
-  PHONE
-}
-
-enum FactoryType {
-  DELL
-  ACER
-  MSI
-  LENOVO
-  HP
-  ASUS
-  GIGABYTE
-  MACBOOK
-  IPHONE
-  SAMSUNG
-  XIAOMI
-  OPPO
-  REALME
-  VIVO
-}
-
 model User {
   id                Int       @id @default(autoincrement())
   name              String    @db.VarChar(100)
@@ -48,46 +19,35 @@ model User {
   sent_at           DateTime?
   verification_code String?   @db.VarChar(255)
   code_expired      DateTime?
-
-  cart    Cart?    @relation("UserCart")
-  orders  Order[]
-  reviews Review[]
+  cart              Cart[]
+  orders            Order[]
+  reviews           Review[]
 
   @@map("users")
 }
 
 model Cart {
-  id          Int        @id @default(autoincrement())
-  userID      Int        @unique
-  total_price Int
-  user        User       @relation("UserCart", fields: [userID], references: [id])
-  cartItems   CartItem[]
+  id        Int @id @default(autoincrement())
+  userID    Int
+  productID Int
+  number    Int
+
+  user    User    @relation(fields: [userID], references: [id])
+  product Product @relation(fields: [productID], references: [id])
 
   @@map("carts")
 }
 
-model CartItem {
-  id        Int @id @default(autoincrement())
-  cartID    Int
-  productID Int
-  quantity  Int
-
-  cart    Cart    @relation(fields: [cartID], references: [id])
-  product Product @relation(fields: [productID], references: [id])
-
-  @@map("cart_items")
-}
-
 model Order {
-  id            Int         @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   userID        Int
   totalPrice    Int
-  recipientName String      @db.VarChar(100)
-  address       String      @db.VarChar(255)
-  phone         String      @db.VarChar(20)
-  status        OrderStatus
+  recipientName String    @db.VarChar(100)
+  address       String    @db.VarChar(255)
+  phone         String    @db.VarChar(20)
+  status        String    @db.VarChar(20)
   orderDate     DateTime
-  trackingCode  String      @db.VarChar(100)
+  trackingCode  String    @db.VarChar(100)
   deliveryDate  DateTime?
   receivedDate  DateTime?
 
@@ -146,8 +106,6 @@ model Product {
   price         Int?
   coupon        Int?
   images        ProductImage[]
-  detailDesc    String         @db.VarChar(255)
-  shortDesc     String         @db.VarChar(255)
   quantity      Int
   sold          Int            @default(0)
   warranty      String         @db.VarChar(100)
@@ -157,16 +115,13 @@ model Product {
   storage       String         @db.VarChar(100)
   screen        String         @db.VarChar(100)
   graphicsCard  String         @db.VarChar(100)
-  os            String         @db.VarChar(100)
   battery       String         @db.VarChar(100)
   weight        String         @db.VarChar(100)
   releaseYear   String         @db.VarChar(100)
-  categoryID    Int
-  factoryID     Int
+  category      String         @db.VarChar(20)
+  factory       String         @db.VarChar(20)
 
-  category   Category    @relation(fields: [categoryID], references: [id])
-  factory    Factory     @relation(fields: [factoryID], references: [id])
-  cartItems  CartItem[]
+  carts      Cart[]
   orderItems OrderItem[]
   reviews    Review[]
 
@@ -178,20 +133,4 @@ model ProductImage {
   url       String
   product   Product @relation(fields: [productId], references: [id])
   productId Int
-}
-
-model Category {
-  id       Int          @id @default(autoincrement())
-  name     CategoryType
-  products Product[]
-
-  @@map("categories")
-}
-
-model Factory {
-  id       Int         @id @default(autoincrement())
-  name     FactoryType
-  products Product[]
-
-  @@map("factories")
 }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FcPlus } from 'react-icons/fc';
-import { FaSearch } from "react-icons/fa";
+import { FaPlus, FaSearch } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io"; 
 import { toast } from 'react-toastify';
 import TableUserPaginate from "./TableUserPaginate";
@@ -84,8 +83,9 @@ const ManagerUser = () => {
       if (res && res.EC === 0) {
         const page = res.DT?.page || 1;
         if (page && page > 0) {
-          setCurrentPage(page);
           await fetchAndNotify(page, keyword);
+          setCurrentPage(page);
+          setPageCount(page)
         } else {
           setListUsers([]);
           setPageCount(0);
@@ -133,7 +133,13 @@ const ManagerUser = () => {
         <div className="title">Quản lý người dùng</div>
         <div className="actions">
           <div className="search-box">
-            
+            <input
+              type="text"
+              placeholder="Nhập email để tìm kiếm ..."
+              value={searchTerm}
+              onChange={handleChangeSearch}
+              onKeyDown={onKeyDown}
+            />
             {search ? (
               // HIỂN THỊ NÚT X (CLEAR) KHI CÓ SEARCHTERM
               <button className="search-clear-btn" onClick={handleClearSearch} aria-label="clear search">
@@ -145,21 +151,13 @@ const ManagerUser = () => {
                 <FaSearch className="search-icon" style={{color: '#636262ff'}} />
               </button>
             )}
-
-            <input
-              type="text"
-              placeholder="Nhập email để tìm kiếm ..."
-              value={searchTerm}
-              onChange={handleChangeSearch}
-              onKeyDown={onKeyDown}
-            />
           </div>
           <button
             className="btn-create"
             onClick={() => setShowModelCreateUser(true)}
             disabled={showModelCreateUser}
           >
-            <FcPlus style={{ fontSize: '1.2rem' }} /> Tạo mới User
+            <FaPlus />  Tạo mới User
           </button>
         </div>
       </div>
@@ -176,6 +174,7 @@ const ManagerUser = () => {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             resetSearchTerm={resetSearchTerm}
+            limit={LIMIT}
           />
         </div>
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import NProgress from 'nprogress';
 import { store } from '../redux/store';
-import { doLogin, doLogout } from '../redux/action/userAction';
+import { updateAccessToken, doLogout } from '../redux/action/userAction';
 import { toast } from 'react-toastify';
 
 // ================== CẤU HÌNH NProgress ==================
@@ -13,7 +13,7 @@ NProgress.configure({
 
 // ================== KHỞI TẠO INSTANCE ==================
 const instance = axios.create({
-  baseURL: 'http://localhost:8080/'
+  baseURL: import.meta.env.VITE_BACKEND_URL
 });
 
 // ================== QUẢN LÝ REFRESH TOKEN ==================
@@ -77,7 +77,7 @@ instance.interceptors.response.use(
         return new Promise((resolve) => {
           addRefreshSubscriber((newAccessToken) => {
             originalRequest.headers['Authorization'] =
-              'Bearer ' + newAccessToken;
+              `Bearer ${newAccessToken}`;
             resolve(instance(originalRequest));
           });
         });
@@ -88,18 +88,13 @@ instance.interceptors.response.use(
 
       try {
         // Gọi API refresh token (refresh_token nằm trong cookie)
-        const res = await instance.post('auth/refresh-token', {}, { withCredentials: true });
-        if (res?.EC === 0 && res?.DT) {
-          const { access_token: newAccess, user } = res.DT;
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/refresh-token`,
+          {}, { withCredentials: true }
+        );
+        if (res?.data?.EC === 0 && res?.data?.DT?.access_token) {
+          const newAccess = res.data.DT.access_token;
 
-          store.dispatch(
-            doLogin({
-              DT: {
-                access_token: newAccess,
-                user,
-              },
-            })
-          );
+          store.dispatch(updateAccessToken(newAccess));
 
           onRefreshed(newAccess);
           console.log('Refresh token thành công.');
@@ -113,7 +108,6 @@ instance.interceptors.response.use(
         console.error('Làm mới token thất bại:', err);
         toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!');
         store.dispatch(doLogout());
-        window.location.href = '/login';
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

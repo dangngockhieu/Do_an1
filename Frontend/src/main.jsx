@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './redux/store';
-
 import Login from './pages/login.jsx';
 import Register from './pages/register.jsx';
 import ResetPassword from "./pages/resetPassword.jsx";
@@ -18,6 +17,7 @@ import LandingPage from './components/user/LandingPage.jsx';
 import Product from './components/user/Product.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
 import ManagerUser from './components/admin/ManageUser/ManagerUser.jsx';
+import ManageProduct from './components/admin/ManageProduct/ManageProduct.jsx';
 
 const router = createBrowserRouter([
   {
@@ -38,10 +38,9 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <AdminDashboard /> },
-      { path: 'products', element: <div>All Products</div> },
+      { path: 'products', element: <ManageProduct /> },
       { path: 'orders', element: <div>All Orders</div> },
       { path: 'users', element: <ManagerUser /> },
-      { path: 'settings', element: <div>All Settings</div> },
     ],
   },
   { path: '/login', element: <Login /> },

@@ -19,7 +19,7 @@ const TableUserPaginate = (props) => {
 
   return (
     <>
-      <table className="table table-hover table-bordered">
+      <table className="table table-hover table-bordered user-table">
         <thead>
           <tr>
             <th scope="col">Id</th>
@@ -33,7 +33,7 @@ const TableUserPaginate = (props) => {
           {listUsers && listUsers.length > 0 ? (
             listUsers.map((item, index) => (
               <tr key={index}>
-                <td>{item.id}</td>
+                <td>{(props.currentPage - 1) * props.limit + index + 1}</td>
                 <td>{item.name}</td>
                 <td>{item.email}</td>
                 <td>{item.role}</td>

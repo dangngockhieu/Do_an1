@@ -1,6 +1,5 @@
 'use strict';
 import { PrismaClient } from '@prisma/client';
-
 // Singleton pattern cho Prisma Client để tránh tạo nhiều instances
 let prisma;
 

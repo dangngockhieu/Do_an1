@@ -1,0 +1,111 @@
+import { useState, useEffect } from "react";
+import "./ProductDetailEdit.scss";
+
+const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
+
+const ProductDetail = ({ show, setShow, product }) => {
+  const [zoomImg, setZoomImg] = useState(null);
+  const [form, setForm] = useState({});
+
+  useEffect(() => {
+    if (product) {
+      setForm({
+        name: product.name || "",
+        originalPrice: product.originalPrice || "",
+        coupon: product.coupon || "",
+        quantity: product.quantity || "",
+        infor: product.infor || "",
+        warranty: product.warranty || "",
+        cpu: product.cpu || "",
+        ram: product.ram || "",
+        storage: product.storage || "",
+        screen: product.screen || "",
+        graphicsCard: product.graphicsCard || "",
+        battery: product.battery || "",
+        weight: product.weight || "",
+        releaseYear: product.releaseYear || "",
+        category: product.category || "",
+        factory: product.factory || "",
+      });
+    }
+  }, [product]);
+
+  if (!show || !product) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-box">
+        <h4>Chi tiết sản phẩm</h4>
+
+        {/* ========== ẢNH SẢN PHẨM ========== */}
+        <div className="image-gallery">
+          {product?.images?.length ? (
+            product.images.map((img) => (
+              <div key={img.id} className="gallery-item">
+                <img
+                  src={`${BASE_URL}${img.url}`}
+                  alt={`img-${img.id}`}
+                  onClick={() => setZoomImg(`${BASE_URL}${img.url}`)}
+                />
+              </div>
+            ))
+          ) : (
+            <p>Không có ảnh</p>
+          )}
+        </div>
+
+        {/* ========== THÔNG TIN SẢN PHẨM ========== */}
+        <div className="detail-info">
+          <h5>Thông tin chung</h5>
+          <div className="detail-grid">
+            <p><strong>Tên:</strong> {form.name}</p>
+            <p><strong>Giá:</strong> {form.originalPrice?.toLocaleString()}₫</p>
+            <p><strong>Giảm giá:</strong> {form.coupon}%</p>
+            <p><strong>Số lượng:</strong> {form.quantity}</p>
+            <p><strong>Bảo hành:</strong> {form.warranty}</p>
+            <p><strong>Năm phát hành:</strong> {form.releaseYear}</p>
+            <p><strong>Danh mục:</strong> {form.category}</p>
+            <p><strong>Hãng:</strong> {form.factory}</p>
+          </div>
+
+          <h5>Thông số kỹ thuật</h5>
+          <div className="detail-grid">
+            <p><strong>CPU:</strong> {form.cpu}</p>
+            <p><strong>RAM:</strong> {form.ram}</p>
+            <p><strong>Lưu trữ:</strong> {form.storage}</p>
+            <p><strong>Màn hình:</strong> {form.screen}</p>
+            <p><strong>Card đồ họa:</strong> {form.graphicsCard}</p>
+            <p><strong>Pin:</strong> {form.battery}</p>
+            <p><strong>Trọng lượng:</strong> {form.weight}</p>
+          </div>
+
+          {form.infor && (
+            <>
+              <h5>Thông tin thêm</h5>
+              <div className="detail-extra">{form.infor}</div>
+            </>
+          )}
+        </div>
+
+        <div className="modal-actions">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setShow(false)}
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+
+      {/* Overlay zoom ảnh */}
+      {zoomImg && (
+        <div className="zoom-overlay" onClick={() => setZoomImg(null)}>
+          <img src={zoomImg} alt="zoomed" className="zoomed-img" />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProductDetail;

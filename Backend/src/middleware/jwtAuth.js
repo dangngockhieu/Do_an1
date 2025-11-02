@@ -22,6 +22,6 @@ export const jwtAuth = (req, res, next) => {
       return res.status(401).json({ EM: 'Access token expired', EC: -1 });
     }
     console.error('JWT Auth Error:', err.message);
-    return res.status(403).json({ EM: 'Invalid token', EC: -1 });
+    return res.status(401).json({ EM: 'Invalid token', EC: -1 });
   }
 };
