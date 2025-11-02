@@ -25,10 +25,10 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
     factory: "",
   });
 
-  const [images, setImages] = useState([]); // File objects
+  const [images, setImages] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [errors, setErrors] = useState({});
-  const fileInputRef = useRef(null); // 👈 để thao tác với input file
+  const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,8 +47,6 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
   const removePreview = (index) => {
     const newFiles = [...images];
     const newPreview = [...previewUrls];
-
-    // Hủy URL preview
     URL.revokeObjectURL(newPreview[index]);
     newFiles.splice(index, 1);
     newPreview.splice(index, 1);
@@ -56,14 +54,12 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
     setImages(newFiles);
     setPreviewUrls(newPreview);
 
-    //  Cập nhật lại input file theo danh sách còn lại
     if (fileInputRef.current) {
       const dataTransfer = new DataTransfer();
       newFiles.forEach((file) => dataTransfer.items.add(file));
       fileInputRef.current.files = dataTransfer.files;
     }
 
-    //  Nếu không còn ảnh nào, reset hoàn toàn
     if (newFiles.length === 0 && fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -107,8 +103,6 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
       if (res && res.EC === 0) {
         toast.success("Thêm sản phẩm thành công!");
         onRefresh();
-
-        // cleanup previews
         previewUrls.forEach((u) => URL.revokeObjectURL(u));
         setForm({
           name: "",
@@ -130,10 +124,7 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
         });
         setImages([]);
         setPreviewUrls([]);
-
-        //  reset input file
         if (fileInputRef.current) fileInputRef.current.value = "";
-
         setShow(false);
       } else toast.error(res?.EM || "Thêm thất bại");
     } catch (err) {
@@ -148,13 +139,12 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
     <div className="modal-overlay">
       <div className="modal-box">
         <h4>Thêm sản phẩm mới</h4>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="form-add-product">
           {Object.entries({
             name: "Tên sản phẩm",
             originalPrice: "Giá gốc",
             coupon: "Giảm giá (%)",
             quantity: "Số lượng",
-            infor: "Thông tin",
             warranty: "Bảo hành",
             cpu: "CPU",
             ram: "RAM",
@@ -165,60 +155,86 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
             weight: "Trọng lượng",
             releaseYear: "Năm phát hành",
           }).map(([key, label]) =>
-            key === "infor" ? (
-              <textarea
-                key={key}
-                name={key}
-                placeholder={label}
-                value={form[key]}
-                onChange={handleChange}
-                className={errors[key] ? "error" : ""}
-                rows={4}
-              />
-            ) : (
-              <input
-                key={key}
-                name={key}
-                placeholder={label}
-                value={form[key]}
-                onChange={handleChange}
-                className={errors[key] ? "error" : ""}
-              />
+            key === "infor" ? null : (
+              <div className="form-group" key={key}>
+                <label htmlFor={key}>{label}</label>
+                <input
+                  id={key}
+                  name={key}
+                  value={form[key]}
+                  onChange={handleChange}
+                  placeholder={label}
+                  className={errors[key] ? "error" : ""}
+                />
+              </div>
             )
           )}
 
-          <div className="select-row">
-            <select name="category" value={form.category} onChange={handleChange}>
-              <option value="" disabled>
-                -- Chọn danh mục --
-              </option>
-              <option value="LAPTOP">Laptop</option>
-              <option value="PHONE">Điện thoại</option>
-            </select>
-
-            <select name="factory" value={form.factory} onChange={handleChange}>
-              <option value="" disabled>
-                -- Chọn nhà sản xuất --
-              </option>
-              <option value="DELL">DELL</option>
-              <option value="ACER">ACER</option>
-              <option value="MSI">MSI</option>
-              <option value="LENOVO">LENOVO</option>
-              <option value="HP">HP</option>
-              <option value="ASUS">ASUS</option>
-              <option value="MACBOOK">MACBOOK</option>
-              <option value="IPHONE">IPHONE</option>
-              <option value="SAMSUNG">SAMSUNG</option>
-            </select>
+          <div className="form-group">
+            <label htmlFor="infor">Thông tin thêm</label>
+            <textarea
+              id="infor"
+              name="infor"
+              value={form.infor}
+              onChange={handleChange}
+              placeholder="Thông tin sản phẩm..."
+              className={errors.infor ? "error" : ""}
+              rows={4}
+            />
           </div>
 
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-          />
+          <div className="select-row">
+            <div className="form-group">
+              <label htmlFor="category">Danh mục</label>
+              <select
+                id="category"
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+              >
+                <option value="" disabled>
+                  -- Chọn danh mục --
+                </option>
+                <option value="LAPTOP">Laptop</option>
+                <option value="PHONE">Điện thoại</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="factory">Nhà sản xuất</label>
+              <select
+                id="factory"
+                name="factory"
+                value={form.factory}
+                onChange={handleChange}
+              >
+                <option value="" disabled>
+                  -- Chọn nhà sản xuất --
+                </option>
+                <option value="DELL">DELL</option>
+                <option value="ACER">ACER</option>
+                <option value="MSI">MSI</option>
+                <option value="LENOVO">LENOVO</option>
+                <option value="HP">HP</option>
+                <option value="ASUS">ASUS</option>
+                <option value="MACBOOK">MACBOOK</option>
+                <option value="IPHONE">IPHONE</option>
+                <option value="SAMSUNG">SAMSUNG</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="images">Ảnh sản phẩm</label>
+            <input
+              id="images"
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+            />
+          </div>
 
           {previewUrls.length > 0 && (
             <div className="preview-row">
@@ -233,11 +249,15 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
             </div>
           )}
 
-          <div className="modal-actions">
-            <button type="button" onClick={() => setShow(false)}>
+          <div className="modal-actions bottom">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShow(false)}
+            >
               Hủy
             </button>
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn btn-primary">
               Lưu
             </button>
           </div>

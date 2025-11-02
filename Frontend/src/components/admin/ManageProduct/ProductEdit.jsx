@@ -5,35 +5,17 @@ import {
   deleteProductImage,
 } from "../../../services/apiServices";
 import { toast } from "react-toastify";
-import "./ProductDetailEdit.scss";
+import "./ProductEdit.scss";
 
 const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
 
 const ProductEdit = ({ show, setShow, product, onRefresh }) => {
-  const [form, setForm] = useState({
-    name: product?.name || "",
-    originalPrice: product?.originalPrice || "",
-    coupon: product?.coupon || "",
-    quantity: product?.quantity || "",
-    infor: product?.infor || "",
-    warranty: product?.warranty || "",
-    cpu: product?.cpu || "",
-    ram: product?.ram || "",
-    storage: product?.storage || "",
-    screen: product?.screen || "",
-    graphicsCard: product?.graphicsCard || "",
-    battery: product?.battery || "",
-    weight: product?.weight || "",
-    releaseYear: product?.releaseYear || "",
-    category: product?.category || "",
-    factory: product?.factory || "",
-  });
-
-  const [existingImages, setExistingImages] = useState(product?.images || []);
+  const [form, setForm] = useState({});
+  const [existingImages, setExistingImages] = useState([]);
   const [newFiles, setNewFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [zoomImg, setZoomImg] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null); // 👈 popup xác nhận
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
     setForm({
@@ -82,9 +64,7 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
     setPreviewUrls(npre);
   };
 
-  const handleDeleteExistingImage = (imageId) => {
-    setConfirmDelete(imageId); 
-  };
+  const handleDeleteExistingImage = (imageId) => setConfirmDelete(imageId);
 
   const confirmDeleteImage = async () => {
     if (!confirmDelete) return;
@@ -92,14 +72,9 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
       const res = await deleteProductImage(confirmDelete);
       if (res && res.EC === 0) {
         toast.success("Đã xóa ảnh");
-        setExistingImages((prev) =>
-          prev.filter((i) => i.id !== confirmDelete)
-        );
-      } else {
-        toast.error(res?.EM || "Xóa ảnh thất bại");
-      }
-    } catch (err) {
-      console.error(err);
+        setExistingImages((prev) => prev.filter((i) => i.id !== confirmDelete));
+      } else toast.error(res?.EM || "Xóa ảnh thất bại");
+    } catch {
       toast.error("Lỗi khi xóa ảnh");
     } finally {
       setConfirmDelete(null);
@@ -128,8 +103,7 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
       toast.success("Cập nhật sản phẩm thành công!");
       onRefresh();
       setShow(false);
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Lỗi khi cập nhật sản phẩm");
     }
   };
@@ -141,58 +115,8 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
       <div className="modal-box">
         <h4>Cập nhật sản phẩm</h4>
 
-        <div className="image-edit-row">
-          <div className="existing-images">
-            <h5>Ảnh hiện có</h5>
-            {existingImages?.length ? (
-              existingImages.map((img) => (
-                <div key={img.id} className="existing-item">
-                  <img
-                    src={`${BASE_URL}${img.url}`}
-                    alt={`img-${img.id}`}
-                    onClick={() => setZoomImg(`${BASE_URL}${img.url}`)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteExistingImage(img.id)}
-                  >
-                    X
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p>Không có ảnh</p>
-            )}
-          </div>
-
-          <div className="add-new-images">
-            <h5>Thêm ảnh mới</h5>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-            {previewUrls.length > 0 && (
-              <div className="preview-row">
-                {previewUrls.map((p, i) => (
-                  <div className="preview-item" key={i}>
-                    <img
-                      src={p}
-                      alt={`preview-${i}`}
-                      onClick={() => setZoomImg(p)}
-                    />
-                    <button type="button" onClick={() => removeNewPreview(i)}>
-                      X
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="form-edit-product">
+        {/* FORM CHÍNH */}
+        <form className="form-edit-product">
           {[
             { name: "name", label: "Tên sản phẩm" },
             { name: "originalPrice", label: "Giá ban đầu" },
@@ -271,30 +195,79 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
               </select>
             </div>
           </div>
-
-          <div className="modal-actions">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setShow(false)}
-            >
-              Hủy
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Lưu thay đổi
-            </button>
-          </div>
         </form>
+
+        {/* PHẦN ẢNH */}
+        <div className="edit-images">
+          <div className="existing-images">
+            <h5>Ảnh hiện có</h5>
+            <div className="image-row">
+              {existingImages?.length ? (
+                existingImages.map((img) => (
+                  <div key={img.id} className="image-item">
+                    <img
+                      src={`${BASE_URL}${img.url}`}
+                      alt={`img-${img.id}`}
+                      onClick={() => setZoomImg(`${BASE_URL}${img.url}`)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteExistingImage(img.id)}
+                    >
+                      X
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p>Không có ảnh</p>
+              )}
+            </div>
+          </div>
+
+          <div className="add-new-images">
+            <h5>Thêm ảnh mới</h5>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            {previewUrls.length > 0 && (
+              <div className="image-row">
+                {previewUrls.map((p, i) => (
+                  <div className="image-item" key={i}>
+                    <img src={p} alt={`preview-${i}`} />
+                    <button type="button" onClick={() => removeNewPreview(i)}>
+                      X
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* NÚT DƯỚI CÙNG */}
+        <div className="modal-actions bottom">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setShow(false)}
+          >
+            Hủy
+          </button>
+          <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
+            Lưu thay đổi
+          </button>
+        </div>
       </div>
 
-      {/* Overlay zoom ảnh */}
       {zoomImg && (
         <div className="zoom-overlay" onClick={() => setZoomImg(null)}>
           <img src={zoomImg} alt="zoomed" className="zoomed-img" />
         </div>
       )}
 
-      {/* Popup xác nhận xóa ảnh */}
       {confirmDelete && (
         <div className="confirm-overlay">
           <div className="confirm-box">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./ProductDetailEdit.scss";
+import "./ProductDetail.scss";
 
 const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
 
