@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "nodemon src/app.js",
-    "start:debug": "node --inspect=9229 src/app.js"
+    "start:debug": "node --inspect=9229 src/app.js",
+    "push": "npx prisma db push",
+    "seed": "npx prisma db seed",
+    "reset": "npx prisma migrate reset --force --skip-generate --skip-seed && npm run push && npm run seed"
   },
   "nodemonConfig": {
     "watch": [
@@ -51,5 +54,8 @@
   "devDependencies": {
     "nodemon": "3.1.9",
     "prisma": "6.18.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

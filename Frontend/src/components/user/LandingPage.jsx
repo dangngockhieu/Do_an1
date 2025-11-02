@@ -1,111 +1,130 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import banner1 from "../../assets/banner_header1.jpg";
 import banner2 from "../../assets/banner_header2.jpg";
 import banner3 from "../../assets/banner_header3.jpg";
 import banner4 from "../../assets/banner_header4.png";
-import { useState, useEffect } from "react";
-import {Link} from "react-router-dom";
-import './LandingPage.scss';
+import { getTopSellingLaptop, getTopSellingPhone } from "../../services/apiServices";
+import "./LandingPage.scss";
+
+const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
+
 const LandingPage = () => {
-    // ========== Xử lý banner tự động đổi ==========
-      const banners = [banner1, banner2, banner3, banner4];
-      const [currentBanner, setCurrentBanner] = useState(0);
-      useEffect(() => {
-        const interval = setInterval(() => {
-          setCurrentBanner((prev) => (prev + 1) % banners.length);
-        }, 20000); 
-    
-        return () => clearInterval(interval);
-      }, []);
-    return (
-        <div className="container">
-            <section className="header__hero">
-                <div className="header__hero-content">
-                    <h4>100% Sản Phẩm Chính Hãng</h4>
-                    <h1>
-                        Trải nghiệm khác biệt <br />
-                        <span>Deal hot mỗi ngày</span>
-                    </h1>
-                    <button className="hero-btn">Mua ngay</button>
-                </div>
-                <div className="header__hero-image">
-                    <img src={banners[currentBanner]} alt="Laptop Gaming" />
-                </div>
-            </section>
-            <section className="bestseller">
-  <div className="bestseller__header">
-    <h2>Bán chạy</h2>
-    <p>Sản phẩm bán chạy của chúng tôi</p>
-    <Link to="#">Xem tất cả</Link>
-  </div>
+  const navigate = useNavigate();
+  const banners = [banner1, banner2, banner3, banner4];
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [topLaptops, setTopLaptops] = useState([]);
+  const [topPhones, setTopPhones] = useState([]);
 
-  <div className="bestseller__list">
-    {[
-      {
-        id: 1,
-        img: "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_-_2023-06-08t005130.908.png",
-        title: "Laptop ASUS VivoBook Go 14 E1404FA-NK177W",
-        rating: 4.8,
-        price: "11.890.000đ",
-        oldPrice: "14.490.000đ",
-        discount: "18%",
-      },
-      {
-        id: 2,
-        img: "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_7_108.png",
-        title: "Laptop Lenovo LOQ 15ARP9 83JC00M3VN",
-        rating: 4.33,
-        price: "22.490.000đ",
-        oldPrice: "24.490.000đ",
-        discount: "8%",
-      },
-      {
-        id: 3,
-        img: "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-17-pro-max_3.jpg",
-        title: "IPhone 17 Pro Max 256GB",
-        rating: 5,
-        price: "37.990.000đ",
-        oldPrice: "37.990.000đ",
-        discount: "0%",
-      },
-      {
-        id: 4,
-        img: "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_3__3.png",
-        title: "Samsung Galaxy S25 Ultra 512GB",
-        rating: 4.9,
-        price: "29.480.000đ",
-        oldPrice: "36.810.000đ",
-        discount: "20%",
-      },
-      {
-        id: 5,
-        img: "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/r/e/realme-13-plus-5g_6_.jpg",
-        title: "Realme 13+ 5G 8GB 256GB",
-        rating: 5,
-        price: "6.590.000đ",
-        oldPrice: "9.490.000đ",
-        discount: "31%",
-      },
-    ].map((item) => (
-      <div key={item.id} className="product-card">
-        <div className="discount">{item.discount}</div>
-        <img src={item.img} alt={item.title} />
-        <div className="info">
-          <div className="rating">
-            ⭐ {item.rating} <span>(3)</span>
-          </div>
-          <h3>{item.title}</h3>
-          <div className="price">
-            <span className="new">{item.price}</span>
-            {+item.oldPrice > 0 && <span className="old">{item.oldPrice}</span>}
-          </div>
-          <button>Thêm vào giỏ hàng</button>
-        </div>
-      </div>
-    ))}
-  </div>
-</section>
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % banners.length);
+    }, 15000);
 
+    const fetchTopSelling = async () => {
+      try {
+        const [laptopRes, phoneRes] = await Promise.all([
+          getTopSellingLaptop(),
+          getTopSellingPhone(),
+        ]);
+        if (laptopRes?.EC === 0) setTopLaptops(laptopRes.DT);
+        if (phoneRes?.EC === 0) setTopPhones(phoneRes.DT);
+      } catch (err) {
+        console.error("Lỗi khi tải sản phẩm bán chạy:", err);
+      }
+    };
+
+    fetchTopSelling();
+    return () => clearInterval(interval);
+  }, []);
+
+  // 👉 Hàm điều hướng đến trang chi tiết
+  const handleNavigate = (product) => {
+    navigate(`/product/${product.id}`, { state: { productId: product.id } });
+  };
+
+  const renderProducts = (list = []) =>
+    list.map((item) => {
+      const imgUrl = item.imageUrl?.startsWith("http")
+        ? item.imageUrl
+        : `${BASE_URL}${item.imageUrl}`;
+      const avgRating = Number(item.avgRating || 0).toFixed(2);
+      const totalReviews = item.totalReviews || 0;
+
+      const hasDiscount = item.coupon > 0;
+      const newPrice = item.price?.toLocaleString("vi-VN") + "đ";
+      const oldPrice = item.originalPrice?.toLocaleString("vi-VN") + "đ";
+
+      return (
+        <div key={item.id} className="product-card">
+          {hasDiscount && <div className="discount">-{item.coupon}%</div>}
+          <img
+            src={imgUrl}
+            alt={item.name}
+            onClick={() => handleNavigate(item)}
+            style={{ cursor: "pointer" }}
+          />
+          <div className="info">
+            <div className="rating">
+              ⭐ {avgRating} <span>({totalReviews})</span>
+            </div>
+            <h3>{item.name}</h3>
+            <div className={`price ${!hasDiscount ? "center" : ""}`}>
+              <span className="new">{newPrice}</span>
+              {hasDiscount && <span className="old">{oldPrice}</span>}
+            </div>
+
+            <div className="actions">
+              <button className="add-cart" onClick={() => handleNavigate(item)}>
+                Add To Cart
+              </button>
+              <button className="buy-now" onClick={() => handleNavigate(item)}>
+                Buy Now
+              </button>
+            </div>
+          </div>
         </div>
-    );
+      );
+    });
+
+  return (
+    <div className="container landing-page">
+      {/* ===== HERO BANNER ===== */}
+      <section className="header__hero">
+        <div className="header__hero-content">
+          <h4>100% Sản Phẩm Chính Hãng</h4>
+          <h1>
+            Trải nghiệm khác biệt <br />
+            <span>Deal hot mỗi ngày</span>
+          </h1>
+          <button className="hero-btn">Mua ngay</button>
+        </div>
+        <div className="header__hero-image">
+          <img src={banners[currentBanner]} alt="Banner" />
+        </div>
+      </section>
+
+      {/* ===== TOP LAPTOP ===== */}
+      <section className="bestseller">
+        <div className="bestseller__header">
+          <h2>🔥 Top Laptop Bán Chạy</h2>
+        </div>
+        <div className="bestseller__list">
+          {topLaptops.length ? renderProducts(topLaptops) : <p>Đang tải dữ liệu...</p>}
+        </div>
+      </section>
+
+      {/* ===== TOP PHONE ===== */}
+      <section className="bestseller">
+        <div className="bestseller__header">
+          <h2>📱 Top Điện Thoại Bán Chạy</h2>
+        </div>
+        <div className="bestseller__list">
+          {topPhones.length ? renderProducts(topPhones) : <p>Đang tải dữ liệu...</p>}
+        </div>
+      </section>
+    </div>
+  );
 };
+
 export default LandingPage;

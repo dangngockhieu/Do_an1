@@ -68,7 +68,7 @@ export const changePassword = (oldPassword, newPassword) => {
   return axios.patch(URL_BACKEND, data);
 };
 
-// ==================== PRODUCT API (Admin) ====================
+// ==================== PRODUCT API ====================
 // Lấy danh sách sản phẩm có phân trang + tìm kiếm
 export const getProductsWithPaginate = (page, limit, search = "", category) => {
   const URL_BACKEND = `product/get-products-paginate?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}`;
@@ -78,6 +78,16 @@ export const getProductsWithPaginate = (page, limit, search = "", category) => {
 // Lấy chi tiết sản phẩm theo ID
 export const getProductById = (id) => {
   const URL_BACKEND = `product/get-product/${id}`;
+  return axios.get(URL_BACKEND);
+};
+// lấy 5 sp laptop bán chạy nhất
+export const getTopSellingLaptop = () => {
+  const URL_BACKEND = `product/get-top-selling-laptop`;
+  return axios.get(URL_BACKEND);
+};
+// lấy 5 sp điện thoại bán chạy nhất
+export const getTopSellingPhone = () => {
+  const URL_BACKEND = `product/get-top-selling-phone`;
   return axios.get(URL_BACKEND);
 };
 

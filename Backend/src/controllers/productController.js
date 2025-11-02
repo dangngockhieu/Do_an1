@@ -14,6 +14,26 @@ export const getProductsWithPaginate = async (req, res) => {
   }
 };
 
+export const getTopSellingLaptop = async (req,res) => {
+  try {
+    const products = await productService.getTopSellingLaptop();
+    if (!products) return res.status(404).json({ EC: 1, EM: 'Not found' });
+    res.status(200).json({ EC: 0, DT: products });
+  } catch (err) {
+    res.status(500).json({ EC: 1, EM: err.message });
+  }
+};
+
+export const getTopSellingPhone = async (req, res) => {
+  try {
+    const products = await productService.getTopSellingPhone();
+    if (!products) return res.status(404).json({ EC: 1, EM: 'Not found' });
+    res.status(200).json({ EC: 0, DT: products });
+  } catch (err) {
+    res.status(500).json({ EC: 1, EM: err.message });
+  }
+};
+
 export const getProductById = async (req, res) => {
   try {
     const product = await productService.getProductById(+req.params.id);

@@ -5,6 +5,8 @@ import fs from 'fs';
 import path from 'path';
 import {
   getProductsWithPaginate,
+  getTopSellingLaptop,
+  getTopSellingPhone,
   getProductById,
   createProduct,
   updateProduct,
@@ -40,6 +42,12 @@ const productRoutes = (app) => {
 
   // Lấy chi tiết sản phẩm theo ID
   router.get('/get-product/:id', getProductById);
+
+  // Lấy 5 sp Laptop bán chạy nhất
+  router.get('/get-top-selling-laptop', getTopSellingLaptop);
+
+  // Lấy 5 sp Phone bán chạy nhất
+  router.get('/get-top-selling-phone', getTopSellingPhone);
 
   // Tạo mới sản phẩm (có ảnh)
   router.post(

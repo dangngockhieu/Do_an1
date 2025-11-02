@@ -11,7 +11,7 @@ import { getUserWithPaginate, findUserPage } from '../../../services/apiServices
 import './ManageUser.scss';
 
 const ManagerUser = () => {
-  const LIMIT = 2;
+  const LIMIT = 5;
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [listUsers, setListUsers] = useState([]);

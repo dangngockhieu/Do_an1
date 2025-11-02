@@ -124,6 +124,7 @@ model Product {
   carts      Cart[]
   orderItems OrderItem[]
   reviews    Review[]
+  features   ProductFeature[]
 
   @@map("products")
 }
@@ -133,4 +134,25 @@ model ProductImage {
   url       String
   product   Product @relation(fields: [productId], references: [id])
   productId Int
+
+  @@map("product_images")
+}
+
+model Feature {
+  id       Int              @id @default(autoincrement())
+  name     String           @db.VarChar(100)
+  products ProductFeature[]
+
+  @@map("features")
+}
+
+model ProductFeature {
+  productId Int
+  featureId Int
+
+  product Product @relation(fields: [productId], references: [id])
+  feature Feature @relation(fields: [featureId], references: [id])
+
+  @@id([productId, featureId])
+  @@map("product_features")
 }

@@ -18,6 +18,7 @@ import Product from './components/user/Product.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
 import ManagerUser from './components/admin/ManageUser/ManagerUser.jsx';
 import ManageProduct from './components/admin/ManageProduct/ManageProduct.jsx';
+import ProductDetail from './components/user/ProductDetail.jsx';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <LandingPage /> },
       { path: 'product', element: <Product /> },
+      { path: 'product/:id', element: <ProductDetail /> },
     ],
     errorElement: <NotFound />,
   },

@@ -85,7 +85,6 @@ CREATE TABLE `products` (
     `originalPrice` INTEGER NOT NULL,
     `price` INTEGER NULL,
     `coupon` INTEGER NULL,
-    `detailDesc` VARCHAR(255) NOT NULL,
     `quantity` INTEGER NOT NULL,
     `sold` INTEGER NOT NULL DEFAULT 0,
     `warranty` VARCHAR(100) NOT NULL,
@@ -98,19 +97,35 @@ CREATE TABLE `products` (
     `battery` VARCHAR(100) NOT NULL,
     `weight` VARCHAR(100) NOT NULL,
     `releaseYear` VARCHAR(100) NOT NULL,
-    `category` VARCHAR(100) NOT NULL,
-    `factory` VARCHAR(100) NOT NULL,
+    `category` VARCHAR(20) NOT NULL,
+    `factory` VARCHAR(20) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `ProductImage` (
+CREATE TABLE `product_images` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `url` VARCHAR(191) NOT NULL,
     `productId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `features` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(100) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `product_features` (
+    `productId` INTEGER NOT NULL,
+    `featureId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`productId`, `featureId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -138,4 +153,10 @@ ALTER TABLE `reviews` ADD CONSTRAINT `reviews_userID_fkey` FOREIGN KEY (`userID`
 ALTER TABLE `reviews` ADD CONSTRAINT `reviews_productID_fkey` FOREIGN KEY (`productID`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductImage` ADD CONSTRAINT `ProductImage_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `product_images` ADD CONSTRAINT `product_images_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `product_features` ADD CONSTRAINT `product_features_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `product_features` ADD CONSTRAINT `product_features_featureId_fkey` FOREIGN KEY (`featureId`) REFERENCES `features`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
