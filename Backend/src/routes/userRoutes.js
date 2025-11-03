@@ -3,7 +3,6 @@ import express from 'express';
 import {
   getAllUsers,
   getUsersWithPaginate,
-  findUserPage,
   getUserById,
   changePassword,
   findUserByEmail,
@@ -17,15 +16,16 @@ import { authorizeRole } from '../middleware/authorizeRole.js';
 const router = express.Router();
 
 const userRoutes = (app) => {
-  router.get('/get-all-users', jwtAuth, authorizeRole(['ADMIN']), getAllUsers);
-  router.get('/get-users-paginate', jwtAuth, authorizeRole(['ADMIN']), getUsersWithPaginate);
-  router.get('/find-user-page', jwtAuth, authorizeRole(['ADMIN']), findUserPage);
-  router.get('/get-user/:id', jwtAuth, authorizeRole(['ADMIN']), getUserById);
-  router.patch('/change-password', jwtAuth, changePassword);
+  router.get('/users', jwtAuth, authorizeRole(['ADMIN']), getAllUsers);
+  router.get('/users-paginate', jwtAuth, authorizeRole(['ADMIN']), getUsersWithPaginate);
+  ////////////////////////////////////////////////////////
+  router.get('/users/:id', jwtAuth, authorizeRole(['ADMIN']), getUserById);
   router.get('/find-user', jwtAuth, authorizeRole(['ADMIN']), findUserByEmail);
-  router.post('/create-user', jwtAuth, authorizeRole(['ADMIN']), createUser);
-  router.patch('/update-role-user/:id', jwtAuth, authorizeRole(['ADMIN']), changeRoleUser);
-  router.delete('/delete-user/:id', jwtAuth, authorizeRole(['ADMIN']), deleteUser);
+  ///////////////////////////////////////////////////////
+  router.post('/user', jwtAuth, authorizeRole(['ADMIN']), createUser);
+  router.patch('/change-password', jwtAuth, changePassword);
+  router.patch('/user-role/:id', jwtAuth, authorizeRole(['ADMIN']), changeRoleUser);
+  router.delete('/users/:id', jwtAuth, authorizeRole(['ADMIN']), deleteUser);
 
 app.use('/user', router);
 };

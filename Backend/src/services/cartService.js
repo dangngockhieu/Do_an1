@@ -3,18 +3,18 @@ import prisma from '../lib/prisma.js';
 import 'dotenv/config'
 
 // Thêm item vào cart
-const addItemCart = async (userId, productId, quantity) => {
+const addItemCart = async (userID, productID, quantity) => {
   try {
     //Kiểm tra sản phẩm có tồn tại và đủ hàng không
     const product = await prisma.product.findFirst({
-      where: { id: productId }
+      where: { id: productID }
     })
     if (!product) {
       return { EC: -1, EM: 'Product not found' };
     }
     // Tìm giỏ hàng của user (Dựa theo UML, mỗi user có 1 cart)
     const cart = await prisma.cart.findFirst({
-      where: { userID: userId }
+      where: { userID: userID }
     });
     if (!cart) {
       return { EC: -1, EM: 'Cart not found for user' };

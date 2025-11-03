@@ -143,7 +143,7 @@ const main = async () => {
           weight: "1.24kg",
           releaseYear: "2024",
           category: "LAPTOP",
-          factory: "APPLE",
+          factory: "MACBOOK",
         },
       ],
     });
@@ -168,7 +168,7 @@ const main = async () => {
           weight: "187g",
           releaseYear: "2024",
           category: "PHONE",
-          factory: "APPLE",
+          factory: "IPHONE",
         },
         {
           name: "Samsung Galaxy S24 Ultra",
@@ -263,14 +263,14 @@ const main = async () => {
     for (const laptop of laptops) {
       switch (laptop.name) {
         case "Dell Inspiron 15":
-          await prisma.productFeature.create({ data: { productId: laptop.id, featureId: vanPhong.id } });
+          await prisma.productFeature.create({ data: { productID: laptop.id, featureID: vanPhong.id } });
           break;
 
         case "HP Pavilion 14":
           await prisma.productFeature.createMany({
             data: [
-              { productId: laptop.id, featureId: vanPhong.id },
-              { productId: laptop.id, featureId: mongNhe.id },
+              { productID: laptop.id, featureID: vanPhong.id },
+              { productID: laptop.id, featureID: mongNhe.id },
             ],
           });
           break;
@@ -278,8 +278,8 @@ const main = async () => {
         case "ASUS TUF Gaming F15":
           await prisma.productFeature.createMany({
             data: [
-              { productId: laptop.id, featureId: gaming.id },
-              { productId: laptop.id, featureId: doHoa.id },
+              { productID: laptop.id, featureID: gaming.id },
+              { productID: laptop.id, featureID: doHoa.id },
             ],
           });
           break;
@@ -287,8 +287,8 @@ const main = async () => {
         case "Lenovo ThinkPad X1 Carbon":
           await prisma.productFeature.createMany({
             data: [
-              { productId: laptop.id, featureId: vanPhong.id },
-              { productId: laptop.id, featureId: mongNhe.id },
+              { productID: laptop.id, featureID: vanPhong.id },
+              { productID: laptop.id, featureID: mongNhe.id },
             ],
           });
           break;
@@ -296,8 +296,8 @@ const main = async () => {
         case "MacBook Air M3 2024":
           await prisma.productFeature.createMany({
             data: [
-              { productId: laptop.id, featureId: mongNhe.id },
-              { productId: laptop.id, featureId: laptopAI.id },
+              { productID: laptop.id, featureID: mongNhe.id },
+              { productID: laptop.id, featureID: laptopAI.id },
             ],
           });
           break;
@@ -352,7 +352,7 @@ const main = async () => {
           data: {
             userID: user.id,
             productID: product.id,
-            rating: Math.floor(Math.random() * 5) + 1, // ⭐ 1 đến 5 sao
+            rating: Math.floor(Math.random() * 5) + 1, 
             comment: `Sản phẩm ${product.name} rất tốt! Người dùng ${user.name} hài lòng.`,
           },
         });

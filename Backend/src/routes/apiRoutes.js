@@ -12,16 +12,16 @@ const apiRoutes = (app) => {
 
     // User routes
     router.get('/get-all-user', getAllUsers);
-    router.get('/get-user-by-id/:userId', getUserById);
+    router.get('/get-user-by-id/:userID', getUserById);
     router.post('/register-user', registerUser);
-    router.patch('/update-user/:userId', putUser);
-    router.patch('/change-password/:userId', changePassword);
-    router.delete('/delete-user/:userId', deleteUser);
+    router.patch('/update-user/:userID', putUser);
+    router.patch('/change-password/:userID', changePassword);
+    router.delete('/delete-user/:userID', deleteUser);
 
     // Product routes (admin only)
     router.post('/post-products', checkUserJWT, checkIsAdmin, postProduct);
-    router.patch('/update-products/:productId', checkUserJWT, checkIsAdmin, updateProduct);
-    router.delete('/delete-products/:productId', checkUserJWT, checkIsAdmin, deleteProduct);
+    router.patch('/update-products/:productID', checkUserJWT, checkIsAdmin, updateProduct);
+    router.delete('/delete-products/:productID', checkUserJWT, checkIsAdmin, deleteProduct);
 
     // Cart routes (user + admin)
     router.post('/cart/add', checkUserJWT, addItemCart);

@@ -18,8 +18,8 @@ const TableUserPaginate = (props) => {
   };
 
   return (
-    <>
-      <table className="table table-hover table-bordered user-table">
+    <div className="user-table">
+      <table className="table table-hover table-bordered">
         <thead>
           <tr>
             <th scope="col">Id</th>
@@ -87,7 +87,7 @@ const TableUserPaginate = (props) => {
         renderOnZeroPageCount={null}
         forcePage={props.currentPage - 1}
       />
-    </>
+    </div>
   );
 };
 

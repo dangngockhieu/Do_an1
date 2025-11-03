@@ -220,6 +220,11 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
                 <option value="MACBOOK">MACBOOK</option>
                 <option value="IPHONE">IPHONE</option>
                 <option value="SAMSUNG">SAMSUNG</option>
+                <option value="OPPO">OPPO</option>
+                <option value="VIVO">VIVO</option>
+                <option value="XIAOMI">XIAOMI</option>
+                <option value="REALME">REALME</option>
+                <option value="HUAWEI">HUAWEI</option>
               </select>
             </div>
           </div>

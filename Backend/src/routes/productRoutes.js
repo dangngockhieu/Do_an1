@@ -7,7 +7,7 @@ import {
   getProductsWithPaginate,
   getTopSellingLaptop,
   getTopSellingPhone,
-  getProductById,
+  getReviewsByProductId,
   createProduct,
   updateProduct,
   addProductImages,
@@ -38,20 +38,20 @@ const upload = multer({ storage });
 // ==================== ROUTES ====================
 const productRoutes = (app) => {
   // Lấy danh sách sản phẩm (có phân trang, search)
-  router.get('/get-products-paginate', getProductsWithPaginate);
+  router.get('/products-paginate', getProductsWithPaginate);
 
   // Lấy chi tiết sản phẩm theo ID
-  router.get('/get-product/:id', getProductById);
+  router.get('/product-reviews/:id', getReviewsByProductId);
 
   // Lấy 5 sp Laptop bán chạy nhất
-  router.get('/get-top-selling-laptop', getTopSellingLaptop);
+  router.get('/top-selling-laptop', getTopSellingLaptop);
 
   // Lấy 5 sp Phone bán chạy nhất
-  router.get('/get-top-selling-phone', getTopSellingPhone);
+  router.get('/top-selling-phone', getTopSellingPhone);
 
   // Tạo mới sản phẩm (có ảnh)
   router.post(
-    '/create-product',
+    '/product',
     jwtAuth,
     authorizeRole(['ADMIN']),
     upload.array('images', 10),
@@ -60,7 +60,7 @@ const productRoutes = (app) => {
 
   // Cập nhật thông tin sản phẩm (không ảnh)
   router.patch(
-    '/update-product/:id',
+    '/products/:id',
     jwtAuth,
     authorizeRole(['ADMIN']),
     updateProduct
@@ -68,7 +68,7 @@ const productRoutes = (app) => {
 
   // Thêm nhiều ảnh cho sản phẩm
   router.post(
-    '/add-product-images/:id',
+    '/product-images/:id',
     jwtAuth,
     authorizeRole(['ADMIN']),
     upload.array('images', 10),
@@ -77,7 +77,7 @@ const productRoutes = (app) => {
 
   // Cập nhật 1 ảnh cụ thể
   router.patch(
-    '/update-product-image/:imageId',
+    '/product-image/:imageId',
     jwtAuth,
     authorizeRole(['ADMIN']),
     upload.single('image'),
@@ -86,7 +86,7 @@ const productRoutes = (app) => {
 
   // Xóa 1 ảnh
   router.delete(
-    '/delete-product-image/:imageId',
+    '/product-image/:imageId',
     jwtAuth,
     authorizeRole(['ADMIN']),
     deleteProductImage
@@ -94,7 +94,7 @@ const productRoutes = (app) => {
 
   // Xóa sản phẩm
   router.delete(
-    '/delete-product/:id',
+    '/products/:id',
     jwtAuth,
     authorizeRole(['ADMIN']),
     deleteProduct

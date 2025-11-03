@@ -19,6 +19,7 @@ const ManageProduct = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("LAPTOP");
+  const [factoryFilter, setFactoryFilter] = useState("ALL");
 
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -30,10 +31,10 @@ const ManageProduct = () => {
   const [loading, setLoading] = useState(false);
 
   // ================= FETCH PRODUCTS =================
-  const fetchProducts = async (page = 1, keyword = "", category = "LAPTOP") => {
+  const fetchProducts = async (page = 1, keyword = "", category = "LAPTOP", factory = "ALL") => {
     setLoading(true);
     try {
-      const res = await getProductsWithPaginate(page, LIMIT, keyword, category);
+      const res = await getProductsWithPaginate(page, LIMIT, keyword, category, factory);
       if (res && res.EC === 0) {
         setProducts(res.DT.products || []);
         setPageCount(Math.ceil((res.DT.total || 0) / LIMIT));
@@ -50,8 +51,13 @@ const ManageProduct = () => {
   };
 
   useEffect(() => {
-    fetchProducts(currentPage, searchTerm, categoryFilter);
-  }, [currentPage, categoryFilter]);
+    fetchProducts(currentPage, searchTerm, categoryFilter, factoryFilter);
+  }, [currentPage, categoryFilter, factoryFilter]);
+
+  useEffect(() => {
+    setFactoryFilter("ALL"); 
+    setCurrentPage(1);
+  }, [categoryFilter]);
 
   // ================= SEARCH =================
   const handleSearchSubmit = async () => {
@@ -124,6 +130,44 @@ const ManageProduct = () => {
             <option value="LAPTOP">Laptop</option>
             <option value="PHONE">Điện thoại</option>
           </select>
+
+          {categoryFilter === 'LAPTOP' && (
+            <select
+              value={factoryFilter}
+              onChange={(e) => {
+                setFactoryFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="ALL">Tất cả</option>
+              <option value="DELL">DELL</option>
+              <option value="ACER">ACER</option>
+              <option value="MSI">MSI</option>
+              <option value="LENOVO">LENOVO</option>
+              <option value="HP">HP</option>
+              <option value="ASUS">ASUS</option>
+              <option value="MACBOOK">MACBOOK</option>
+            </select>
+          )}
+
+          {categoryFilter === 'PHONE' && (
+            <select
+              value={factoryFilter}
+              onChange={(e) => {
+                setFactoryFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="ALL">Tất cả</option>
+              <option value="IPHONE">IPHONE</option>
+              <option value="SAMSUNG">SAMSUNG</option>
+              <option value="OPPO">OPPO</option>
+              <option value="VIVO">VIVO</option>
+              <option value="XIAOMI">XIAOMI</option>
+              <option value="REALME">REALME</option>
+              <option value="HUAWEI">HUAWEI</option>
+            </select>
+          )}
 
           <div className="search-box">
             <input

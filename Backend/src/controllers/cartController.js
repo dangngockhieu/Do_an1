@@ -3,9 +3,9 @@ import cartService from '../services/cartService.js';
 
 const addItemCart = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const { productId, quantity } = req.body;
-        const data = await cartService.addItemCart(userId, productId, quantity);
+        const userID = req.user.id;
+        const { productID, quantity } = req.body;
+        const data = await cartService.addItemCart(userID, productID, quantity);
         if (data.EC === 0) return res.status(200).json(data);
         return res.status(400).json(data);
     } catch (err) {

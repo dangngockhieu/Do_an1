@@ -7,7 +7,7 @@ import ModelCreateUser from "./ModelCreateUser";
 import ModelUpdateUser from "./ModelUpdateUser";
 import ModelViewUser from "./ModelViewUser";
 import ModelDeleteUser from "./ModelDeleteUser";
-import { getUserWithPaginate, findUserPage } from '../../../services/apiServices';
+import { getUserWithPaginate } from '../../../services/apiServices';
 import './ManageUser.scss';
 
 const ManagerUser = () => {
@@ -70,35 +70,10 @@ const ManagerUser = () => {
   };
 
   const handleSearchSubmit = async () => {
-    setSearch(true);
-    const keyword = searchTerm.trim();
-    if (!keyword) {
-      setCurrentPage(1);
-      await fetchAndNotify(1, keyword);
-      return;
-    }
-
-    try {
-      const res = await findUserPage(keyword, LIMIT);
-      if (res && res.EC === 0) {
-        const page = res.DT?.page || 1;
-        if (page && page > 0) {
-          await fetchAndNotify(page, keyword);
-          setCurrentPage(page);
-          setPageCount(page)
-        } else {
-          setListUsers([]);
-          setPageCount(0);
-          toast.error('Không tìm thấy người dùng');
-        }
-      } else {
-        toast.error(res?.EM || 'Lỗi khi tìm trang người dùng');
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('Lỗi khi tìm trang người dùng');
-    }
-  };
+  setSearch(true);
+  setCurrentPage(1);
+  await fetchAndNotify(1, searchTerm);
+};
 
   const onKeyDown = (e) => {
     if (e.key === 'Enter') {

@@ -39,16 +39,20 @@ const ProductDetail = ({ show, setShow, product }) => {
 
         {/* ========== ẢNH SẢN PHẨM ========== */}
         <div className="image-gallery">
-          {product?.images?.length ? (
-            product.images.map((img) => (
-              <div key={img.id} className="gallery-item">
-                <img
-                  src={`${BASE_URL}${img.url}`}
-                  alt={`img-${img.id}`}
-                  onClick={() => setZoomImg(`${BASE_URL}${img.url}`)}
-                />
-              </div>
-            ))
+          {/* Lọc các phần tử null/rỗng */}
+          {product?.images?.filter(img => img)?.length > 0 ? (
+          product.images.filter(img => img).map((img, i) => ( 
+            <div key={i} className="gallery-item">
+              <img
+                src={`${BASE_URL}${img.url?.startsWith("/") ? img.url : "/" + img.url}`}
+                alt={`img-${i}`}
+                onClick={() =>
+                  setZoomImg(`${BASE_URL}${img.url?.startsWith("/") ? img.url : "/" + img.url}`)
+                }
+                onError={(e) => (e.target.src = "/no-image.png")}
+              />
+            </div>
+          ))
           ) : (
             <p>Không có ảnh</p>
           )}
@@ -60,7 +64,7 @@ const ProductDetail = ({ show, setShow, product }) => {
           <div className="detail-grid">
             <p><strong>Tên:</strong> {form.name}</p>
             <p><strong>Giá:</strong> {form.originalPrice?.toLocaleString()}₫</p>
-            <p><strong>Giảm giá:</strong> {form.coupon}%</p>
+            <p><strong>Giảm giá:</strong> {form.coupon ?? 0}%</p>
             <p><strong>Số lượng:</strong> {form.quantity}</p>
             <p><strong>Bảo hành:</strong> {form.warranty}</p>
             <p><strong>Năm phát hành:</strong> {form.releaseYear}</p>

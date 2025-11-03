@@ -6,6 +6,7 @@ import banner3 from "../../assets/banner_header3.jpg";
 import banner4 from "../../assets/banner_header4.png";
 import { getTopSellingLaptop, getTopSellingPhone } from "../../services/apiServices";
 import "./LandingPage.scss";
+import { FaStar } from "react-icons/fa6";
 
 const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
 
@@ -38,16 +39,16 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // 👉 Hàm điều hướng đến trang chi tiết
+  //  Hàm điều hướng đến trang chi tiết
   const handleNavigate = (product) => {
-    navigate(`/product/${product.id}`, { state: { productId: product.id } });
+    navigate(`/products/${product.id}`, { state: { product: product } });
   };
 
   const renderProducts = (list = []) =>
     list.map((item) => {
-      const imgUrl = item.imageUrl?.startsWith("http")
-        ? item.imageUrl
-        : `${BASE_URL}${item.imageUrl}`;
+      const imgUrl = item.imageUrls?.length
+  ? (item.imageUrls[0].startsWith("/") ? `${BASE_URL}${item.imageUrls[0]}` : item.imageUrls[0])
+  : "/no-image.png";
       const avgRating = Number(item.avgRating || 0).toFixed(2);
       const totalReviews = item.totalReviews || 0;
 
@@ -66,7 +67,7 @@ const LandingPage = () => {
           />
           <div className="info">
             <div className="rating">
-              ⭐ {avgRating} <span>({totalReviews})</span>
+              <FaStar className="star"/> {avgRating} <span>({totalReviews})</span>
             </div>
             <h3>{item.name}</h3>
             <div className={`price ${!hasDiscount ? "center" : ""}`}>

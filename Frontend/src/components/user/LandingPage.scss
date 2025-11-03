@@ -157,10 +157,15 @@
       justify-content: space-between;
 
       .rating {
-        color: #ffa000;
+        color: #ac781e;
         font-size: 0.85rem;
         margin-bottom: 4px;
-
+        .star{
+          align-items: center;
+          color: #ffa000 !important;
+          margin-bottom: 7px;
+          font-size: 1rem;
+        }
         span {
           color: #555;
           font-size: 0.8rem;

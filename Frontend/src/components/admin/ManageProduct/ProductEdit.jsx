@@ -36,7 +36,8 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
       category: product?.category || "",
       factory: product?.factory || "",
     });
-    setExistingImages(product?.images || []);
+    // LỌC BỎ null, undefined, và chuỗi rỗng "" ngay khi set state
+    setExistingImages(product?.images?.filter(img => img) || []); 
     setNewFiles([]);
     previewUrls.forEach((u) => URL.revokeObjectURL(u));
     setPreviewUrls([]);
@@ -202,26 +203,26 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
           <div className="existing-images">
             <h5>Ảnh hiện có</h5>
             <div className="image-row">
-              {existingImages?.length ? (
-                existingImages.map((img) => (
-                  <div key={img.id} className="image-item">
-                    <img
-                      src={`${BASE_URL}${img.url}`}
-                      alt={`img-${img.id}`}
-                      onClick={() => setZoomImg(`${BASE_URL}${img.url}`)}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteExistingImage(img.id)}
-                    >
-                      X
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p>Không có ảnh</p>
-              )}
+            {existingImages?.length ? (
+            existingImages.map((img, i) => (
+            <div key={i} className="image-item">
+              <img
+                src={`${BASE_URL}${img.url?.startsWith("/") ? img.url : "/" + img.url}`}
+                alt={`img-${i}`}
+                onClick={() =>
+                  setZoomImg(`${BASE_URL}${img.url?.startsWith("/") ? img.url : "/" + img.url}`)
+                }
+                onError={(e) => (e.target.src = "/no-image.png")}
+              />
+              <button type="button" onClick={() => handleDeleteExistingImage(img.id)}>
+                X
+              </button>
             </div>
+          ))
+          ) : (
+            <p>Không có ảnh</p>
+          )}
+          </div>
           </div>
 
           <div className="add-new-images">

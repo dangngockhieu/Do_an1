@@ -64,7 +64,7 @@ model Payment {
   amount        Int
   method        String   @db.VarChar(50) // COD, VNPay, Momo...
   status        String   @db.VarChar(50) // PENDING, SUCCESS, FAILED, REFUNDED
-  transactionId String?  @db.VarChar(100) // mã giao dịch từ cổng thanh toán
+  transactionID String?  @db.VarChar(100) // mã giao dịch từ cổng thanh toán
   createdAt     DateTime @default(now())
 
   order Order @relation(fields: [orderID], references: [id])
@@ -132,8 +132,8 @@ model Product {
 model ProductImage {
   id        Int     @id @default(autoincrement())
   url       String
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
+  productID Int
+  product   Product @relation(fields: [productID], references: [id])
 
   @@map("product_images")
 }
@@ -147,12 +147,12 @@ model Feature {
 }
 
 model ProductFeature {
-  productId Int
-  featureId Int
+  productID Int
+  featureID Int
 
-  product Product @relation(fields: [productId], references: [id])
-  feature Feature @relation(fields: [featureId], references: [id])
+  product Product @relation(fields: [productID], references: [id])
+  feature Feature @relation(fields: [featureID], references: [id])
 
-  @@id([productId, featureId])
+  @@id([productID, featureID])
   @@map("product_features")
 }

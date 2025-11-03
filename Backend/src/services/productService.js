@@ -4,54 +4,77 @@ import fs from 'fs';
 import path from 'path';
 
 // Lấy tất cả sản phẩm có phân trang
-export const getProductsWithPaginate = async (page, limit, search, category) => {
-  const skip = (page - 1) * limit;
+export const getProductsWithPaginate = async (page = 1, limit = 10, search = "", category, factory) => {
+  page = +page || 1;
+  limit = +limit || 10;
+  const offset = (page - 1) * limit;
 
-  const filters = [];
+  // Tạo điều kiện WHERE động
+  let whereClauses = [`1=1`];
 
-  if (search) {
-    filters.push({
-      OR: [
-        { name: { contains: search, mode: 'insensitive' } },
-        { infor: { contains: search, mode: 'insensitive' } },
-      ],
-    });
+  if (category && ["LAPTOP", "PHONE"].includes(category)) {
+    whereClauses.push(`p.category = '${category}'`);
   }
 
-  const normalizedCategory = typeof category === 'string' && category.trim() ? category.trim() : null;
-  if (normalizedCategory) {
-    filters.push({ category: normalizedCategory });
+  if (factory && factory !== "ALL") {
+    whereClauses.push(`p.factory = '${factory}'`);
   }
 
-  const where = filters.length ? { AND: filters } : {};
+  if (search && search.trim() !== "") {
+    const keyword = `%${search.trim()}%`;
+    whereClauses.push(`(p.name LIKE ${prisma.raw("'" + keyword + "'")} OR p.infor LIKE ${prisma.raw("'" + keyword + "'")})`);
+  }
 
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { id: 'asc' },
-      include: { images: true },
-    }),
-    prisma.product.count({ where }),
-  ]);
+  const whereSQL = whereClauses.join(" AND ");
 
-  return { products, total };
+  //  Lấy danh sách sản phẩm
+  const products = await prisma.$queryRawUnsafe(`
+    SELECT p.*, 
+    (
+        SELECT JSON_ARRAYAGG(
+            JSON_OBJECT('id', i.id, 'url', i.url)
+        )
+        FROM product_images i
+        WHERE i.productId = p.id
+    ) AS images
+    FROM products p
+    LEFT JOIN product_images i ON i.productId = p.id
+    WHERE ${whereSQL}
+    GROUP BY p.id
+    ORDER BY p.id ASC
+    LIMIT ${limit} OFFSET ${offset};
+  `);
+
+  //  Đếm tổng
+  const totalResult = await prisma.$queryRawUnsafe(`
+    SELECT COUNT(DISTINCT p.id) AS total
+    FROM products p
+    WHERE ${whereSQL};
+  `);
+
+  // Convert BigInt
+  const safeProducts = products.map((p) =>
+    Object.fromEntries(Object.entries(p).map(([k, v]) => [k, typeof v === "bigint" ? Number(v) : v]))
+  );
+  const total =
+    totalResult?.[0]?.total && typeof totalResult[0].total === "bigint"
+      ? Number(totalResult[0].total)
+      : totalResult?.[0]?.total || 0;
+
+  return { products: safeProducts, total };
 };
 // Lấy 5 sp Laptop bán chạy nhất
 export const getTopSellingLaptop = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
-      p.id, p.name, p.originalPrice, p.price, p.coupon, p.sold,
+      p.*,
       ROUND(AVG(r.rating), 2) AS avgRating,
       COUNT(r.id) AS totalReviews,
       (
-        SELECT pi.url 
+        SELECT JSON_ARRAYAGG(pi.url)
         FROM product_images pi 
-        WHERE pi.productId = p.id 
-        ORDER BY pi.id ASC 
-        LIMIT 1
-      ) AS imageUrl
+        WHERE pi.productId = p.id
+      ) AS imageUrls
     FROM products p
     LEFT JOIN reviews r ON p.id = r.productID
     WHERE p.category = 'LAPTOP'
@@ -59,6 +82,7 @@ export const getTopSellingLaptop = async () => {
     ORDER BY p.sold DESC
     LIMIT 5;
   `;
+
   const safeProducts = products.map(p =>
     Object.fromEntries(
       Object.entries(p).map(([k, v]) => [
@@ -68,23 +92,31 @@ export const getTopSellingLaptop = async () => {
     )
   );
 
+  safeProducts.forEach(p => {
+    if (typeof p.imageUrls === 'string') {
+      try {
+        p.imageUrls = JSON.parse(p.imageUrls);
+      } catch {
+        p.imageUrls = [];
+      }
+    }
+  });
+
   return safeProducts;
-}
+};
 
 // Lấy 5 sp Phone bán chạy nhất
 export const getTopSellingPhone = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
-      p.id, p.name, p.originalPrice, p.price, p.coupon, p.sold,
+      p.*,
       ROUND(AVG(r.rating), 2) AS avgRating,
       COUNT(r.id) AS totalReviews,
       (
-        SELECT pi.url 
+        SELECT JSON_ARRAYAGG(pi.url)
         FROM product_images pi 
-        WHERE pi.productId = p.id 
-        ORDER BY pi.id ASC 
-        LIMIT 1
-      ) AS imageUrl
+        WHERE pi.productId = p.id
+      ) AS imageUrls
     FROM products p
     LEFT JOIN reviews r ON p.id = r.productID
     WHERE p.category = 'PHONE'
@@ -92,6 +124,7 @@ export const getTopSellingPhone = async () => {
     ORDER BY p.sold DESC
     LIMIT 5;
   `;
+
   const safeProducts = products.map(p =>
     Object.fromEntries(
       Object.entries(p).map(([k, v]) => [
@@ -101,60 +134,35 @@ export const getTopSellingPhone = async () => {
     )
   );
 
+  safeProducts.forEach(p => {
+    if (typeof p.imageUrls === 'string') {
+      try {
+        p.imageUrls = JSON.parse(p.imageUrls);
+      } catch {
+        p.imageUrls = [];
+      }
+    }
+  });
+
   return safeProducts;
 }
 
 // Lấy 1 sản phẩm
-export const getProductById = async (id) => {
-  const [product] = await prisma.$queryRaw`
+export const getReviewsByProductId = async (id) => {
+  const reviews = await prisma.$queryRaw`
     SELECT 
-      p.id,
-      p.name,
-      p.originalPrice,
-      p.price,
-      p.coupon,
-      p.sold,
-      p.quantity,
-      p.warranty,
-      p.infor,
-      p.cpu,
-      p.ram,
-      p.storage,
-      p.screen,
-      p.graphicsCard,
-      p.battery,
-      p.weight,
-      p.releaseYear,
-      p.category,
-      p.factory,
-      ROUND(AVG(r.rating), 2) AS avgRating,
-      COUNT(r.id) AS totalReviews,
-      (
-        SELECT JSON_ARRAYAGG(pi.url)
-        FROM product_images pi
-        WHERE pi.productId = p.id
-      ) AS imageUrls,
-      (
-        SELECT JSON_ARRAYAGG(
-          JSON_OBJECT(
-            'id', rv.id,
-            'rating', rv.rating,
-            'comment', rv.comment,
-            'createdAt', rv.createdAt,
-            'userName', u.name
-          )
-        )
-        FROM reviews rv
-        JOIN users u ON rv.userID = u.id
-        WHERE rv.productID = p.id
-      ) AS reviews
-    FROM products p
-    LEFT JOIN reviews r ON p.id = r.productID
-    WHERE p.id = ${id}
-    GROUP BY p.id;
+      r.id,
+      r.rating,
+      r.comment,
+      u.name AS userName,
+      r.createdAt
+    FROM reviews r
+    INNER JOIN users u ON r.userID = u.id
+    WHERE r.productID = ${id}
+    ORDER BY r.createdAt DESC;
   `;
 
-  return product;
+  return reviews;
 };
 
 // Tạo sản phẩm mới
@@ -246,11 +254,11 @@ export const updateProduct = async (id, data) => {
 
 
 // Thêm nhiều ảnh (khi edit muốn thêm ảnh mới)
-export const addProductImages = async (productId, files) => {
+export const addProductImages = async (productID, files) => {
   if (!files?.length) return;
   const imagesData = files.map((f) => ({
     url: `/uploads/products/${f.filename}`,
-    productId,
+    productID,
   }));
   await prisma.productImage.createMany({ data: imagesData });
 };
@@ -284,7 +292,7 @@ export const deleteProductImage = async (imageId) => {
 export const deleteProduct = async (id) => {
   try {
     // Lấy toàn bộ ảnh của sản phẩm
-    const images = await prisma.productImage.findMany({ where: { productId: id } });
+    const images = await prisma.productImage.findMany({ where: { productID: id } });
 
     // Xoá từng file ảnh thật trong thư mục
     for (const img of images) {
@@ -296,7 +304,6 @@ export const deleteProduct = async (id) => {
       if (fs.existsSync(filePath)) {
         try {
           fs.unlinkSync(filePath);
-          console.log(`Deleted file: ${filePath}`);
         } catch (err) {
           console.warn(`Error deleting file ${filePath}:`, err.message);
         }
@@ -304,7 +311,7 @@ export const deleteProduct = async (id) => {
     }
 
     // Xoá record ảnh và sản phẩm trong DB
-    await prisma.productImage.deleteMany({ where: { productId: id } });
+    await prisma.productImage.deleteMany({ where: { productID: id } });
     await prisma.product.delete({ where: { id } });
 
     return { EC: 0, EM: "Xóa sản phẩm thành công" };

@@ -7,7 +7,8 @@ export const getProductsWithPaginate = async (req, res) => {
     const limit = +req.query.limit || 10;
     const search = req.query.search || '';
     const category = req.query.category || '';
-    const data = await productService.getProductsWithPaginate(page, limit, search, category);
+    const factory = req.query.factory || '';
+    const data = await productService.getProductsWithPaginate(page, limit, search, category, factory);
     return res.status(200).json({ EC: 0, DT: data });
   } catch (err) {
     return res.status(500).json({ EC: 1, EM: err.message });
@@ -34,11 +35,11 @@ export const getTopSellingPhone = async (req, res) => {
   }
 };
 
-export const getProductById = async (req, res) => {
+export const getReviewsByProductId = async (req, res) => {
   try {
-    const product = await productService.getProductById(+req.params.id);
-    if (!product) return res.status(404).json({ EC: 1, EM: 'Not found' });
-    res.status(200).json({ EC: 0, DT: product });
+    const reviews = await productService.getReviewsByProductId(+req.params.id);
+    if (!reviews) return res.status(404).json({ EC: 1, EM: 'Not found' });
+    res.status(200).json({ EC: 0, DT: reviews });
   } catch (err) {
     res.status(500).json({ EC: 1, EM: err.message });
   }

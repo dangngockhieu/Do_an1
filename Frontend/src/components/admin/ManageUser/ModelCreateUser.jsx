@@ -65,12 +65,12 @@ const ModelCreateUser = (props) => {
           </div>
 
           <div className="form-group">
-            <label>Tên người dùng</label>
+            <label>Họ và tên người dùng</label>
             <input
               type="text"
               className="form-control"
               value={name}
-              placeholder='Nhập tên người dùng'
+              placeholder='Nhập họ tên người dùng'
               onChange={(e) => setName(e.target.value)}
             />
           </div>

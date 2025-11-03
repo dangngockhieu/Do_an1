@@ -28,59 +28,65 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
   limit = +limit || 10;
   const offset = (page - 1) * limit;
 
-  // Nếu có search (email là duy nhất)
-  if (search) {
-    const user = await prisma.user.findUnique({
-      where: { email: search },
-      select: { id: true, name: true, email: true, role: true, isVerified: true },
-    });
+  const searchCondition = search ? `${search}%` : null;
 
-    if (!user || !user.isVerified) {
-      return { users: [], total: 0 };
-    }
+  let users = [];
+  let totalResult = [];
 
-    return { users: [user], total: 1 };
+  if (searchCondition) {
+    users = await prisma.$queryRawUnsafe(
+      `SELECT id, name, email, role 
+       FROM users 
+       WHERE isVerified = true 
+       AND email LIKE ? 
+       ORDER BY id ASC 
+       LIMIT ? OFFSET ?;`,
+      searchCondition,
+      limit,
+      offset
+    );
+
+    totalResult = await prisma.$queryRawUnsafe(
+      `SELECT COUNT(*) AS total 
+       FROM users 
+       WHERE isVerified = true 
+       AND email LIKE ?;`,
+      searchCondition
+    );
+  } else {
+    users = await prisma.$queryRawUnsafe(
+      `SELECT id, name, email, role 
+       FROM users 
+       WHERE isVerified = true 
+       ORDER BY id ASC 
+       LIMIT ? OFFSET ?;`,
+      limit,
+      offset
+    );
+
+    totalResult = await prisma.$queryRawUnsafe(
+      `SELECT COUNT(*) AS total 
+       FROM users 
+       WHERE isVerified = true;`
+    );
   }
 
-  // Nếu không có search → phân trang bình thường
-  const whereCondition = { isVerified: true };
+  // 🔧 Chuyển BigInt → Number an toàn
+  const safeUsers = users.map((u) =>
+    Object.fromEntries(
+      Object.entries(u).map(([k, v]) => [
+        k,
+        typeof v === 'bigint' ? Number(v) : v,
+      ])
+    )
+  );
 
-  const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      where: whereCondition,
-      skip: offset,
-      take: limit,
-      orderBy: { id: 'asc' },
-      select: { id: true, name: true, email: true, role: true },
-    }),
-    prisma.user.count({ where: whereCondition }),
-  ]);
+  const total =
+    totalResult?.[0]?.total && typeof totalResult[0].total === 'bigint'
+      ? Number(totalResult[0].total)
+      : totalResult?.[0]?.total || 0;
 
-  return { users, total };
-};
-
-
-
-// ==================== FIND PAGE OF USER (BY SEARCH) ====================
-export const findUserPage = async (search, limit = 10) => {
-  if (!search) return -1;
-
-  const user = await prisma.user.findUnique({
-    where: {
-      isVerified: true,
-      email: search ,
-    },
-    select: { id: true, isVerified: true },
-  });
-
-  if (!user) return -1;
-
-  // Đếm số user có id nhỏ hơn user được tìm thấy
-  const countBefore = await prisma.user.count({
-    where: { isVerified: true, id: { lt: user.id } },
-  });
-
-  return Math.floor((countBefore) / (+limit || 10)) + 1;
+  return { users: safeUsers, total };
 };
 
 // ==================== GET USER BY ID ====================
@@ -158,7 +164,7 @@ export const changeRoleUser = async (id, role) => {
 
 // ==================== DELETE USER ====================
 export const deleteUser = async (id) => {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({ where: { id:id } });
   if (!user) throw new Error('User không tồn tại!');
 
   await prisma.user.delete({ where: { id } });

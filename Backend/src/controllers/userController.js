@@ -23,17 +23,6 @@ export const getUsersWithPaginate = async (req, res) => {
   }
 };
 
-// ==================== FIND USER PAGE ====================
-export const findUserPage = async (req, res) => {
-  try {
-    const search = req.query.search || '';
-    const limit = +req.query.limit || 10;
-    const page = await userService.findUserPage(search, limit);
-    return res.status(200).json({ DT: { page }, EM: 'Find user page successful', EC: 0 });
-  } catch (error) {     
-    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
-  }
-};
 
 // ==================== GET USER BY ID ====================
 export const getUserById = async (req, res) => {
