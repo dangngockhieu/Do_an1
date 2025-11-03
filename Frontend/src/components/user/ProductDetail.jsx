@@ -45,8 +45,6 @@ const ProductDetail = () => {
     });
   };
 
-  // --- LOGIC XỬ LÝ ĐÁNH GIÁ ĐÃ SỬA LỖI SLICE ---
-  // Sử dụng reviewsData là mảng đánh giá (đã được khởi tạo là [])
   const allReviews = reviewsData || []; 
   const totalReviewsCount = allReviews.length;
 
@@ -55,13 +53,12 @@ const ProductDetail = () => {
       ? allReviews
       : allReviews.filter((r) => r.rating === filter);
 
-  // paginatedReviews giờ đã an toàn vì filteredReviews luôn là một mảng
   const paginatedReviews = filteredReviews.slice(0, visibleCount);
   const hasMore = visibleCount < filteredReviews.length;
 
   const handleShowMore = () => {
     if (hasMore) setVisibleCount((prev) => prev + 5);
-    else setVisibleCount(5); // Thu gọn
+    else setVisibleCount(5);
   };
 
   const hasDiscount = product?.coupon > 0;
