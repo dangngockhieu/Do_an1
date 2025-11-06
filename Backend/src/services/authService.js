@@ -304,10 +304,22 @@ export const postrefresh_token = async (refresh_token) => {
     }
 
     const user = await prisma.user.findUnique({ where: { email: payload.email } });
-    if (!user || !user.refresh_token) throw new Error('User not found or refresh token revoked');
+    if (!user || !user.refresh_token){
+      console.error('❌ Argon verify failed. refresh_token mismatch');
+      throw new Error('User not found or refresh token revoked');
+    } 
 
     const isValid = await argon.verify(user.refresh_token, refresh_token);
-    if (!isValid) throw new Error('Invalid refresh token');
+    try {
+  const isValid = await argon.verify(user.refresh_token, refresh_token);
+  if (!isValid) {
+    console.error('❌ Argon verify failed. refresh_token mismatch');
+    throw new Error('Invalid refresh token');
+  }
+} catch (e) {
+  console.error('🔥 Refresh token verify error:', e.message);
+  throw e;
+}
 
     const access_token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRED });
 

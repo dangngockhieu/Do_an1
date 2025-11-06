@@ -11,7 +11,7 @@ import { getUserWithPaginate } from '../../../services/apiServices';
 import './ManageUser.scss';
 
 const ManagerUser = () => {
-  const LIMIT = 5;
+  const LIMIT = 2;
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [listUsers, setListUsers] = useState([]);
@@ -116,12 +116,10 @@ const ManagerUser = () => {
               onKeyDown={onKeyDown}
             />
             {search ? (
-              // HIỂN THỊ NÚT X (CLEAR) KHI CÓ SEARCHTERM
               <button className="search-clear-btn" onClick={handleClearSearch} aria-label="clear search">
                 <IoMdClose className="clear-icon" style={{color: 'red', fontSize: '1.2rem', fontWeight: "600"}} />
               </button>
             ) : (
-              // HIỂN THỊ NÚT SEARCH KHI KHÔNG CÓ SEARCHTERM
               <button className="search-icon-btn" onClick={handleSearchSubmit} aria-label="search">
                 <FaSearch className="search-icon" style={{color: '#636262ff'}} />
               </button>

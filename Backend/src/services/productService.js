@@ -36,7 +36,15 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, search = "",
         )
         FROM product_images i
         WHERE i.productId = p.id
-    ) AS images
+    ) AS images ,
+    (
+        SELECT JSON_ARRAYAGG(
+          JSON_OBJECT('id', f.id, 'name', f.name)
+        )
+        FROM product_features pf
+        JOIN features f ON pf.featureID = f.id
+        WHERE pf.productID = p.id
+    ) AS features
     FROM products p
     LEFT JOIN product_images i ON i.productId = p.id
     WHERE ${whereSQL}
@@ -67,7 +75,7 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, search = "",
 export const getTopSellingLaptop = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
-      p.*,
+      p.id, p.name, p.coupon, p.price, p.originalPrice,
       ROUND(AVG(r.rating), 2) AS avgRating,
       COUNT(r.id) AS totalReviews,
       (
@@ -105,11 +113,12 @@ export const getTopSellingLaptop = async () => {
   return safeProducts;
 };
 
+
 // Lấy 5 sp Phone bán chạy nhất
 export const getTopSellingPhone = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
-      p.*,
+      p.id, p.name, p.coupon, p.price, p.originalPrice,
       ROUND(AVG(r.rating), 2) AS avgRating,
       COUNT(r.id) AS totalReviews,
       (
@@ -147,9 +156,123 @@ export const getTopSellingPhone = async () => {
   return safeProducts;
 }
 
-// Lấy 1 sản phẩm
-export const getReviewsByProductId = async (id) => {
-  const reviews = await prisma.$queryRaw`
+export const getAllProducts = async (category, filters) => {
+  const whereClauses = [`p.category = '${category}'`];
+
+  // --- Thương hiệu (factory) ---
+  if (filters?.brands?.length) {
+    const brandNames = filters.brands.map(b => `'${b}'`).join(", ");
+    whereClauses.push(`p.factory IN (${brandNames})`);
+  }
+
+  // --- Nhu cầu ---
+  if (filters?.features?.length) {
+    const featureNames = filters.features.map(f => `'${f}'`).join(", ");
+    whereClauses.push(`
+      EXISTS (
+        SELECT 1 FROM product_features pf
+        JOIN features f ON f.id = pf.featureId
+        WHERE pf.productId = p.id AND f.name IN (${featureNames})
+      )
+    `);
+  }
+
+  // --- Các filter text (CPU, RAM, SSD, GPU, v.v.) ---
+  if (filters?.specs) {
+    Object.entries(filters.specs).forEach(([key, values]) => {
+      if (values.length && !values.includes("Tất cả")) {
+        const vals = values.map(v => `'${v}'`).join(", ");
+        whereClauses.push(`p.${key.toLowerCase().replace(/\s/g, "_")} IN (${vals})`);
+      }
+    });
+  }
+
+  // --- Khoảng giá ---
+  if (filters?.price?.min && filters?.price?.max) {
+    const min = filters.price.min ;
+    const max = filters.price.max ;
+    whereClauses.push(`p.price BETWEEN ${min} AND ${max}`);
+  }
+
+  const whereSQL = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+
+  const products = await prisma.$queryRawUnsafe(`
+    SELECT 
+      p.id, p.name, p.coupon, p.price, p.originalPrice, p.factory,
+      ROUND(AVG(r.rating), 2) AS avgRating,
+      COUNT(r.id) AS totalReviews,
+      (
+        SELECT JSON_ARRAYAGG(pi.url)
+        FROM product_images pi 
+        WHERE pi.productId = p.id
+      ) AS imageUrls
+    FROM products p
+    LEFT JOIN reviews r ON p.id = r.productID
+    ${whereSQL}
+    GROUP BY p.id
+    ORDER BY p.sold DESC
+  `);
+
+  const safeProducts = products.map(p =>
+    Object.fromEntries(
+      Object.entries(p).map(([k, v]) => [
+        k,
+        typeof v === 'bigint' ? Number(v) : v
+      ])
+    )
+  );
+
+  safeProducts.forEach(p => {
+    if (typeof p.imageUrls === 'string') {
+      try {
+        p.imageUrls = JSON.parse(p.imageUrls);
+      } catch {
+        p.imageUrls = [];
+      }
+    }
+  });
+
+  return safeProducts;
+};
+
+
+
+export const getProductById = async (id) => {
+  const result = await prisma.$queryRaw`
+    SELECT 
+      p.*,
+      ROUND(AVG(r.rating), 2) AS avgRating,
+      COUNT(r.id) AS totalReviews,
+      (
+        SELECT JSON_ARRAYAGG(pi.url)
+        FROM product_images pi 
+        WHERE pi.productId = p.id
+      ) AS imageUrls
+    FROM products p
+    LEFT JOIN reviews r ON p.id = r.productID
+    WHERE p.id = ${id}
+    GROUP BY p.id;
+  `;
+
+  if (!result || result.length === 0) return { product: null, reviews: [] };
+
+  let product = result[0];
+
+  for (let key in product) {
+    if (typeof product[key] === "bigint") {
+      product[key] = Number(product[key]);
+    }
+  }
+
+  if (typeof product.imageUrls === "string") {
+    try {
+      product.imageUrls = JSON.parse(product.imageUrls);
+    } catch {
+      product.imageUrls = [];
+    }
+  }
+
+    const reviews = await prisma.$queryRaw`
     SELECT 
       r.id,
       r.rating,
@@ -162,8 +285,40 @@ export const getReviewsByProductId = async (id) => {
     ORDER BY r.createdAt DESC;
   `;
 
-  return reviews;
+  return {product, reviews};
+}
+
+
+// Add đặc điểm cho sản phẩm
+export const addProductFeatures = async (productID, featureIDs) => {
+  if (!Array.isArray(featureIDs) || featureIDs.length === 0) {
+        throw new Error("featureIDs must be a non-empty array.");
+    }
+    // Tạo mảng dữ liệu (Data Array)
+    const dataToCreate = featureIDs.map(featureID => ({
+        productID: productID,
+        featureID: featureID,
+    }));
+
+    // Sử dụng createMany với mảng data
+    await prisma.productFeature.createMany({
+        data: dataToCreate,
+        skipDuplicates: true, 
+    });
 };
+
+// Xóa đặc điểm sản phẩm
+export const deleteProductFeature = async (productID, featureID) => {
+  await prisma.productFeature.delete({
+    where: {
+      productID_featureID: {
+        productID,
+        featureID,
+      },
+    },
+  });
+};
+
 
 // Tạo sản phẩm mới
 export const createProduct = async (data, files) => {
@@ -192,7 +347,7 @@ export const createProduct = async (data, files) => {
   if (files?.length) {
     const imagesData = files.map((f) => ({
       url: `/uploads/products/${f.filename}`,
-      productId: product.id,
+      productID: product.id,
     }));
     await prisma.productImage.createMany({ data: imagesData });
   }
@@ -202,53 +357,26 @@ export const createProduct = async (data, files) => {
 
 // Cập nhật thông tin sản phẩm
 export const updateProduct = async (id, data) => {
-  // Lọc bỏ undefined hoặc null
-  const cleanedData = Object.fromEntries(
-    Object.entries(data).filter(([_, v]) => v !== undefined && v !== null)
-  );
   // Ép kiểu cho các trường số
-  if ('originalPrice' in cleanedData)
-    cleanedData.originalPrice = +cleanedData.originalPrice;
-  if ('quantity' in cleanedData)
-    cleanedData.quantity = +cleanedData.quantity;
-  if ('coupon' in cleanedData)
-    cleanedData.coupon = +cleanedData.coupon;
-  if ('releaseYear' in cleanedData)
-    cleanedData.releaseYear = cleanedData.releaseYear.toString();
+  if ('originalPrice' in data)
+    data.originalPrice = +data.originalPrice;
+  if ('quantity' in data)
+    data.quantity = +data.quantity;
+  if ('coupon' in data)
+    data.coupon = +data.coupon;
+  if ('releaseYear' in data)
+    data.releaseYear = data.releaseYear.toString();
 
-  // Nếu ko có thay đổi coupon và originalPrice 
-  if (!('coupon' in cleanedData || 'originalPrice' in cleanedData)) {
-    return prisma.product.update({
-    where: { id: +id },
-    data: cleanedData,
-  });
-  }
-  // Nếu có thay đổi coupon và originalPrice 
-  if ('coupon' in cleanedData && 'originalPrice' in cleanedData) {
-    let final = cleanedData.originalPrice - (cleanedData.originalPrice * cleanedData.coupon) / 100;
-    let price = Math.floor(final / 10000) * 10000;
-    return prisma.product.update({
-      where: { id: +id },
-      data: { ...cleanedData, price: price },
-  });
-  }
-    // Lấy thông tin hiện tại trong DB (phòng khi không gửi lên)
-    const product = await prisma.product.findUnique({
-      where: { id: +id },
-      select: { originalPrice: true, coupon: true },
-    });
-    if (!product) throw new Error("Product not found");
-    // Lấy giá trị gốc và giảm giá hợp lệ
-    const basePrice = cleanedData.originalPrice ?? product.originalPrice;
-    const couponValue = cleanedData.coupon ?? product.coupon ?? 0;
+  const basePrice = data.originalPrice ;
+  const couponValue = data.coupon ?? 0;
 
-    // Tính lại giá mới
-    const finalPrice = basePrice - (basePrice * couponValue) / 100;
-    const roundedPrice = Math.floor(finalPrice / 10000) * 10000;
+  // Tính lại giá mới
+  const finalPrice = basePrice - (basePrice * couponValue) / 100;
+  const roundedPrice = Math.floor(finalPrice / 10000) * 10000;
 
   return prisma.product.update({
     where: { id: +id },
-    data: { ...cleanedData, price: roundedPrice },
+    data: { ...data, price: roundedPrice },
   });
 };
 
@@ -263,19 +391,6 @@ export const addProductImages = async (productID, files) => {
   await prisma.productImage.createMany({ data: imagesData });
 };
 
-// Cập nhật 1 ảnh
-export const updateProductImage = async (imageId, file) => {
-  const image = await prisma.productImage.findUnique({ where: { id: imageId } });
-  if (!image) throw new Error('Image not found');
-
-  const oldPath = path.join('public', image.url);
-  if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-
-  return prisma.productImage.update({
-    where: { id: imageId },
-    data: { url: `/uploads/products/${file.filename}` },
-  });
-};
 
 // Xóa 1 ảnh
 export const deleteProductImage = async (imageId) => {
@@ -312,6 +427,8 @@ export const deleteProduct = async (id) => {
 
     // Xoá record ảnh và sản phẩm trong DB
     await prisma.productImage.deleteMany({ where: { productID: id } });
+
+    await prisma.productFeature.deleteMany({ where: { productID: id } });
     await prisma.product.delete({ where: { id } });
 
     return { EC: 0, EM: "Xóa sản phẩm thành công" };

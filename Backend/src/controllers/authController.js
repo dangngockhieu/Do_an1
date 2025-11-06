@@ -64,7 +64,7 @@ export const logout = async (req, res) => {
 // ==================== REFRESH TOKEN ====================
 export const refreshToken = async (req, res) => {
   try {
-    const refresh_token = req.cookies.refresh_token;
+    const refresh_token = req.cookies?.refresh_token;
     if (!refresh_token) {
       return res.status(401).json({ EM: 'No refresh token provided', EC: 1 });
     }
@@ -73,7 +73,7 @@ export const refreshToken = async (req, res) => {
           EM: 'Refresh token successful', 
           EC: 0 });
     } catch (err) {
-    return res.status(500).json({
+    return res.status(401).json({
       EC: -1, EM: err.message || 'Server Internal Error'
     });
   }

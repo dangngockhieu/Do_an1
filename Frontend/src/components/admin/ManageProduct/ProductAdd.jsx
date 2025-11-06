@@ -1,12 +1,24 @@
-import { useState, useRef } from "react";
-import { createProduct } from "../../../services/apiServices";
+import { useState, useRef, useEffect } from "react";
+import { createProduct, addProductImages } from "../../../services/apiServices";
 import { toast } from "react-toastify";
 import "./ProductAdd.scss";
-
-const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
-
+// Danh sách feature có id + name
+const FEATURE_NAMES = [
+  { id: 1, name: "Văn phòng" },
+  { id: 2, name: "Gaming" },
+  { id: 3, name: "Mỏng nhẹ" },
+  { id: 4, name: "Đồ họa" },
+  { id: 5, name: "Cảm ứng" },
+  { id: 6, name: "Laptop AI" },
+  { id: 7, name: "Điện thoại 5G" },
+  { id: 8, name: "Điện thoại AI" },
+  { id: 9, name: "Gaming Phone" },
+  { id: 10, name: "Phổ thông 4G" },
+  { id: 11, name: "Điện thoại gập" },
+];
 const ProductAdd = ({ show, setShow, onRefresh }) => {
-  const [form, setForm] = useState({
+  
+  const initForm = {
     name: "",
     originalPrice: "",
     coupon: "",
@@ -23,25 +35,52 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
     releaseYear: "",
     category: "",
     factory: "",
-  });
+  };
+  const [form, setForm] = useState(initForm);
 
   const [images, setImages] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [errors, setErrors] = useState({});
   const fileInputRef = useRef(null);
 
+  const [tempFeatures, setTempFeatures] = useState([]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+        let newForm = { ...prev, [name]: value }; 
+        if (name === 'category') {
+            newForm.factory = "";
+        }
+        return newForm;
+    });
     setErrors((prev) => ({ ...prev, [name]: false }));
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
-    setImages(files);
-
-    const urls = files.map((f) => URL.createObjectURL(f));
+    const allFiles = [...images, ...files];
+    setImages(allFiles);
+    const urls = allFiles.map((f) => URL.createObjectURL(f));
+    previewUrls.forEach((u) => URL.revokeObjectURL(u));
     setPreviewUrls(urls);
+    e.target.value = null;
+  };
+  const handleClose = () => {
+    setShow(false);
+    setImages([]);
+    setForm(initForm);
+    previewUrls.forEach((u) => URL.revokeObjectURL(u));
+    setPreviewUrls([]);
+    setTempFeatures([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+//  Toggle feature theo ID
+  const toggleFeature = (id) => {
+    setTempFeatures((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    );
   };
 
   const removePreview = (index) => {
@@ -93,7 +132,6 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
       toast.error("Vui lòng điền đầy đủ thông tin bắt buộc!");
       return;
     }
-
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([key, val]) => fd.append(key, val));
@@ -102,26 +140,10 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
       const res = await createProduct(fd);
       if (res && res.EC === 0) {
         toast.success("Thêm sản phẩm thành công!");
+        if (tempFeatures.length > 0) await addProductFeatures(res.DT.id, tempFeatures);
         onRefresh();
         previewUrls.forEach((u) => URL.revokeObjectURL(u));
-        setForm({
-          name: "",
-          originalPrice: "",
-          coupon: "",
-          quantity: "",
-          infor: "",
-          warranty: "",
-          cpu: "",
-          ram: "",
-          storage: "",
-          screen: "",
-          graphicsCard: "",
-          battery: "",
-          weight: "",
-          releaseYear: "",
-          category: "",
-          factory: "",
-        });
+        setForm(initForm);
         setImages([]);
         setPreviewUrls([]);
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -132,6 +154,8 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
       toast.error("Lỗi khi thêm sản phẩm");
     }
   };
+
+
 
   if (!show) return null;
 
@@ -199,8 +223,8 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
                 <option value="PHONE">Điện thoại</option>
               </select>
             </div>
-
-            <div className="form-group">
+            {form.category === "LAPTOP" && (
+              <div className="form-group">
               <label htmlFor="factory">Nhà sản xuất</label>
               <select
                 id="factory"
@@ -218,28 +242,55 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
                 <option value="HP">HP</option>
                 <option value="ASUS">ASUS</option>
                 <option value="MACBOOK">MACBOOK</option>
+              </select>
+            </div>
+            )}
+
+            {form.category === "PHONE" && (
+              <div className="form-group">
+              <label htmlFor="factory">Nhà sản xuất</label>
+              <select
+                id="factory"
+                name="factory"
+                value={form.factory}
+                onChange={handleChange}
+              >
+                <option value="" disabled>
+                  -- Chọn nhà sản xuất --
+                </option>
                 <option value="IPHONE">IPHONE</option>
                 <option value="SAMSUNG">SAMSUNG</option>
                 <option value="OPPO">OPPO</option>
                 <option value="VIVO">VIVO</option>
                 <option value="XIAOMI">XIAOMI</option>
                 <option value="REALME">REALME</option>
-                <option value="HUAWEI">HUAWEI</option>
+                <option value="HONOR">HONOR</option>
               </select>
             </div>
+            )}
           </div>
-
-          <div className="form-group">
-            <label htmlFor="images">Ảnh sản phẩm</label>
-            <input
-              id="images"
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-            />
-          </div>
+          {form.category && (
+          <div className="features-section">
+            <h5>Nhu cầu sử dụng</h5>
+            <div className="feature-list">
+              {(form.category === "LAPTOP"
+                ? FEATURE_NAMES.slice(0, 6)
+                : form.category === "PHONE"
+                ? FEATURE_NAMES.slice(6)
+                : FEATURE_NAMES
+              ).map((f) => (
+              <div key={f.id}
+                className={`feature-item ${
+                tempFeatures.includes(f.id) ? "selected" : ""
+                }`}
+                onClick={() => toggleFeature(f.id)}
+              >
+          {f.name}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
           {previewUrls.length > 0 && (
             <div className="preview-row">
@@ -258,7 +309,7 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setShow(false)}
+              onClick={() => handleClose()}
             >
               Hủy
             </button>

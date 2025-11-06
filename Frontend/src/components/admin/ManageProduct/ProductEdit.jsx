@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
+  addProductFeatures,
+  deleteProductFeature,
   updateProduct,
   addProductImages,
   deleteProductImage,
@@ -7,79 +9,130 @@ import {
 import { toast } from "react-toastify";
 import "./ProductEdit.scss";
 
-const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BACKEND;
+
+// Danh sách feature có id + name
+const FEATURE_NAMES = [
+  { id: 1, name: "Văn phòng" },
+  { id: 2, name: "Gaming" },
+  { id: 3, name: "Mỏng nhẹ" },
+  { id: 4, name: "Đồ họa" },
+  { id: 5, name: "Cảm ứng" },
+  { id: 6, name: "Laptop AI" },
+  { id: 7, name: "Điện thoại 5G" },
+  { id: 8, name: "Điện thoại AI" },
+  { id: 9, name: "Gaming Phone" },
+  { id: 10, name: "Phổ thông 4G" },
+  { id: 11, name: "Điện thoại gập" },
+];
 
 const ProductEdit = ({ show, setShow, product, onRefresh }) => {
-  const [form, setForm] = useState({});
+  const initForm = {
+    name: product?.name || "",
+    originalPrice: product?.originalPrice || "",
+    coupon: product?.coupon || "",
+    quantity: product?.quantity || "",
+    infor: product?.infor || "",
+    warranty: product?.warranty || "",
+    cpu: product?.cpu || "",
+    ram: product?.ram || "",
+    storage: product?.storage || "",
+    screen: product?.screen || "",
+    graphicsCard: product?.graphicsCard || "",
+    battery: product?.battery || "",
+    weight: product?.weight || "",
+    releaseYear: product?.releaseYear || "",
+    category: product?.category || "",
+    factory: product?.factory || "",
+  };
+
+  const [form, setForm] = useState(initForm);
   const [existingImages, setExistingImages] = useState([]);
   const [newFiles, setNewFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [zoomImg, setZoomImg] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [imageDelete, setImageDelete] = useState([]);
+  const fileInputRef = useRef(null);
+
+  // === Feature state ===
+  const [originalFeatures, setOriginalFeatures] = useState([]); 
+  const [tempFeatures, setTempFeatures] = useState([]);
 
   useEffect(() => {
-    setForm({
-      name: product?.name || "",
-      originalPrice: product?.originalPrice || "",
-      coupon: product?.coupon || "",
-      quantity: product?.quantity || "",
-      infor: product?.infor || "",
-      warranty: product?.warranty || "",
-      cpu: product?.cpu || "",
-      ram: product?.ram || "",
-      storage: product?.storage || "",
-      screen: product?.screen || "",
-      graphicsCard: product?.graphicsCard || "",
-      battery: product?.battery || "",
-      weight: product?.weight || "",
-      releaseYear: product?.releaseYear || "",
-      category: product?.category || "",
-      factory: product?.factory || "",
-    });
-    // LỌC BỎ null, undefined, và chuỗi rỗng "" ngay khi set state
-    setExistingImages(product?.images?.filter(img => img) || []); 
+    setForm(initForm);
+    setImageDelete([]);
     setNewFiles([]);
     previewUrls.forEach((u) => URL.revokeObjectURL(u));
     setPreviewUrls([]);
+    if (fileInputRef.current) fileInputRef.current.value = null;
+
+    // Lấy danh sách feature id từ product.features
+    const current = Array.isArray(product?.features)
+      ? product.features.map((f) => f.id)
+      : [];
+
+    setOriginalFeatures(current);
+    setTempFeatures(current);
   }, [product]);
+
+  useEffect(() => {
+    const allImages = product?.images?.filter((img) => img) || [];
+    const filteredImages = allImages.filter(
+      (img) => !imageDelete.includes(img.id)
+    );
+    setExistingImages(filteredImages);
+  }, [product?.images, imageDelete]);
+
+  useEffect(() => {
+    return () => previewUrls.forEach((u) => URL.revokeObjectURL(u));
+  }, [previewUrls]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      const newForm = { ...prev, [name]: value };
+      if (name === "category") {
+        if(value == product.category){
+          newForm.factory = product.factory;
+        }
+        else{
+          newForm.factory = "";
+        }
+      }
+      return newForm;
+    });
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
-    setNewFiles(files);
-    const urls = files.map((f) => URL.createObjectURL(f));
+    const allFiles = [...newFiles, ...files];
+    setNewFiles(allFiles);
+    const urls = allFiles.map((f) => URL.createObjectURL(f));
+    previewUrls.forEach((u) => URL.revokeObjectURL(u));
     setPreviewUrls(urls);
+    e.target.value = null;
   };
 
   const removeNewPreview = (idx) => {
     const nfiles = [...newFiles];
     const npre = [...previewUrls];
-    URL.revokeObjectURL(npre[idx]);
+    const removedUrl = npre[idx];
     nfiles.splice(idx, 1);
     npre.splice(idx, 1);
+    URL.revokeObjectURL(removedUrl);
     setNewFiles(nfiles);
     setPreviewUrls(npre);
   };
 
-  const handleDeleteExistingImage = (imageId) => setConfirmDelete(imageId);
+  const handleDeleteExistingImage = (imageId) => {
+    setImageDelete((prev) => [...prev, imageId]);
+  };
 
-  const confirmDeleteImage = async () => {
-    if (!confirmDelete) return;
-    try {
-      const res = await deleteProductImage(confirmDelete);
-      if (res && res.EC === 0) {
-        toast.success("Đã xóa ảnh");
-        setExistingImages((prev) => prev.filter((i) => i.id !== confirmDelete));
-      } else toast.error(res?.EM || "Xóa ảnh thất bại");
-    } catch {
-      toast.error("Lỗi khi xóa ảnh");
-    } finally {
-      setConfirmDelete(null);
-    }
+  //  Toggle feature theo ID
+  const toggleFeature = (id) => {
+    setTempFeatures((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -91,22 +144,46 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
         return;
       }
 
+      // Xóa ảnh
+      for (const imgId of imageDelete) {
+        await deleteProductImage(imgId);
+      }
+
+      // Thêm ảnh mới
       if (newFiles.length > 0) {
         const fd = new FormData();
         newFiles.forEach((f) => fd.append("images", f));
-        const resAdd = await addProductImages(product.id, fd);
-        if (!(resAdd && resAdd.EC === 0)) {
-          toast.error(resAdd?.EM || "Upload ảnh thất bại");
-          return;
-        }
+        await addProductImages(product.id, fd);
+      }
+
+      // So sánh feature cũ & mới
+      const added = tempFeatures.filter((id) => !originalFeatures.includes(id));
+      const removed = originalFeatures.filter(
+        (id) => !tempFeatures.includes(id)
+      );
+
+      if (added.length > 0) await addProductFeatures(product.id, added);
+      for (const id of removed) {
+        await deleteProductFeature(product.id, id);
       }
 
       toast.success("Cập nhật sản phẩm thành công!");
       onRefresh();
       setShow(false);
-    } catch {
+    } catch (err) {
+      console.error(" Lỗi cập nhật:", err);
       toast.error("Lỗi khi cập nhật sản phẩm");
     }
+  };
+
+  const handleClose = () => {
+    setShow(false);
+    setTempFeatures(originalFeatures);
+    setNewFiles([]);
+    previewUrls.forEach((u) => URL.revokeObjectURL(u));
+    setPreviewUrls([]);
+    setImageDelete([]);
+    setForm(initForm);
   };
 
   if (!show) return null;
@@ -116,7 +193,7 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
       <div className="modal-box">
         <h4>Cập nhật sản phẩm</h4>
 
-        {/* FORM CHÍNH */}
+        {/* === FORM CHÍNH === */}
         <form className="form-edit-product">
           {[
             { name: "name", label: "Tên sản phẩm" },
@@ -134,9 +211,8 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
             { name: "releaseYear", label: "Năm phát hành" },
           ].map(({ name, label }) => (
             <div className="form-group" key={name}>
-              <label htmlFor={name}>{label}</label>
+              <label>{label}</label>
               <input
-                id={name}
                 name={name}
                 value={form[name]}
                 onChange={handleChange}
@@ -146,21 +222,18 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
           ))}
 
           <div className="form-group">
-            <label htmlFor="infor">Thông tin thêm</label>
+            <label>Thông tin thêm</label>
             <textarea
-              id="infor"
               name="infor"
               value={form.infor}
               onChange={handleChange}
-              placeholder="Thông tin thêm"
             />
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="category">Danh mục</label>
+              <label>Danh mục</label>
               <select
-                id="category"
                 name="category"
                 value={form.category}
                 onChange={handleChange}
@@ -170,77 +243,105 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="factory">Nhà sản xuất</label>
-              <select
-                id="factory"
-                name="factory"
-                value={form.factory}
-                onChange={handleChange}
-              >
-                <option value="">-- Chọn hãng --</option>
-                <option value="DELL">Dell</option>
-                <option value="ACER">Acer</option>
-                <option value="MSI">MSI</option>
-                <option value="LENOVO">Lenovo</option>
-                <option value="HP">HP</option>
-                <option value="ASUS">Asus</option>
-                <option value="GIGABYTE">Gigabyte</option>
-                <option value="MACBOOK">Macbook</option>
-                <option value="IPHONE">iPhone</option>
-                <option value="SAMSUNG">Samsung</option>
-                <option value="XIAOMI">Xiaomi</option>
-                <option value="OPPO">Oppo</option>
-                <option value="REALME">Realme</option>
-                <option value="VIVO">Vivo</option>
-              </select>
-            </div>
+            {form.category === "LAPTOP" && (
+              <div className="form-group">
+                <label>Nhà sản xuất</label>
+                <select
+                  name="factory"
+                  value={form.factory}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>-- Chọn --</option>
+                  <option value="DELL">DELL</option>
+                  <option value="ACER">ACER</option>
+                  <option value="MSI">MSI</option>
+                  <option value="LENOVO">LENOVO</option>
+                  <option value="HP">HP</option>
+                  <option value="ASUS">ASUS</option>
+                  <option value="MACBOOK">MACBOOK</option>
+                </select>
+              </div>
+            )}
+
+            {form.category === "PHONE" && (
+              <div className="form-group">
+                <label>Nhà sản xuất</label>
+                <select
+                  name="factory"
+                  value={form.factory}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>-- Chọn --</option>
+                  <option value="IPHONE">IPHONE</option>
+                  <option value="SAMSUNG">SAMSUNG</option>
+                  <option value="OPPO">OPPO</option>
+                  <option value="VIVO">VIVO</option>
+                  <option value="XIAOMI">XIAOMI</option>
+                  <option value="REALME">REALME</option>
+                  <option value="HONOR">HONOR</option>
+                </select>
+              </div>
+            )}
           </div>
         </form>
 
-        {/* PHẦN ẢNH */}
+        {/* === ẢNH & FEATURE === */}
         <div className="edit-images">
-          <div className="existing-images">
-            <h5>Ảnh hiện có</h5>
-            <div className="image-row">
-            {existingImages?.length ? (
-            existingImages.map((img, i) => (
-            <div key={i} className="image-item">
-              <img
-                src={`${BASE_URL}${img.url?.startsWith("/") ? img.url : "/" + img.url}`}
-                alt={`img-${i}`}
-                onClick={() =>
-                  setZoomImg(`${BASE_URL}${img.url?.startsWith("/") ? img.url : "/" + img.url}`)
-                }
-                onError={(e) => (e.target.src = "/no-image.png")}
-              />
-              <button type="button" onClick={() => handleDeleteExistingImage(img.id)}>
-                X
-              </button>
-            </div>
-          ))
-          ) : (
-            <p>Không có ảnh</p>
-          )}
-          </div>
+          <h5>Ảnh hiện có</h5>
+          <div className="image-row">
+            {existingImages.length ? (
+              existingImages.map((img, i) => (
+                <div key={i} className="image-item">
+                  <img
+                    src={`${BASE_URL}${img.url}`}
+                    alt=""
+                    onClick={() => setZoomImg(`${BASE_URL}${img.url}`)}
+                  />
+                  <button onClick={() => handleDeleteExistingImage(img.id)}>
+                    X
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p>Không có ảnh</p>
+            )}
           </div>
 
-          <div className="add-new-images">
+          <div className="features-section">
+            <h5>Nhu cầu sử dụng</h5>
+            <div className="feature-list">
+              {(form.category === "LAPTOP"
+                ? FEATURE_NAMES.slice(0, 6) 
+                : form.category === "PHONE"
+                ? FEATURE_NAMES.slice(6) 
+                : []
+            ).map((f) => (
+            <div key={f.id}
+              className={`feature-item ${
+            tempFeatures.includes(f.id) ? "selected" : "" }`}
+            onClick={() => toggleFeature(f.id)}
+            >
+            {f.name}
+        </div>
+        ))}
+        </div>
+          </div>
+
+          <div className="features-section">
             <h5>Thêm ảnh mới</h5>
             <input
               type="file"
               multiple
               accept="image/*"
               onChange={handleFileChange}
+              ref={fileInputRef}
             />
             {previewUrls.length > 0 && (
               <div className="image-row">
                 {previewUrls.map((p, i) => (
                   <div className="image-item" key={i}>
-                    <img src={p} alt={`preview-${i}`} />
-                    <button type="button" onClick={() => removeNewPreview(i)}>
-                      X
-                    </button>
+                    <img src={p} alt="" />
+                    <button onClick={() => removeNewPreview(i)}>X</button>
                   </div>
                 ))}
               </div>
@@ -248,16 +349,12 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
           </div>
         </div>
 
-        {/* NÚT DƯỚI CÙNG */}
+        {/* === Nút hành động === */}
         <div className="modal-actions bottom">
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => setShow(false)}
-          >
+          <button className="btn btn-secondary" onClick={handleClose}>
             Hủy
           </button>
-          <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
+          <button className="btn btn-primary" onClick={handleSubmit}>
             Lưu thay đổi
           </button>
         </div>
@@ -265,26 +362,7 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
 
       {zoomImg && (
         <div className="zoom-overlay" onClick={() => setZoomImg(null)}>
-          <img src={zoomImg} alt="zoomed" className="zoomed-img" />
-        </div>
-      )}
-
-      {confirmDelete && (
-        <div className="confirm-overlay">
-          <div className="confirm-box">
-            <p>Bạn có chắc muốn xóa ảnh này không?</p>
-            <div className="confirm-actions">
-              <button
-                className="btn-cancel"
-                onClick={() => setConfirmDelete(null)}
-              >
-                Hủy
-              </button>
-              <button className="btn-confirm" onClick={confirmDeleteImage}>
-                Xác nhận
-              </button>
-            </div>
-          </div>
+          <img src={zoomImg} alt="zoomed" />
         </div>
       )}
     </div>

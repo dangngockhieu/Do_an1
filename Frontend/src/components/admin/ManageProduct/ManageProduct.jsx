@@ -13,7 +13,7 @@ import { getProductsWithPaginate, deleteProduct } from "../../../services/apiSer
 import "./ManageProduct.scss";
 
 const ManageProduct = () => {
-  const LIMIT = 10;
+  const LIMIT = 7;
   const [products, setProducts] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -165,7 +165,7 @@ const ManageProduct = () => {
               <option value="VIVO">VIVO</option>
               <option value="XIAOMI">XIAOMI</option>
               <option value="REALME">REALME</option>
-              <option value="HUAWEI">HUAWEI</option>
+              <option value="HONOR">HONOR</option>
             </select>
           )}
 

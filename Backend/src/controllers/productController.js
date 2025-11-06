@@ -35,13 +35,58 @@ export const getTopSellingPhone = async (req, res) => {
   }
 };
 
-export const getReviewsByProductId = async (req, res) => {
+export const addProductFeatures = async (req, res) => {
   try {
-    const reviews = await productService.getReviewsByProductId(+req.params.id);
-    if (!reviews) return res.status(404).json({ EC: 1, EM: 'Not found' });
-    res.status(200).json({ EC: 0, DT: reviews });
+    let { featureIDs } = req.body;
+
+    if (typeof featureIDs === "string") {
+      featureIDs = JSON.parse(featureIDs);
+    }
+
+    await productService.addProductFeatures(+req.params.productID, featureIDs);
+    res.status(200).json({ EC: 0, EM: "Added successfully" });
+  } catch (err) {
+    console.error(" addProductFeatures error:", err);
+    res.status(500).json({ EC: 1, EM: err.message });
+  }
+};
+
+export const deleteProductFeature = async (req, res) => {
+  try {
+    await productService.deleteProductFeature(+req.query.productID, +req.query.featureID);
+    res.status(200).json({ EC: 0, EM: 'Deleted successfully' });
   } catch (err) {
     res.status(500).json({ EC: 1, EM: err.message });
+  }
+};
+
+export const getProductById = async (req, res) => {
+  try {
+    const {product, reviews} = await productService.getProductById(+req.params.id);
+    if (!product) return res.status(404).json({ EC: 1, EM: 'Not found' });
+    res.status(200).json({ EC: 0, DT: {product, reviews} });
+  } catch (err) {
+    res.status(500).json({ EC: 1, EM: err.message });
+  }
+}
+
+export const getFilteredProducts = async (req, res) => {
+  try {
+    const { category } = req.query;
+    const filters = req.body;
+
+    const products = await productService.getAllProducts(category, filters);
+
+    res.status(200).json({
+      EC: 0,
+      DT: {products, count: products.length},
+    });
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    res.status(500).json({
+      EC: 1,
+      EM: "Lỗi khi lấy danh sách sản phẩm",
+    });
   }
 };
 
@@ -85,14 +130,6 @@ export const addProductImages = async (req, res) => {
   }
 };
 
-export const updateProductImage = async (req, res) => {
-  try {
-    const updated = await productService.updateProductImage(+req.params.imageId, req.file);
-    res.status(200).json({ EC: 0, DT: updated, EM: 'Image updated successfully' });
-  } catch (err) {
-    res.status(500).json({ EC: 1, EM: err.message });
-  }
-};
 
 export const deleteProductImage = async (req, res) => {
   try {

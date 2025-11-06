@@ -7,13 +7,15 @@ import {
   getProductsWithPaginate,
   getTopSellingLaptop,
   getTopSellingPhone,
-  getReviewsByProductId,
+  addProductFeatures,
+  deleteProductFeature,
+  getProductById,
   createProduct,
   updateProduct,
   addProductImages,
-  updateProductImage,
   deleteProductImage,
   deleteProduct,
+  getFilteredProducts
 } from '../controllers/productController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
@@ -40,14 +42,35 @@ const productRoutes = (app) => {
   // Lấy danh sách sản phẩm (có phân trang, search)
   router.get('/products-paginate', getProductsWithPaginate);
 
-  // Lấy chi tiết sản phẩm theo ID
-  router.get('/product-reviews/:id', getReviewsByProductId);
+  // Lấy chi tiết đánh giá sản phẩm theo ID
+  router.get('/products/:id', getProductById);
+
+
 
   // Lấy 5 sp Laptop bán chạy nhất
   router.get('/top-selling-laptop', getTopSellingLaptop);
 
   // Lấy 5 sp Phone bán chạy nhất
   router.get('/top-selling-phone', getTopSellingPhone);
+
+  // Lọc sp
+  router.post("/filter-products", getFilteredProducts);
+
+  // Thêm nhiều đặc điểm cho sản phẩm
+  router.post(
+    '/product-features/:productID',
+    jwtAuth,
+    authorizeRole(['ADMIN']),
+    addProductFeatures
+  );
+
+  // delete đặc điểm của sản phẩm
+  router.delete(
+    '/product-feature',
+    jwtAuth,
+    authorizeRole(['ADMIN']),
+    deleteProductFeature
+  );
 
   // Tạo mới sản phẩm (có ảnh)
   router.post(
@@ -59,7 +82,7 @@ const productRoutes = (app) => {
   );
 
   // Cập nhật thông tin sản phẩm (không ảnh)
-  router.patch(
+  router.put(
     '/products/:id',
     jwtAuth,
     authorizeRole(['ADMIN']),
@@ -75,14 +98,7 @@ const productRoutes = (app) => {
     addProductImages
   );
 
-  // Cập nhật 1 ảnh cụ thể
-  router.patch(
-    '/product-image/:imageId',
-    jwtAuth,
-    authorizeRole(['ADMIN']),
-    upload.single('image'),
-    updateProductImage
-  );
+
 
   // Xóa 1 ảnh
   router.delete(

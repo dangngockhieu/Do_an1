@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./ProductDetail.scss";
 
-const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BACKEND ;
 
 const ProductDetail = ({ show, setShow, product }) => {
   const [zoomImg, setZoomImg] = useState(null);
@@ -83,12 +83,25 @@ const ProductDetail = ({ show, setShow, product }) => {
             <p><strong>Trọng lượng:</strong> {form.weight}</p>
           </div>
 
-          {form.infor && (
-            <>
-              <h5>Thông tin thêm</h5>
-              <div className="detail-extra">{form.infor}</div>
-            </>
-          )}
+          <div className="detail-group-container">
+              <div className="detail-group-item">
+                  <h5>Đặc điểm phân loại</h5>
+                  {product?.features?.filter(feature => feature)?.length > 0 ? (
+                  product.features.filter(feature => feature).map((feature, i) => ( 
+                    <div key={feature.id || i} className="detail-extra">{feature.name}</div>
+                  ))
+                  ) : (
+                    <p>Không có Đặc điểm</p>
+                  )}
+              </div>
+              
+              {form.infor && (
+                <div className="detail-group-item">
+                  <h5>Thông tin thêm</h5>
+                  <div className="detail-extra">{form.infor}</div>
+                </div>
+              )}
+          </div>
         </div>
 
         <div className="modal-actions">

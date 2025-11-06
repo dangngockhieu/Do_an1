@@ -33,9 +33,14 @@ const main = async () => {
         { name: "Văn phòng" },
         { name: "Gaming" },
         { name: "Mỏng nhẹ" },
-        { name: "Đồ họa - kỹ thuật" },
+        { name: "Đồ họa" },
         { name: "Cảm ứng" },
         { name: "Laptop AI" },
+        { name: "Điện thoại 5G" },
+        { name: "Điện thoại AI"},
+        { name: "Gaming Phone"},
+        { name: "Phổ thông 4G"},
+        { name: "Điện thoại gập"}
       ],
     });
   }
@@ -228,7 +233,7 @@ const main = async () => {
           factory: "OPPO",
         },
         {
-          name: "Realme GT 5 Pro",
+          name: "Samsung Galaxy Z Fold6",
           originalPrice: 19000000,
           price: 17000000,
           coupon: 10,
@@ -244,7 +249,7 @@ const main = async () => {
           weight: "205g",
           releaseYear: "2024",
           category: "PHONE",
-          factory: "REALME",
+          factory: "SAMSUNG",
         },
       ],
     });
@@ -255,11 +260,12 @@ const main = async () => {
   // ========== PRODUCT FEATURES ==========
   const pfCount = await prisma.productFeature.count();
   if (pfCount === 0) {
-    console.log("🔗 Gắn feature cho sản phẩm (chỉ Laptop)...");
+    console.log("🔗 Gắn feature cho sản phẩm ...");
 
     const laptops = products.filter((p) => p.category === "LAPTOP");
-    const [vanPhong, gaming, mongNhe, doHoa, camUng, laptopAI] = features;
+    const phones = products.filter((p) => p.category === "PHONE");
 
+    const [vanPhong, gaming, mongNhe, doHoa, camUng, laptopAI, dienThoai5G, dienThoaiAI, gamingPhone, phoThong4G, dienThoaiGap] = features;
     for (const laptop of laptops) {
       switch (laptop.name) {
         case "Dell Inspiron 15":
@@ -298,6 +304,50 @@ const main = async () => {
             data: [
               { productID: laptop.id, featureID: mongNhe.id },
               { productID: laptop.id, featureID: laptopAI.id },
+            ],
+          });
+          break;
+      }
+    }
+
+    for (const phone of phones) {
+      switch (phone.name) {
+        case "iPhone 15 Pro":
+          await prisma.productFeature.create({ data: { productID: phone.id, featureID: dienThoai5G.id } });
+          break;
+
+        case "Samsung Galaxy S24 Ultra":
+          await prisma.productFeature.createMany({
+            data: [
+              { productID: phone.id, featureID: dienThoai5G.id },
+              { productID: phone.id, featureID: dienThoaiAI.id },
+            ],
+          });
+          break;
+
+        case "Xiaomi 14 Pro":
+          await prisma.productFeature.createMany({
+            data: [
+              { productID: phone.id, featureID: gamingPhone.id },
+              { productID: phone.id, featureID: phoThong4G.id },
+            ],
+          });
+          break;
+
+        case "Oppo Find X7":
+          await prisma.productFeature.createMany({
+            data: [
+              { productID: phone.id, featureID: gamingPhone.id },
+              { productID: phone.id, featureID: dienThoai5G.id },
+            ],
+          });
+          break;
+
+        case "Samsung Galaxy Z Fold6":
+          await prisma.productFeature.createMany({
+            data: [
+              { productID: phone.id, featureID: dienThoai5G.id },
+              { productID: phone.id, featureID: dienThoaiGap.id },
             ],
           });
           break;

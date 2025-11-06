@@ -72,8 +72,8 @@ export const getProductsWithPaginate = (page, limit, search = "", category, fact
 };
 
 // Lấy chi tiết sản phẩm theo ID
-export const getReviewsByProductId = (id) => {
-  const URL_BACKEND = `product/product-reviews/${id}`;
+export const getProductById = (id) => {
+  const URL_BACKEND = `product/products/${id}`;
   return axios.get(URL_BACKEND);
 };
 // lấy 5 sp laptop bán chạy nhất
@@ -87,6 +87,24 @@ export const getTopSellingPhone = () => {
   return axios.get(URL_BACKEND);
 };
 
+// Lọc sản phẩm
+export const getFilteredProducts = async (category, filters) => {
+  const URL_BACKEND = `product/filter-products?category=${category}`;
+  return await axios.post(URL_BACKEND, filters);
+};
+
+// Thêm nhiều đặc điểm cho sản phẩm
+export const addProductFeatures = (productID, featureIDs) => {
+  const URL_BACKEND = `product/product-features/${productID}`;
+  return axios.post(URL_BACKEND, { featureIDs });
+};
+
+// Xóa đặc điểm của sản phẩm
+export const deleteProductFeature = (productID, featureID) => {
+  const URL_BACKEND = `product/product-feature?productID=${productID}&featureID=${featureID}`;
+  return axios.delete(URL_BACKEND);
+};
+
 // Tạo mới sản phẩm (có ảnh)
 export const createProduct = (formData) => {
   const URL_BACKEND = `product/product`;
@@ -98,7 +116,7 @@ export const createProduct = (formData) => {
 // Cập nhật thông tin sản phẩm (không bao gồm ảnh)
 export const updateProduct = (id, data) => {
   const URL_BACKEND = `product/products/${id}`;
-  return axios.patch(URL_BACKEND, data);
+  return axios.put(URL_BACKEND, data);
 };
 
 // Thêm nhiều ảnh cho sản phẩm
@@ -109,13 +127,6 @@ export const addProductImages = (id, formData) => {
   });
 };
 
-// Cập nhật 1 ảnh
-export const updateProductImage = (imageId, formData) => {
-  const URL_BACKEND = `product/product-image/${imageId}`;
-  return axios.patch(URL_BACKEND, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-};
 
 // Xóa 1 ảnh
 export const deleteProductImage = (imageId) => {

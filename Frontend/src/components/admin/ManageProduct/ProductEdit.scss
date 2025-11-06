@@ -122,6 +122,48 @@
   }
 }
 
+/* ===  Nhu cầu sử dụng === */
+.features-section {
+  margin-top: 25px;
+
+  h5 {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  .feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .feature-item {
+      border: 1.5px solid #ccc;
+      padding: 7px 14px;
+      border-radius: 22px;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-color: #f9fafb;
+      user-select: none;
+
+      &:hover {
+        border-color: #1ea971;
+        background: #e8fff4;
+        color: #1ea971;
+      }
+
+      &.selected {
+        background: #1ea971;
+        color: #fff;
+        border-color: #1ea971;
+        font-weight: 600;
+        box-shadow: 0 0 6px rgba(30, 169, 113, 0.3);
+      }
+    }
+  }
+}
+
 /* NÚT DƯỚI CÙNG */
 .modal-actions.bottom {
   margin-top: 25px;
@@ -204,5 +246,51 @@
       border-radius: 6px;
       cursor: pointer;
     }
+  }
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .modal-box {
+    padding: 18px 22px;
+    max-width: 95%;
+
+    h4 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .image-item {
+    width: 90px;
+    height: 90px;
+  }
+
+  .feature-item {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
+  .modal-actions.bottom {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-box {
+    padding: 15px;
+  }
+
+  .image-item {
+    width: 75px;
+    height: 75px;
+  }
+
+  .feature-item {
+    font-size: 0.8rem;
   }
 }

@@ -8,7 +8,7 @@ import { getTopSellingLaptop, getTopSellingPhone } from "../../services/apiServi
 import "./LandingPage.scss";
 import { FaStar } from "react-icons/fa6";
 
-const BASE_URL = import.meta.env.VITE_BACKEND || "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BACKEND ;
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const LandingPage = () => {
 
   //  Hàm điều hướng đến trang chi tiết
   const handleNavigate = (product) => {
-    navigate(`/products/${product.id}`, { state: { product: product } });
+    navigate(`/product/${product.id}`);
   };
 
   const renderProducts = (list = []) =>

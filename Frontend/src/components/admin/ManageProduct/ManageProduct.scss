@@ -152,8 +152,6 @@
 
       tbody tr {
         border-bottom: 1px solid #f1f5f9;
-
-        // === Hàng chẵn/lẻ màu khác nhau ===
         &:nth-child(odd) {
           background-color: #f9fafb;
         }
@@ -161,7 +159,6 @@
           background-color: #dfdede;
         }
 
-        // Hover làm nổi bật
         &:hover {
           background-color: #e0e7ff;
           transition: background-color 0.25s ease;
