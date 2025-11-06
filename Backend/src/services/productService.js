@@ -156,43 +156,133 @@ export const getTopSellingPhone = async () => {
   return safeProducts;
 }
 
+const buildFlexibleLikeClause = (fieldName, values) => {
+  if (!values?.length || values.includes("Tất cả")) return null;
+
+  const clauses = values.map(rawV => {
+    const v = String(rawV).toLowerCase().replace(/\s/g, ""); // chuẩn hóa filter
+    // tránh lỗi dấu nháy đơn phá SQL
+    const safeV = v.replace(/'/g, "''");
+    // COALESCE để không fail nếu cột null
+    return `COALESCE(REPLACE(LOWER(${fieldName}), ' ', ''), '') LIKE CONCAT('%', '${safeV}', '%')`;
+  });
+
+  return `(${clauses.join(" OR ")})`;
+};
 export const getAllProducts = async (category, filters) => {
   const whereClauses = [`p.category = '${category}'`];
 
   // --- Thương hiệu (factory) ---
-  if (filters?.brands?.length) {
-    const brandNames = filters.brands.map(b => `'${b}'`).join(", ");
+  if (filters?.factories?.length) {
+    const brandNames = filters.factories.map(b => `'${b}'`).join(", ");
     whereClauses.push(`p.factory IN (${brandNames})`);
   }
 
   // --- Nhu cầu ---
-  if (filters?.features?.length) {
-    const featureNames = filters.features.map(f => `'${f}'`).join(", ");
-    whereClauses.push(`
-      EXISTS (
-        SELECT 1 FROM product_features pf
-        JOIN features f ON f.id = pf.featureId
-        WHERE pf.productId = p.id AND f.name IN (${featureNames})
-      )
-    `);
-  }
-
-  // --- Các filter text (CPU, RAM, SSD, GPU, v.v.) ---
-  if (filters?.specs) {
-    Object.entries(filters.specs).forEach(([key, values]) => {
-      if (values.length && !values.includes("Tất cả")) {
-        const vals = values.map(v => `'${v}'`).join(", ");
-        whereClauses.push(`p.${key.toLowerCase().replace(/\s/g, "_")} IN (${vals})`);
-      }
-    });
-  }
+  if (filters?.product_features?.length) {
+  const featureIds = filters.product_features.join(", ");
+  whereClauses.push(`
+    EXISTS (
+      SELECT 1 FROM product_features pf
+      WHERE pf.productID = p.id AND pf.featureID IN (${featureIds})
+    )
+  `);
+}
 
   // --- Khoảng giá ---
-  if (filters?.price?.min && filters?.price?.max) {
-    const min = filters.price.min ;
-    const max = filters.price.max ;
+ if (filters?.price) {
+  const { min, max } = filters.price;
+
+  if (min != null && max != null) {
     whereClauses.push(`p.price BETWEEN ${min} AND ${max}`);
+  } else if (min != null) {
+    whereClauses.push(`p.price >= ${min}`);
+  } else if (max != null) {
+    whereClauses.push(`p.price <= ${max}`);
   }
+}
+
+ // ======= Lọc SPECIFIC =======
+if (filters?.specs) {
+  const specs = filters.specs;
+
+  // === Lọc CPU ===
+  if (specs.CPU?.length && !specs.CPU.includes("Tất cả")) {
+    const cpuVals = specs.CPU
+    .filter(v => v && v !== "Tất cả") 
+    .map(v =>
+      `REPLACE(LOWER(p.cpu), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+    ).join(" OR ");
+    if (cpuVals) whereClauses.push(`(${cpuVals})`);
+  }
+
+  // === Lọc RAM ===
+  if (specs.RAM?.length && !specs.RAM.includes("Tất cả")) {
+    const ramVals = specs.RAM
+    .filter(v => v && v !== "Tất cả") 
+    .map(v =>
+      `REPLACE(LOWER(p.ram), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+    ).join(" OR ");
+    if (ramVals) whereClauses.push(`(${ramVals})`);
+  }
+
+
+  // === Lọc Cạc đồ họa rời ===
+  if (specs.GPU?.length && !specs.GPU.includes("Tất cả")) {
+    const gpuVals = specs.GPU
+    .filter(v => v && v !== "Tất cả") 
+    .map(v =>
+      `REPLACE(LOWER(p.graphicsCard), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+    )
+    .join(" OR ");
+    if (gpuVals) whereClauses.push(`(${gpuVals})`);
+}
+
+  // === Lọc Ổ cứng ===
+  if (specs.Storage?.length && !specs.Storage.includes("Tất cả")) {
+    const ssdVals = specs.Storage
+    .filter(v => v && v !== "Tất cả") 
+    .map(v =>
+      `REPLACE(LOWER(p.storage), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+    )
+    .join(" OR ");
+    if (ssdVals) whereClauses.push(`(${ssdVals})`);
+}
+
+  // === Lọc kích thước màn hình ===
+  if (specs.ScreenSize?.length && !specs.ScreenSize.includes("Tất cả")) {
+    const screenVals = specs.ScreenSize
+    .filter(v => v && v !== "Tất cả") 
+    .map(v =>
+      `REPLACE(LOWER(p.screen), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+    )
+    .join(" OR ");
+    if (screenVals) whereClauses.push(`(${screenVals})`);
+}
+
+  // === Lọc Pin (nếu là điện thoại) ===
+  if (specs.PIN?.length && !specs.PIN.includes("Tất cả")) {
+    const pinVals = specs.PIN
+    .filter(v => v && v !== "Tất cả") 
+    .map(v =>
+      `REPLACE(LOWER(p.battery), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+    )
+    .join(" OR ");
+    if (pinVals) whereClauses.push(`(${pinVals})`);
+}
+
+  // === Lọc Màn hình (nếu là điện thoại) ===
+  if (specs.Screen?.length && !specs.Screen.includes("Tất cả")) {
+    const displayVals = specs.Screen
+    .filter(v => v && v !== "Tất cả") 
+    .map(v =>
+      `REPLACE(LOWER(p.screen), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+    )
+    .join(" OR ");
+    if (displayVals) whereClauses.push(`(${displayVals})`);
+}
+}
+
 
   const whereSQL = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
 

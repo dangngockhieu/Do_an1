@@ -44,6 +44,10 @@ const LandingPage = () => {
     navigate(`/product/${product.id}`);
   };
 
+  const navigateProduct = () =>{
+    navigate('/product');
+  }
+
   const renderProducts = (list = []) =>
     list.map((item) => {
       const imgUrl = item.imageUrls?.length
@@ -89,7 +93,7 @@ const LandingPage = () => {
     });
 
   return (
-    <div className="container landing-page">
+    <div className="landing-page">
       {/* ===== HERO BANNER ===== */}
       <section className="header__hero">
         <div className="header__hero-content">
@@ -98,7 +102,7 @@ const LandingPage = () => {
             Trải nghiệm khác biệt <br />
             <span>Deal hot mỗi ngày</span>
           </h1>
-          <button className="hero-btn">Mua ngay</button>
+          <button className="hero-btn" onClick={() => navigateProduct()}>Mua ngay</button>
         </div>
         <div className="header__hero-image">
           <img src={banners[currentBanner]} alt="Banner" />

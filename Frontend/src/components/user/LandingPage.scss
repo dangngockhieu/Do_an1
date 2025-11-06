@@ -1,11 +1,15 @@
+.landing-page{
+  background: #edf4f6;
+}
 .header__hero {
+  background: #afcfd6;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100vw;
   margin: 0 calc(-50vw + 50%);
   padding: 60px 0;
-  background: #e4e5e5;
+  background: #d8e5e5;
   box-sizing: border-box;
   overflow: hidden;
   gap: 40px;
@@ -73,6 +77,7 @@
 .bestseller {
   margin-top: 80px;
   padding-bottom: 40px;
+  // background: #afcfd6;
 
   &__header {
     display: flex;
@@ -81,6 +86,7 @@
     margin-bottom: 20px;
     flex-wrap: wrap;
     gap: 8px;
+    padding-left: 130px ;
 
     h2 {
       font-size: 1.6rem;
@@ -276,6 +282,7 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 6px;
+      
 
       a {
         align-self: flex-end;
