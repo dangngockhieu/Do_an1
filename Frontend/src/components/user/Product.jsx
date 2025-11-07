@@ -30,7 +30,7 @@ import { getFilteredProducts } from "../../services/apiServices";
 import "./Product.scss";
 import { toast } from "react-toastify";
 
-const BASE_URL = import.meta.env.VITE_BACKEND;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const FACTORIES = [
   { id: 1, name: "MACBOOK", image: macbook },
@@ -136,7 +136,9 @@ const PHONE_PRICE_OPTIONS = [
 const Product = () => {
   const navigate = useNavigate();
   const [category, setCategory] = useState("LAPTOP");
-  const headers = [header1, header2, header3, header4, header5, header6, header7, header8, header9, header10];
+  const headersLaptop = [header1, header2, header3, header4, header5];
+  const headersPhone = [header6, header7, header8, header9, header10];
+  const [headers, setHeaders] = useState(headersLaptop);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [currentFactories, setCurrentFactories] = useState(FACTORIES.slice(0, 7));
   const [currentPrices, setCurrentPrices] = useState(LAPTOP_PRICE_OPTIONS);
@@ -243,14 +245,23 @@ const Product = () => {
       setCurrentFeatures(FEATURE_NAMES.slice(0, 6));
       setProducts(initialLaptops);
       setCount(initialLaptopCount);
+      setHeaders(headersLaptop);
     } else {
       setCurrentFactories(FACTORIES.slice(7));
       setCurrentPrices(PHONE_PRICE_OPTIONS);
       setCurrentFeatures(FEATURE_NAMES.slice(6));
       setProducts(initialPhones);
       setCount(initialPhoneCount);
+      setHeaders(headersPhone);
     }
   }, [category, initialLaptops, initialPhones]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % headers.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const currentFilters = category === "LAPTOP" ? LAPTOP_FILTERS : PHONE_FILTERS;
   const filterKeys = Object.keys(currentFilters);

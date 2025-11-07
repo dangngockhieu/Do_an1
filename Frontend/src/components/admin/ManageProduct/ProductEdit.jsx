@@ -8,8 +8,9 @@ import {
 } from "../../../services/apiServices";
 import { toast } from "react-toastify";
 import "./ProductEdit.scss";
+import { RiFolderUploadFill } from "react-icons/ri";
 
-const BASE_URL = import.meta.env.VITE_BACKEND;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 // Danh sách feature có id + name
 const FEATURE_NAMES = [
@@ -329,24 +330,34 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
 
           <div className="features-section">
             <h5>Thêm ảnh mới</h5>
+
+            <div className="file-upload-wrapper">
             <input
               type="file"
+              id="fileUpload"
               multiple
               accept="image/*"
               onChange={handleFileChange}
               ref={fileInputRef}
+              style={{ display: "none" }}
             />
-            {previewUrls.length > 0 && (
-              <div className="image-row">
-                {previewUrls.map((p, i) => (
-                  <div className="image-item" key={i}>
-                    <img src={p} alt="" />
-                    <button onClick={() => removeNewPreview(i)}>X</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+            <label htmlFor="fileUpload" className="custom-upload-btn">
+              <RiFolderUploadFill style={{ marginRight: "5px", marginBottom: "2px", fontSize: "30px", color: "#817614ff" }} /> Chọn ảnh ({newFiles.length > 0 ? `${newFiles.length} file đã chọn` : "Chưa chọn ảnh"})
+            </label>
+            </div>
+
+          {previewUrls.length > 0 && (
+            <div className="image-row">
+            {previewUrls.map((p, i) => (
+          <div className="image-item" key={i}>
+          <img src={p} alt="" />
+          <button onClick={() => removeNewPreview(i)}>X</button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
         </div>
 
         {/* === Nút hành động === */}

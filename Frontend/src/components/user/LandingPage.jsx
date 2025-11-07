@@ -8,7 +8,7 @@ import { getTopSellingLaptop, getTopSellingPhone } from "../../services/apiServi
 import "./LandingPage.scss";
 import { FaStar } from "react-icons/fa6";
 
-const BASE_URL = import.meta.env.VITE_BACKEND ;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const LandingPage = () => {
   const navigate = useNavigate();

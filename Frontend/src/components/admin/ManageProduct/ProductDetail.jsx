@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./ProductDetail.scss";
 
-const BASE_URL = import.meta.env.VITE_BACKEND ;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ProductDetail = ({ show, setShow, product }) => {
   const [zoomImg, setZoomImg] = useState(null);
