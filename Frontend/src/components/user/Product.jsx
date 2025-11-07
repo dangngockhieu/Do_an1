@@ -103,14 +103,15 @@ const PHONE_FILTERS = {
     { label: "5.x", name: "5" }, 
     { label: "6.x", name: "6" },
     { label: "7.x", name: "7" },
+    { label: "8.x", name: "8" },
   ],
   "PIN (mAh)": [
     { label: "Tất cả", name: null },
-    { label: "3000.x", name: "3000" }, 
-    { label: "4000.x", name: "4000" },
-    { label: "5000.x", name: "5000" },
-    { label: "6000.x", name: "6000" },
-    { label: "7000.x", name: "7000" },
+    { label: "3000+", name: "3000" }, 
+    { label: "4000+", name: "4000" },
+    { label: "5000+", name: "5000" },
+    { label: "6000+", name: "6000" },
+    { label: "7000+", name: "7000" },
   ],
 };
 

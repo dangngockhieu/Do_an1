@@ -69,12 +69,13 @@
       cursor: pointer;
       transition: 0.3s;
 
-      &.active {
-        background: #000d08;
-      }
+      
 
       &:hover {
         background: #1ea971;
+      }
+      &.active {
+        background: #000d08;
       }
     }
   }
@@ -196,7 +197,7 @@
               border: 2px solid #0c0c0c;
             }
 
-            &:hover {
+            &:hover:not(.selected) {
               border-color: #1ea971;
             }
           }
@@ -321,7 +322,7 @@
           position: absolute;
           top: 10px;
           left: 10px;
-          background: #e63946;
+          background: #1976d2;
           color: #fff;
           font-size: 12px;
           font-weight: 600;
@@ -406,12 +407,12 @@
               transition: 0.3s;
 
               &.add-cart {
-                background: #1ea971;
+                background: #1976d2;
                 color: #fff;
               }
 
               &.buy-now {
-                background: #f4b400;
+                background: #16a34a;
                 color: #fff;
               }
 
@@ -431,6 +432,7 @@
       margin-left: 0rem;
       margin-right: 0rem;
     }
+    
 
     .main-content {
       flex-direction: column;
