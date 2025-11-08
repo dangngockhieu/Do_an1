@@ -272,11 +272,10 @@ export const generateToken = async (user) => {
   // ==================== LOGIN ====================
 export const login = async (user) => {
     const { access_token, refresh_token } = await generateToken(user);
-    const hashed = await argon.hash(refresh_token);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { refresh_token: hashed },
+      data: { refresh_token: refresh_token },
     });
 
     return {
@@ -305,20 +304,12 @@ export const postrefresh_token = async (refresh_token) => {
 
     const user = await prisma.user.findUnique({ where: { email: payload.email } });
     if (!user || !user.refresh_token){
-      console.error('❌ Argon verify failed. refresh_token mismatch');
       throw new Error('User not found or refresh token revoked');
     } 
-
-    const isValid = await argon.verify(user.refresh_token, refresh_token);
-    try {
-  const isValid = await argon.verify(user.refresh_token, refresh_token);
-  if (!isValid) {
-    console.error('❌ Argon verify failed. refresh_token mismatch');
-    throw new Error('Invalid refresh token');
-  }
-} catch (e) {
-  console.error('🔥 Refresh token verify error:', e.message);
-  throw e;
+    const isValid = user.refresh_token === refresh_token;
+    
+    if (!isValid) {
+  throw new Error('Invalid refresh token');
 }
 
     const access_token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRED });

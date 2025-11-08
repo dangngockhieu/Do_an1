@@ -14,7 +14,7 @@ const cleanupExpiredUsers = async () => {
       },
     });
     if (result.count > 0) {
-      console.log(`[CLEANUP] Deleted ${result.count} expired users`);
+      console.log(`Deleted ${result.count} expired users`);
     }
   } catch (err) {
     console.error('Cleanup job failed:', err);

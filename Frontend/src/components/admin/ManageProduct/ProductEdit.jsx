@@ -172,7 +172,6 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
       onRefresh();
       setShow(false);
     } catch (err) {
-      console.error(" Lỗi cập nhật:", err);
       toast.error("Lỗi khi cập nhật sản phẩm");
     }
   };

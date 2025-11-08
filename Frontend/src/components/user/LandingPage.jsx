@@ -7,15 +7,59 @@ import banner4 from "../../assets/banner_header4.png";
 import { getTopSellingLaptop, getTopSellingPhone } from "../../services/apiServices";
 import "./LandingPage.scss";
 import { FaStar } from "react-icons/fa6";
+import { useSelector, useDispatch } from "react-redux";
+import { setCartCount } from "../../redux/action/cartAction";
+import { addProductToCart, getNumberCart, buyNow } from "../../services/apiServices";
+import { toast } from "react-toastify";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const LandingPage = () => {
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const banners = [banner1, banner2, banner3, banner4];
   const [currentBanner, setCurrentBanner] = useState(0);
   const [topLaptops, setTopLaptops] = useState([]);
   const [topPhones, setTopPhones] = useState([]);
+
+  const handleAddToCart = async (productID) => {
+  if (!isAuthenticated) {
+    toast.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
+    return;
+  }
+
+    const res = await addProductToCart(productID);
+    try{
+    if (res?.EC === 0) {
+      toast.success("Đã thêm vào giỏ hàng!");
+      const cartRes = await getNumberCart();
+      if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
+    } else {
+      toast.error(res?.EM || "Không thể thêm vào giỏ hàng");
+    }
+    } catch (err){
+      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    }
+};
+
+  const handleBuyNow = async (productID) => {
+  if (!isAuthenticated) {
+    toast.warning("Vui lòng đăng nhập để mua sản phẩm!");
+    return;
+  }
+
+    const res = await buyNow(productID);
+    try{
+    if (res?.EC === 0) {
+      const cartRes = await getNumberCart();
+      if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
+      navigate('/cart');
+    } 
+    } catch (err){
+      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    }
+};
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,10 +124,10 @@ const LandingPage = () => {
             </div>
 
             <div className="actions">
-              <button className="add-cart" onClick={() => handleNavigate(item)}>
+              <button className="add-cart" onClick={() => handleAddToCart(item.id)}>
                 Add To Cart
               </button>
-              <button className="buy-now" onClick={() => handleNavigate(item)}>
+              <button className="buy-now" onClick={() => handleBuyNow(item.id)}>
                 Buy Now
               </button>
             </div>

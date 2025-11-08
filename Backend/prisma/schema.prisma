@@ -27,14 +27,15 @@ model User {
 }
 
 model Cart {
-  id        Int @id @default(autoincrement())
-  userID    Int
-  productID Int
-  number    Int
+  userID     Int
+  productID  Int
+  number     Int
+  isSelected Boolean @default(false)
 
   user    User    @relation(fields: [userID], references: [id])
   product Product @relation(fields: [productID], references: [id])
 
+  @@id([userID, productID])
   @@map("carts")
 }
 

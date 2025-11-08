@@ -77,7 +77,7 @@ instance.interceptors.response.use(
         return new Promise((resolve) => {
           addRefreshSubscriber((newAccessToken) => {
             originalRequest.headers['Authorization'] =
-              `Bearer ${newAccessToken}`;
+              'Bearer ' + newAccessToken;
             resolve(instance(originalRequest));
           });
         });
@@ -98,7 +98,7 @@ instance.interceptors.response.use(
 
           onRefreshed(newAccess);
           console.log('Refresh token thành công.');
-
+          originalRequest._retry = true;
           originalRequest.headers['Authorization'] = 'Bearer ' + newAccess;
           return instance(originalRequest);
         } else {
@@ -106,6 +106,7 @@ instance.interceptors.response.use(
         }
       } catch (err) {
         console.error('Làm mới token thất bại:', err);
+        console.log('Refresh token error response:', err.response?.data, err.response?.status);
         toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!');
         store.dispatch(doLogout());
         return Promise.reject(err);

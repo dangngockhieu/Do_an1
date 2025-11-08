@@ -43,7 +43,6 @@ const ManageProduct = () => {
         toast.error(res?.EM || "Không tải được danh sách sản phẩm");
       }
     } catch (err) {
-      console.error(err);
       toast.error("Lỗi khi tải danh sách sản phẩm");
     } finally {
       setLoading(false);
@@ -107,7 +106,6 @@ const ManageProduct = () => {
         toast.error(res?.EM || "Xóa thất bại");
       }
     } catch (err) {
-      console.error(err);
       toast.error("Lỗi khi xóa sản phẩm");
     } finally {
       handleCloseAll();

@@ -33,7 +33,6 @@ const ManagerUser = () => {
   const fetchAndNotify = async (page, keyword = "") => {
     try {
       const res = await getUserWithPaginate(page, LIMIT, keyword);
-      console.log(res);
       if (res && res.EC === 0) {
         const users = res.DT?.users || [];
         setListUsers(users);
@@ -46,7 +45,6 @@ const ManagerUser = () => {
         if (res && res.EM) toast.error(res.EM);
       }
     } catch (error) {
-      console.error(error);
       setPageCount(0);
       toast.error('Lỗi khi tìm kiếm');
     }

@@ -81,11 +81,11 @@ export const getTopSellingLaptop = async () => {
       (
         SELECT JSON_ARRAYAGG(pi.url)
         FROM product_images pi 
-        WHERE pi.productId = p.id
+        WHERE pi.productId = p.id 
       ) AS imageUrls
     FROM products p
     LEFT JOIN reviews r ON p.id = r.productID
-    WHERE p.category = 'LAPTOP'
+    WHERE p.category = 'LAPTOP' AND p.quantity > 0
     GROUP BY p.id
     ORDER BY p.sold DESC
     LIMIT 5;
@@ -128,7 +128,7 @@ export const getTopSellingPhone = async () => {
       ) AS imageUrls
     FROM products p
     LEFT JOIN reviews r ON p.id = r.productID
-    WHERE p.category = 'PHONE'
+    WHERE p.category = 'PHONE' AND p.quantity > 0
     GROUP BY p.id
     ORDER BY p.sold DESC
     LIMIT 5;
@@ -156,19 +156,7 @@ export const getTopSellingPhone = async () => {
   return safeProducts;
 }
 
-const buildFlexibleLikeClause = (fieldName, values) => {
-  if (!values?.length || values.includes("Tất cả")) return null;
 
-  const clauses = values.map(rawV => {
-    const v = String(rawV).toLowerCase().replace(/\s/g, ""); // chuẩn hóa filter
-    // tránh lỗi dấu nháy đơn phá SQL
-    const safeV = v.replace(/'/g, "''");
-    // COALESCE để không fail nếu cột null
-    return `COALESCE(REPLACE(LOWER(${fieldName}), ' ', ''), '') LIKE CONCAT('%', '${safeV}', '%')`;
-  });
-
-  return `(${clauses.join(" OR ")})`;
-};
 export const getAllProducts = async (category, filters) => {
   const whereClauses = [`p.category = '${category}'`];
 
@@ -258,17 +246,22 @@ if (filters?.specs) {
     )
     .join(" OR ");
     if (screenVals) whereClauses.push(`(${screenVals})`);
-}
+  }
 
   // === Lọc Pin (nếu là điện thoại) ===
   if (specs.PIN?.length && !specs.PIN.includes("Tất cả")) {
-    const pinVals = specs.PIN
-    .filter(v => v && v !== "Tất cả") 
-    .map(v =>
-      `REPLACE(LOWER(p.battery), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
-    )
+  const pinConditions = specs.PIN
+    .filter(v => v && v !== "Tất cả")
+    .map(v => {
+      // lấy phần số (vd: "3000" → 3000)
+      const num = parseInt(v.match(/\d+/)?.[0] || 0, 10);
+      const min = num;
+      const max = num + 1000; 
+      return `CAST(REGEXP_SUBSTR(p.battery, '[0-9]+') AS UNSIGNED) >= ${min} AND CAST(REGEXP_SUBSTR(p.battery, '[0-9]+') AS UNSIGNED) < ${max}`;
+    })
     .join(" OR ");
-    if (pinVals) whereClauses.push(`(${pinVals})`);
+
+  if (pinConditions) whereClauses.push(`(${pinConditions})`);
 }
 
   // === Lọc Màn hình (nếu là điện thoại) ===
@@ -523,7 +516,6 @@ export const deleteProduct = async (id) => {
 
     return { EC: 0, EM: "Xóa sản phẩm thành công" };
   } catch (error) {
-    console.error("Error in deleteProduct:", error);
     return { EC: 1, EM: "Xóa sản phẩm thất bại", DT: error.message };
   }
 };

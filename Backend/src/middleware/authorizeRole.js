@@ -14,7 +14,6 @@ export const authorizeRole = (roles = []) => {
       // Nếu hợp lệ => đi tiếp
       next();
     } catch (err) {
-      console.error('Role authorization error:', err);
       return res.status(500).json({ EM: 'Server Internal Error', EC: -1 });
     }
   };

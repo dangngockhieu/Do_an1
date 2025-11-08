@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: #fff; /* 💡 nền trắng */
+  background: #fff; 
   color: #111;
   text-align: center;
   padding: 20px;
@@ -46,6 +46,12 @@
       font-weight: 600;
       letter-spacing: 0.5px;
       transition: all 0.3s ease;
+      .icon {
+        vertical-align: middle;
+        margin-right: 6px;
+        font-size: 1.1rem;
+        transform: scaleX(-1) !important;
+      }
 
       &:hover {
         background-color: #2fa463;
@@ -81,7 +87,7 @@
         vertical-align: middle;
         margin-right: 6px;
         font-size: 1.1rem;
-        transform: scaleX(-1);
+        transform: scaleX(-1) !important;
       }
     }
   }

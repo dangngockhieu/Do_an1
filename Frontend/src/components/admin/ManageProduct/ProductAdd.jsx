@@ -6,7 +6,6 @@ import {
 import { toast } from "react-toastify";
 import { RiFolderUploadFill } from "react-icons/ri";
 import "./ProductAdd.scss";
-import { set } from "nprogress";
 
 const FEATURE_NAMES = [
   { id: 1, name: "Văn phòng" },
@@ -147,7 +146,6 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
         setShow(false);
       } else toast.error(res?.EM || "Thêm thất bại");
     } catch (err) {
-      console.error(err);
       toast.error("Lỗi khi thêm sản phẩm");
     }
   };

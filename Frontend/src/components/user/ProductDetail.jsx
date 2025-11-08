@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./ProductDetail.scss";
-const BASE_URL = import.meta.env.VITE_BACKEND;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 import { FaStar, FaRegCircleCheck } from "react-icons/fa6";
-import { getProductById } from "../../services/apiServices";
+import { useSelector, useDispatch } from "react-redux";
+import { setCartCount } from "../../redux/action/cartAction";
+import { addProductToCart, getNumberCart, getProductById, buyNow } from "../../services/apiServices";
+import { toast } from "react-toastify";
 
 const ProductDetail = () => {
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.user);
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [reviewsData, setReviewsData] = useState([]);
@@ -29,6 +34,42 @@ const ProductDetail = () => {
     };
     fetchProduct();
   }, [id]);
+
+  const handleAddToCart = async (productID) => {
+  if (!isAuthenticated) {
+    toast.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
+    return;
+  }
+
+    const res = await addProductToCart(productID);
+    try{
+    if (res?.EC === 0) {
+      toast.success("Đã thêm vào giỏ hàng!");
+      const cartRes = await getNumberCart();
+      if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
+      } 
+    } catch (err){
+      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    }
+};
+
+const handleBuyNow = async (productID) => {
+  if (!isAuthenticated) {
+    toast.warning("Vui lòng đăng nhập để mua sản phẩm!");
+    return;
+  }
+
+    const res = await buyNow(productID);
+    try{
+    if (res?.EC === 0) {
+      const cartRes = await getNumberCart();
+      if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
+      navigate('/cart');
+    } 
+    } catch (err){
+      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    }
+};
 
   const handleScrollToReviews = () => {
     reviewsRef.current.scrollIntoView({
@@ -170,8 +211,8 @@ const ProductDetail = () => {
           </div>
 
           <div className="actions">
-            <button className="add-cart">Add To Cart</button>
-            <button className="buy-now">Buy Now</button>
+            <button className="add-cart" onClick={() => handleAddToCart(product.id)}>Add To Cart</button>
+            <button className="buy-now" onClick={() => handleBuyNow(product.id)}>Buy Now</button>
           </div>
         </div>
       </div>

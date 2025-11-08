@@ -13,7 +13,12 @@ export const jwtAuth = (req, res, next) => {
 
     // Xác thực token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = {
+      id: decoded.sub, 
+      email: decoded.email,
+      name: decoded.name,
+      role: decoded.role,
+    };
     return next();
   } catch (err) {
     // If token is expired, return 401 so client can attempt to refresh using refresh_token

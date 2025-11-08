@@ -1,25 +1,29 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { FaUserCircle, FaMapMarkerAlt } from "react-icons/fa";
-import { BsCartPlusFill, BsEnvelopeFill } from "react-icons/bs";
+import { BsCartPlusFill, BsEnvelopeFill, BsCaretDownFill } from "react-icons/bs";
 import { USER_LOGOUT_SUCCESS } from "../../redux/action/userAction";
 import { logout } from "../../services/apiServices";
-import { BsCaretDownFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import "./Header.scss";
 import ChangePassword from './ChangePassword';
 import { NavLink, Link } from "react-router-dom";
+import { setCartCount } from "../../redux/action/cartAction";
+import { getNumberCart} from "../../services/apiServices";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, account } = useSelector((state) => state.user);
+  const numberCart = useSelector((state) => state.cart.count);
 
   const [showMenu, setShowMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   const menuRef = useRef(null);
+  
 
   // Ẩn menu khi click ra ngoài
   useEffect(() => {
@@ -32,6 +36,22 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const res = await getNumberCart();
+        if (res?.EC === 0) {
+          dispatch(setCartCount(res.DT));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCart();
+  }, [dispatch]);
+
+
   const handleLogout = async() => {
       try {
         await logout(account.email);
@@ -43,6 +63,16 @@ const Header = () => {
       setShowMenu(false);
       navigate('/login');
   };
+
+  const handleOpenCart = () => {
+    if(isAuthenticated){
+      navigate('/cart');
+    }
+    else{
+      toast.info("Vui lòng đăng nhập để xem giỏ hàng");
+    }
+  };
+
 
   return (
     <header className="header">
@@ -83,9 +113,9 @@ const Header = () => {
         </div>
 
         <div className="header__icons" ref={menuRef}>
-          <button className="icon-btn cart left">
+          <button className="icon-btn cart left" onClick={handleOpenCart}>
             <BsCartPlusFill />
-            <span className="badge">0</span>
+            <span className="badge">{numberCart ?? 0}</span>
           </button>
 
           {/* Nút user */}
@@ -132,7 +162,6 @@ const Header = () => {
           )}
         </div>
       </div>
-
       {showChangePassword && (
         <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}

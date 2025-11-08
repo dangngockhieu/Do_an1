@@ -26,12 +26,23 @@ export const login = async (req, res) => {
     }
     const data = await authService.login(user);
     const isProd = process.env.NODE_ENV === 'production';
-      res.cookie('refresh_token', data.refresh_token, {
-      httpOnly: true,      
-      secure: isProd,
-      sameSite: isProd ? 'strict' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
-    });
+    if (req.cookies?.refresh_token) {
+  res.clearCookie('refresh_token', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+    domain: isProd ? '.techzone.vn' : 'localhost',
+  });
+}
+res.cookie('refresh_token', data.refresh_token, {
+  httpOnly: true,
+  secure: isProd,                      
+  sameSite: isProd ? 'none' : 'lax',   
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: '/',
+  domain: isProd ? '.techzone.vn' : 'localhost'
+});
     return res.status(200).json({
         DT: {
         access_token: data.access_token,
@@ -50,7 +61,16 @@ export const logout = async (req, res) => {
   try {
     const email = req.user.email;
     await authService.logout(email);
-    res.clearCookie('refresh_token');
+    const isProd = process.env.NODE_ENV === 'production';
+    if (req.cookies?.refresh_token) {
+  res.clearCookie('refresh_token', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+    domain: isProd ? '.techzone.vn' : 'localhost',
+  });
+}
     return res.status(200).json({
       EM: 'Logout successful', EC: 0
     });

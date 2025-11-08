@@ -46,7 +46,6 @@ export const addProductFeatures = async (req, res) => {
     await productService.addProductFeatures(+req.params.productID, featureIDs);
     res.status(200).json({ EC: 0, EM: "Added successfully" });
   } catch (err) {
-    console.error(" addProductFeatures error:", err);
     res.status(500).json({ EC: 1, EM: err.message });
   }
 };
@@ -82,7 +81,6 @@ export const getFilteredProducts = async (req, res) => {
       DT: {products, count: products.length},
     });
   } catch (err) {
-    console.error("Error fetching products:", err);
     res.status(500).json({
       EC: 1,
       EM: "Lỗi khi lấy danh sách sản phẩm",
@@ -107,7 +105,6 @@ export const createProduct = async (req, res) => {
       EM: 'Created successfully',
     });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ EC: 1, EM: err.message });
   }
 };
