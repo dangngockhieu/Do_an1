@@ -50,12 +50,11 @@
 
       .cart-info {
         flex: 1;
-        // BỐ CỤC CHÍNH: Chuyển cart-info thành Flex ngang (chia 2 cột)
         display: flex; 
-        align-items: flex-start; // Căn các cột theo chiều dọc (căn trên)
+        align-items: flex-start; 
 
         .product-text-info {
-            flex-grow: 1; // Chiếm phần lớn không gian
+            flex-grow: 1; 
             
             h4 {
                 font-size: 16px;
@@ -68,7 +67,6 @@
             }
 
             .cart-price {
-                // Đảm bảo không có margin-bottom nào đẩy xuống
                 .current {
                     color: #d0011b;
                     font-weight: 600;
@@ -82,13 +80,9 @@
         }
         
         .cart-actions {
-            // Căn chỉnh cho khối điều chỉnh số lượng
-            // Đẩy khối actions sang phải và căn giữa theo chiều dọc
             margin-top: 0; 
-            margin-left: 20px; // Thêm khoảng cách với tên/giá
-            align-self: center; // <-- Căn giữa theo chiều dọc so với khối product-text-info
-            
-            // Xóa các style Flex cũ từ .cart-info để tránh xung đột
+            margin-left: 20px; 
+            align-self: center; 
             display: block; 
             width: auto;
             
@@ -97,7 +91,7 @@
                 align-items: center;
                 justify-content: center;
                 gap: 8px; 
-                margin-left: auto; // Giữ nguyên margin-left: auto để căn chỉnh nội bộ
+                margin-left: auto; 
             }
 
             button {

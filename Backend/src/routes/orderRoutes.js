@@ -1,7 +1,7 @@
 'use strict';
 import express from 'express';
 import { createOrder, getOrderPendingforAdmin, getOrderShippingforAdmin, getOrderItem,
-  updateOrderComplete, updatePendingtoShipping
+  updateOrderComplete, updatePendingtoShipping, countOrders, getRevenueThisMonth, getRevenueByMonth
  } from '../controllers/orderController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
@@ -14,6 +14,13 @@ const orderRoutes = (app) => {
   router.get('/orders-item', jwtAuth, authorizeRole(['ADMIN']), getOrderItem);
   router.patch('/order-to-shipping', jwtAuth, authorizeRole(['ADMIN']), updatePendingtoShipping);
   router.patch('/order-complete', jwtAuth, updateOrderComplete);
+
+  // ==================== COUNT ORDERS ====================
+  router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countOrders);
+  router.get('/revenue-this-month', jwtAuth, authorizeRole(['ADMIN']), getRevenueThisMonth);
+
+  router.get('/revenue-by-month', jwtAuth, authorizeRole(['ADMIN']), getRevenueByMonth);
+
 
 
   app.use('/order', router);

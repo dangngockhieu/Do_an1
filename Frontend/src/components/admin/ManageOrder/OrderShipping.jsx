@@ -1,10 +1,9 @@
-// OrderShipping.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FaShippingFast } from 'react-icons/fa';
 import './OrderShipping.scss';
 import OrderViewModal from './OrderViewModal';
 
-const OrderShipping = ({ orders = [], pagination = {}, setPage, onRefresh }) => {
+const OrderShipping = ({ orders = [] }) => {
   const [viewOrder, setViewOrder] = useState(null);
   const ordersList = Array.isArray(orders) ? orders : [];
 

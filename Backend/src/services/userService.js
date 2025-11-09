@@ -169,3 +169,11 @@ export const deleteUser = async (id) => {
 
   await prisma.user.delete({ where: { id } });
 };
+
+// ==================== Count User ====================
+export const countUser = async () => {
+  const count = await prisma.user.count({
+    where: { isVerified: true },
+  });
+  return count;
+};

@@ -9,6 +9,7 @@ import {
   createUser,
   changeRoleUser,
   deleteUser,
+  countUsers
 } from '../controllers/userController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
@@ -26,6 +27,9 @@ const userRoutes = (app) => {
   router.patch('/change-password', jwtAuth, changePassword);
   router.patch('/user-role/:id', jwtAuth, authorizeRole(['ADMIN']), changeRoleUser);
   router.delete('/users/:id', jwtAuth, authorizeRole(['ADMIN']), deleteUser);
+
+  // ==================== COUNT USERS ====================
+  router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countUsers);
 
 app.use('/user', router);
 };

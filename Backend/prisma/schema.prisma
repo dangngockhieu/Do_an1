@@ -46,7 +46,7 @@ model Order {
   recipientName String    @db.VarChar(100)
   address       String    @db.VarChar(255)
   phone         String    @db.VarChar(20)
-  status        String    @db.VarChar(20)
+  status        String    @db.VarChar(20) // PENDING, SHIPPING, COMPLETED
   orderDate     DateTime
   trackingCode  String?   @db.VarChar(100)
   deliveryDate  DateTime?
@@ -64,7 +64,7 @@ model Payment {
   orderID       Int
   amount        Int
   method        String   @db.VarChar(50) // COD, VNPay, Momo...
-  status        String   @db.VarChar(50) // PENDING, SUCCESS, FAILED, REFUNDED
+  status        String   @db.VarChar(50) // UNPAID, PAIDED
   transactionID String?  @db.VarChar(100) // mã giao dịch từ cổng thanh toán
   createdAt     DateTime @default(now())
 

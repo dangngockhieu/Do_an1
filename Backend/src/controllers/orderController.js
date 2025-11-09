@@ -109,3 +109,33 @@ export const updateOrderComplete = async (req, res) => {
         });
     }
 };
+
+// ==================== COUNT ORDERS ====================
+export const countOrders = async (req, res) => {
+  try {
+    const count = await orderService.countOrders();
+    return res.status(200).json({ DT: { count }, EM: 'Count orders successful', EC: 0 });
+  } catch (error) {
+    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
+  }
+};
+
+// ==================== Revenue ====================
+export const getRevenueThisMonth = async (req, res) => {
+  try {
+    const revenue = await orderService.getRevenueThisMonth();
+    return res.status(200).json({ DT: { revenue }, EM: 'Get revenue successful', EC: 0 });
+  } catch (error) {
+    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
+  }
+};
+
+export const getRevenueByMonth = async (req, res) => {
+  try {
+    const data = await orderService.getRevenueByMonth();
+    res.status(200).json({ EC: 0, EM: "OK", DT: data });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ EC: -1, EM: "Server error" });
+  }
+};

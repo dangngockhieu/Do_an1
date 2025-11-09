@@ -161,7 +161,7 @@ export const updatePendingtoShipping = async(orderID, trackingCode, receivedDate
     return updatedOrder;
 };
 
-export const updateOrderComplete = async(orderID) =>{
+export const updateOrderComplete = async(orderID) =>{   // Dành cho ng dùng
     const updatedOrder = await prisma.order.update({
         where: { id: +orderID },
         data: {
@@ -195,3 +195,82 @@ export const getOrderItem = async(orderID) =>{
     `;
     return products;
 };
+
+export const countOrders = async () => {
+  const now = new Date();
+  const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+
+  const startOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), 1);
+  const endOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), vnNow.getDate(), 23, 59, 59);
+
+  const count = await prisma.order.count({
+    where: {
+      orderDate: {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      },
+    },
+  });
+
+  return count;
+};
+
+export const getRevenueThisMonth = async () => {
+  const now = new Date();
+  const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+
+  const startOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), 1);
+  const endOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), vnNow.getDate(), 23, 59, 59);
+
+  const result = await prisma.order.aggregate({
+    _sum: {
+      totalPrice: true,
+    },
+    where: {
+      orderDate: {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      },
+      status: "COMPLETED",
+    },
+  });
+
+  const totalRevenue = result._sum.totalPrice || 0;
+  return totalRevenue;
+};
+
+const toVietnamTime = (date) => {
+  return new Date(date.getTime() + 7 * 60 * 60 * 1000);
+};
+export const getRevenueByMonth = async () => {
+  const now = new Date();
+  const vnNow = toVietnamTime(now);
+  const year = vnNow.getFullYear();
+
+  const startOfYear = new Date(Date.UTC(year, 0, 1, 0, 0, 0)); 
+  const endOfYear = new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+
+  const result = await prisma.order.findMany({
+    where: {
+      status: "COMPLETED",
+      orderDate: {
+        gte: startOfYear,
+        lte: endOfYear,
+      },
+    },
+    select: {
+      orderDate: true,
+      totalPrice: true,
+    },
+  });
+
+  const monthlyRevenue = Array(12).fill(0);
+  result.forEach((r) => {
+    const vnDate = toVietnamTime(new Date(r.orderDate));
+    const month = vnDate.getMonth(); 
+    monthlyRevenue[month] += r.totalPrice;
+  });
+
+  return monthlyRevenue;
+};
+

@@ -15,7 +15,8 @@ import {
   addProductImages,
   deleteProductImage,
   deleteProduct,
-  getFilteredProducts
+  getFilteredProducts,
+  countProducts
 } from '../controllers/productController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
@@ -115,6 +116,9 @@ const productRoutes = (app) => {
     authorizeRole(['ADMIN']),
     deleteProduct
   );
+
+  // ==================== COUNT PRODUCTS ====================
+  router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countProducts);
 
   app.use('/product', router);
 };

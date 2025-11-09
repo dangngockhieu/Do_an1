@@ -1,4 +1,3 @@
-// OrderPending.jsx
 import { useState } from 'react';
 import './OrderPending.scss';
 import { FaBoxes } from 'react-icons/fa';

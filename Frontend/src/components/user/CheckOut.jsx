@@ -30,7 +30,6 @@ const Checkout = () => {
     { label: "Thanh toán qua ví MOMO", value: "MOMO" }
     ];
     const [paymentMethod, setPaymentMethod] = useState("COD");
-     // State cho thông tin người nhận
     const [recipient, setRecipient] = useState({
         name: '',
         address: '',
@@ -112,7 +111,6 @@ const Checkout = () => {
           )}
       </div>
       <div className="two-column-layout">
-      {/* KHỐI 1: THÔNG TIN NGƯỜI NHẬN */}
       <div className="recipient-info-block"> 
         <h2 className="block-title">Thông Tin Người Nhận</h2>
         

@@ -519,3 +519,10 @@ export const deleteProduct = async (id) => {
     return { EC: 1, EM: "Xóa sản phẩm thất bại", DT: error.message };
   }
 };
+
+
+// ==================== Count Products ====================
+export const countProducts = async () => {
+  const count = await prisma.product.count();
+  return count;
+}

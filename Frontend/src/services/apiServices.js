@@ -207,3 +207,33 @@ export const updateOrderComplete = (orderID) => {
   const URL_BACKEND = `/order/order-complete?orderID=${orderID}`;
   return axios.patch(URL_BACKEND);
 }
+
+// ==================== COUNT USERS API (Admin) ====================
+export const countUsersforAdmin = () => {
+  const URL_BACKEND = '/user/count';
+  return axios.get(URL_BACKEND);
+};
+
+// ==================== COUNT PRODUCTS API (Admin) ====================
+export const countProductsforAdmin = () => {
+  const URL_BACKEND = '/product/count';
+  return axios.get(URL_BACKEND);
+};
+
+// ==================== COUNT ORDERS API (Admin) ====================
+export const countOrdersthisMonth = () => {
+  const URL_BACKEND = '/order/count';
+  return axios.get(URL_BACKEND);
+};
+
+// ==================== REVENUE THIS MONTH API (Admin) ====================
+export const getRevenueThisMonthforAdmin = () => {
+  const URL_BACKEND = '/order/revenue-this-month';
+  return axios.get(URL_BACKEND);
+};
+
+// ==================== REVENUE BY MONTH API (Admin) ====================
+export const getRevenueByMonthforAdmin = () => {
+  const URL_BACKEND = '/order/revenue-by-month';
+  return axios.get(URL_BACKEND);
+};

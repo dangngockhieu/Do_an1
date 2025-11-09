@@ -145,3 +145,14 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ EC: 1, EM: err.message });
   }
 };
+
+
+// ==================== Count Products ====================
+export const countProducts = async (req, res) => {
+  try {
+    const count = await productService.countProducts();
+    return res.status(200).json({ DT: { count }, EM: 'Count products successful', EC: 0 });
+  } catch (error) {
+    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
+  }
+};

@@ -1,4 +1,3 @@
-// OrderViewModal.jsx
 import { useEffect, useState } from 'react';
 import { FaTimes, FaUser, FaBox, FaCalendarAlt } from 'react-icons/fa';
 import './OrderViewModal.scss';

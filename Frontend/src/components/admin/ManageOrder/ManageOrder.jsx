@@ -21,8 +21,7 @@ const ManageOrder = () => {
       setLoading(true);
       setOrders([]);
       try {
-        let res =
-          status === TAB_STATES.PENDING
+        let res = status === TAB_STATES.PENDING
             ? await getOrderPendingforAdmin(page, pagination.limit)
             : await getOrderShippingforAdmin(page, pagination.limit);
 

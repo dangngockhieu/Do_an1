@@ -4,7 +4,7 @@ $primary-color: #6a9c7b;
 $secondary-color: #f5f2f2; 
 $text-color: #333;
 $border-color: #a09e9e;
-$total-amount-color: #d0011b; /* Đã chuyển sang màu đỏ cho tổng tiền */
+$total-amount-color: #d0011b;
 $bg-recipient: #e0e6ed;
 
 .checkout-confirmation-container {
@@ -13,7 +13,6 @@ $bg-recipient: #e0e6ed;
     padding: 0 20px;
 }
 
-// --- KHỐI TÓM TẮT SẢN PHẨM (FULL WIDTH) ---
 .summary-wrapper {
     margin-bottom: 20px;
     width: 100%;
@@ -90,7 +89,6 @@ $bg-recipient: #e0e6ed;
 }
 
 
-// --- KHỐI CHIA 50:50 (DƯỚI) ---
 .two-column-layout {
     display: flex;
     gap: 30px;
@@ -103,10 +101,9 @@ $bg-recipient: #e0e6ed;
 }
 
 
-// --- KHỐI 1 & 2 CHUNG (Bây giờ là cột) ---
 .recipient-info-block,
 .payment-summary-block {
-    flex: 1; /* Chia đều 50:50 */
+    flex: 1; 
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -160,7 +157,7 @@ $bg-recipient: #e0e6ed;
 
 
 .payment-summary-block {
-    background: $secondary-color; /* Nền cho Thanh toán */
+    background: $secondary-color; 
     border: 1px solid color.adjust($border-color, $lightness: 5%); 
 
     .payment-methods-selection {

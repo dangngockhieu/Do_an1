@@ -23,7 +23,6 @@ export const getUsersWithPaginate = async (req, res) => {
   }
 };
 
-
 // ==================== GET USER BY ID ====================
 export const getUserById = async (req, res) => {
   try {
@@ -90,6 +89,16 @@ export const deleteUser = async (req, res) => {
     const id = +req.params.id;
     await userService.deleteUser(id);
     return res.status(200).json({ EM: 'Delete user successful', EC: 0 });
+  } catch (error) {
+    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
+  }
+};
+
+// ==================== COUNT USERS ====================
+export const countUsers = async (req, res) => {
+  try {
+    const count = await userService.countUser();
+    return res.status(200).json({ DT: { count }, EM: 'Count users successful', EC: 0 });
   } catch (error) {
     return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
   }

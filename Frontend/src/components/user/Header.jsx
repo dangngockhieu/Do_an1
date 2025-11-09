@@ -117,8 +117,6 @@ const Header = () => {
             <BsCartPlusFill />
             <span className="badge">{numberCart ?? 0}</span>
           </button>
-
-          {/* Nút user */}
           <button
             className="icon-btn"
             onClick={() => setShowMenu((prev) => !prev)}

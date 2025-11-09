@@ -1,4 +1,3 @@
-// OrderUpdateModal.jsx
 import { useEffect, useState } from 'react';
 import { FaTimes, FaSave, FaTruck, FaCalendarCheck } from 'react-icons/fa';
 import './OrderUpdateModal.scss';
