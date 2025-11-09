@@ -104,7 +104,7 @@ const main = async () => {
           cpu: "Intel Core i7",
           ram: "16GB",
           storage: "1TB SSD",
-          screen: "15.6 inch 144Hz",
+          screen: "15.6 inch Full HD",
           graphicsCard: "RTX 4060",
           battery: "90Wh",
           weight: "2.2kg",
@@ -234,8 +234,8 @@ const main = async () => {
         },
         {
           name: "Samsung Galaxy Z Fold6",
-          originalPrice: 19000000,
-          price: 17000000,
+          originalPrice: 35000000,
+          price: 31500000,
           coupon: 10,
           quantity: 25,
           warranty: "12 tháng",
@@ -243,7 +243,7 @@ const main = async () => {
           cpu: "Snapdragon 8 Gen 3",
           ram: "12GB",
           storage: "256GB",
-          screen: "6.7 inch OLED",
+          screen: "7.6 inch OLED",
           graphicsCard: "Adreno 750",
           battery: "5000mAh",
           weight: "205g",
@@ -386,14 +386,13 @@ const main = async () => {
                 },
               ],
             },
-            payments: {
-              create: [
+            payment: {
+              create: 
                 {
                   amount: product.price || product.originalPrice,
                   method: "COD",
-                  status: "SUCCESS",
+                  status: "PAIDED",
                 },
-              ],
             },
           },
         });

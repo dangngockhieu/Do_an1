@@ -48,13 +48,13 @@ model Order {
   phone         String    @db.VarChar(20)
   status        String    @db.VarChar(20)
   orderDate     DateTime
-  trackingCode  String    @db.VarChar(100)
+  trackingCode  String?   @db.VarChar(100)
   deliveryDate  DateTime?
   receivedDate  DateTime?
 
   user       User        @relation(fields: [userID], references: [id])
   orderItems OrderItem[]
-  payments   Payment[]
+  payment    Payment?
 
   @@map("orders")
 }
@@ -70,6 +70,7 @@ model Payment {
 
   order Order @relation(fields: [orderID], references: [id])
 
+  @@unique([orderID])
   @@map("payments")
 }
 

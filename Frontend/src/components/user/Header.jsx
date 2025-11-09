@@ -147,6 +147,7 @@ const Header = () => {
                     {showSettings && (
                       <div className="setting-dropdown">
                         <button className="link-btn" onClick={() => { setShowMenu(false); setShowSettings(false); setShowChangePassword(true); }}>- Đổi mật khẩu</button>
+                        <button className="link-btn" onClick={() => { setShowMenu(false); setShowSettings(false); navigate('/orders'); }}>- Đơn hàng của tôi</button>
                         {account.role === 'ADMIN' && (
                           <button className="link-btn" onClick={() => { setShowMenu(false); setShowSettings(false); navigate('/admin'); }}>- Trang quản trị</button>
                         )}

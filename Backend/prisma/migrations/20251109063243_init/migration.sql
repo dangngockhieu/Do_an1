@@ -17,12 +17,12 @@ CREATE TABLE `users` (
 
 -- CreateTable
 CREATE TABLE `carts` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userID` INTEGER NOT NULL,
     `productID` INTEGER NOT NULL,
     `number` INTEGER NOT NULL,
+    `isSelected` BOOLEAN NOT NULL DEFAULT false,
 
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`userID`, `productID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -35,7 +35,7 @@ CREATE TABLE `orders` (
     `phone` VARCHAR(20) NOT NULL,
     `status` VARCHAR(20) NOT NULL,
     `orderDate` DATETIME(3) NOT NULL,
-    `trackingCode` VARCHAR(100) NOT NULL,
+    `trackingCode` VARCHAR(100) NULL,
     `deliveryDate` DATETIME(3) NULL,
     `receivedDate` DATETIME(3) NULL,
 
@@ -52,6 +52,7 @@ CREATE TABLE `payments` (
     `transactionID` VARCHAR(100) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `payments_orderID_key`(`orderID`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

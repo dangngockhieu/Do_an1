@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Homepage from './components/user/Homepage.jsx';
 import AdminLayout from './components/admin/AdminLayout.jsx';
 import AdminRoute from './pages/admin.private.route.jsx';
+import PrivateRoute from './pages/private.route.jsx';
 import NotFound from './pages/error.jsx';
 import Login from './pages/login.jsx';
 import Register from './pages/register.jsx';
@@ -12,11 +13,12 @@ import LandingPage from './components/user/LandingPage.jsx';
 import Product from './components/user/Product.jsx';
 import ProductDetail from './components/user/ProductDetail.jsx';
 import CartPage from './components/user/CartPage.jsx';
+import Checkout from './components/user/CheckOut.jsx';
 
-import AdminDashboard from './components/admin/AdminDashboard.jsx';
 import ManageProduct from './components/admin/ManageProduct/ManageProduct.jsx';
 import ManagerUser from './components/admin/ManageUser/ManagerUser.jsx';
-
+import ManageOrder from './components/admin/ManageOrder/ManageOrder.jsx';
+import Dashboard from './components/admin/DashBoard/DashBoard.jsx';
 
 const App = () => {
   return (
@@ -25,13 +27,15 @@ const App = () => {
         <Route index element={<LandingPage />} />
         <Route path="product" element={<Product />} />
         <Route path="product/:id" element={<ProductDetail />} />
-        <Route path="cart" element={<CartPage />} />
+        <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+        <Route path="checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
+        <Route path="orders" element={<PrivateRoute><div>My Orders</div></PrivateRoute>} />
       </Route>
 
       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-        <Route index element={<AdminDashboard />} />
+        <Route index element={<Dashboard />} />
         <Route path="products" element={<ManageProduct />} />
-        <Route path="orders" element={<div>All Orders</div>} />
+        <Route path="orders" element={<ManageOrder />} />
         <Route path="users" element={<ManagerUser />} />
       </Route>
 

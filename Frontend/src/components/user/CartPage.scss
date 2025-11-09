@@ -50,41 +50,68 @@
 
       .cart-info {
         flex: 1;
-        h4 {
-          font-size: 16px;
-          margin-bottom: 5px;
-        }
+        // BỐ CỤC CHÍNH: Chuyển cart-info thành Flex ngang (chia 2 cột)
+        display: flex; 
+        align-items: flex-start; // Căn các cột theo chiều dọc (căn trên)
 
-        .cart-price {
-          .current {
-            color: #d0011b;
-            font-weight: 600;
-            margin-right: 8px;
-          }
-          .old {
-            color: #999;
-            text-decoration: line-through;
-          }
-        }
+        .product-text-info {
+            flex-grow: 1; // Chiếm phần lớn không gian
+            
+            h4 {
+                font-size: 16px;
+                margin-bottom: 5px;
+            }
 
+            .out-of-stock {
+                color: #d0011b;
+                text-decoration: line-through;
+            }
+
+            .cart-price {
+                // Đảm bảo không có margin-bottom nào đẩy xuống
+                .current {
+                    color: #d0011b;
+                    font-weight: 600;
+                    margin-right: 8px;
+                }
+                .old {
+                    color: #999;
+                    text-decoration: line-through;
+                }
+            }
+        }
+        
         .cart-actions {
-          margin-top: 8px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
+            // Căn chỉnh cho khối điều chỉnh số lượng
+            // Đẩy khối actions sang phải và căn giữa theo chiều dọc
+            margin-top: 0; 
+            margin-left: 20px; // Thêm khoảng cách với tên/giá
+            align-self: center; // <-- Căn giữa theo chiều dọc so với khối product-text-info
+            
+            // Xóa các style Flex cũ từ .cart-info để tránh xung đột
+            display: block; 
+            width: auto;
+            
+            .quantity-control {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px; 
+                margin-left: auto; // Giữ nguyên margin-left: auto để căn chỉnh nội bộ
+            }
 
-          button {
-            width: 28px;
-            height: 28px;
-            border: 1px solid #ccc;
-            background: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-          }
-          span {
-            min-width: 20px;
-            text-align: center;
-          }
+            button {
+                width: 28px;
+                height: 28px;
+                border: 1px solid #ccc;
+                background: #fff;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            span {
+                min-width: 20px;
+                text-align: center;
+            }
         }
       }
 

@@ -174,3 +174,36 @@ export const checkout = (productID) =>{
   const URL_BACKEND = `/cart/checkout?productID=${productID}`;
   return axios.patch(URL_BACKEND);
 };
+
+
+// ORDER API
+export const createOrder = (recipientName, address, phone, items, totalPrice, paymentMethod) => {
+  const URL_BACKEND = '/order/order';
+  const data = { recipientName: recipientName, address: address, phone: phone, items: items, totalPrice: totalPrice, paymentMethod: paymentMethod };
+  return axios.post(URL_BACKEND, data);
+}
+
+export const getOrderPendingforAdmin = (page, limit) => {
+  const URL_BACKEND = `/order/orders/pending?page=${page}&limit=${limit}`;
+  return axios.get(URL_BACKEND);
+};
+
+export const getOrderShippingforAdmin = (page, limit) => {
+  const URL_BACKEND = `/order/orders/shipping?page=${page}&limit=${limit}`;
+  return axios.get(URL_BACKEND);
+}
+
+export const getOrderItem = (orderID) => {
+  const URL_BACKEND = `/order/orders-item?orderID=${orderID}`;
+  return axios.get(URL_BACKEND);
+}
+
+export const updatePendingtoShipping = (orderID, trackingCode, receivedDate) => {
+  const URL_BACKEND = `/order/order-to-shipping?orderID=${orderID}`;
+  return axios.patch(URL_BACKEND, { trackingCode, receivedDate });
+}
+
+export const updateOrderComplete = (orderID) => {
+  const URL_BACKEND = `/order/order-complete?orderID=${orderID}`;
+  return axios.patch(URL_BACKEND);
+}

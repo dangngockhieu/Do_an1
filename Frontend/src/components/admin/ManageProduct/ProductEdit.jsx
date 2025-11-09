@@ -346,16 +346,18 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
             </div>
 
           {previewUrls.length > 0 && (
-            <div className="image-row">
-            {previewUrls.map((p, i) => (
-          <div className="image-item" key={i}>
-          <img src={p} alt="" />
-          <button onClick={() => removeNewPreview(i)}>X</button>
+              <div className="image-row">
+                {previewUrls.map((url, i) => (
+                  <div className="image-item" key={i}>
+                    <img src={url} alt={`preview-${i}`} />
+                    <button type="button" onClick={() => removeNewPreview(i)}>
+                      X
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
         </div>
-      ))}
-    </div>
-  )}
-</div>
 
         </div>
 

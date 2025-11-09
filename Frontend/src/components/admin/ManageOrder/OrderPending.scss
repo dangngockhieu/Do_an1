@@ -1,0 +1,76 @@
+/* OrderPending.scss */
+.order-pending-wrap {
+  .empty-state {
+    text-align: center;
+    color: #6b7280;
+    padding: 48px 12px;
+
+    svg { color: #9ca3af; margin-bottom: 8px; }
+    p { margin: 0; font-weight: 600; }
+  }
+
+  .list-head {
+    margin-bottom: 12px;
+    h3 { margin: 0; font-size: 16px; }
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e6e9ee;
+
+    .order-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+
+      th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      th {
+        background: #dbdbdb;
+        font-weight: 600;
+        font-size: 13px;
+        color: #374151;
+      }
+
+      tr:hover td {
+        background: rgba(37,99,235,0.03);
+      }
+
+      .amount { font-weight: 700; color: #0f172a; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace; }
+
+      .actions-col {
+        display: flex;
+        gap: 8px;
+        .btn {
+          padding: 6px 10px;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          font-weight: 600;
+          &.view { background: #03f775; }
+          &.edit { background: #fde68a; }
+        }
+      }
+    }
+  }
+
+  .pagination {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 12px;
+    button {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #e6e9ee;
+      background: white;
+      cursor: pointer;
+    }
+  }
+}

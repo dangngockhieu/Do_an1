@@ -43,7 +43,7 @@ export const numberCart = async (userID) =>{
 
 export const getCart = async (userID) => {
   const cartItems = await prisma.$queryRaw`
-    SELECT p.id, p.name, p.price, p.originalPrice, c.number, c.isSelected,
+    SELECT p.id, p.name, p.price, p.quantity, p.originalPrice, c.number, c.isSelected,
     (
         SELECT pi.url
         FROM product_images pi

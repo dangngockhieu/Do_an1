@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import './jobs/cleanupJob.js';
@@ -42,6 +43,7 @@ const startServer = async () => {
     userRoutes(app);
     cartRoutes(app);
     productRoutes(app);
+    orderRoutes(app);
 
     // test route
     app.get('/', (req, res) => res.send('Server is running...'));

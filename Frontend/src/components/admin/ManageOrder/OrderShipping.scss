@@ -1,0 +1,63 @@
+/* OrderShipping.scss */
+.order-shipping-wrap {
+  .empty-state {
+    text-align: center;
+    color: #6b7280;
+    padding: 48px 12px;
+    svg { color: #9ca3af; margin-bottom: 8px; }
+  }
+
+  .list-head {
+    margin-bottom: 12px;
+    &.shipping { display: flex; gap: 8px; align-items: center; }
+    h3 { margin: 0; font-size: 16px; }
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e6e9ee;
+
+    .order-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+
+      th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      th {
+        background: #dbdbdb;
+        font-weight: 600;
+        font-size: 13px;
+      }
+
+      .amount { font-weight: 700; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace; }
+
+      .actions-col {
+        display: flex;
+        gap: 8px;
+        .btn {
+          padding: 6px 10px;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          font-weight: 600;
+          &.view { background: #f4f004; }
+          &.delivered { background: #bbf7d0; }
+        }
+      }
+    }
+  }
+
+  .pagination {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 12px;
+  }
+}
