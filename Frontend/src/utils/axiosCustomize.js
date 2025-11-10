@@ -84,7 +84,6 @@ instance.interceptors.response.use(
       }
 
       isRefreshing = true;
-      console.log('Đang làm mới access token...');
 
       try {
         // Gọi API refresh token (refresh_token nằm trong cookie)
@@ -97,7 +96,6 @@ instance.interceptors.response.use(
           store.dispatch(updateAccessToken(newAccess));
 
           onRefreshed(newAccess);
-          console.log('Refresh token thành công.');
           originalRequest._retry = true;
           originalRequest.headers['Authorization'] = 'Bearer ' + newAccess;
           return instance(originalRequest);
@@ -105,8 +103,6 @@ instance.interceptors.response.use(
           throw new Error('Invalid refresh response');
         }
       } catch (err) {
-        console.error('Làm mới token thất bại:', err);
-        console.log('Refresh token error response:', err.response?.data, err.response?.status);
         toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!');
         store.dispatch(doLogout());
         return Promise.reject(err);

@@ -312,7 +312,15 @@ export const postrefresh_token = async (refresh_token) => {
   throw new Error('Invalid refresh token');
 }
 
-    const access_token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRED });
+    const access_token = jwt.sign({
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: process.env.JWT_EXPIRED }
+);
 
     return {
       access_token,

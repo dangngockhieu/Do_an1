@@ -11,6 +11,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { setCartCount } from "../../redux/action/cartAction";
 import { addProductToCart, getNumberCart, buyNow } from "../../services/apiServices";
 import { toast } from "react-toastify";
+import { FcCellPhone } from "react-icons/fc";
+import { ImFire } from "react-icons/im";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -156,7 +158,7 @@ const LandingPage = () => {
       {/* ===== TOP LAPTOP ===== */}
       <section className="bestseller">
         <div className="bestseller__header">
-          <h2>🔥 Top Laptop Bán Chạy</h2>
+          <h2><ImFire className="fire"/> Top Laptop Bán Chạy</h2>
         </div>
         <div className="bestseller__list">
           {topLaptops.length ? renderProducts(topLaptops) : <p>Đang tải dữ liệu...</p>}
@@ -166,7 +168,7 @@ const LandingPage = () => {
       {/* ===== TOP PHONE ===== */}
       <section className="bestseller">
         <div className="bestseller__header">
-          <h2>📱 Top Điện Thoại Bán Chạy</h2>
+          <h2><FcCellPhone className='phone'/> Top Điện Thoại Bán Chạy</h2>
         </div>
         <div className="bestseller__list">
           {topPhones.length ? renderProducts(topPhones) : <p>Đang tải dữ liệu...</p>}

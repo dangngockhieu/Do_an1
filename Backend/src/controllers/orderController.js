@@ -135,7 +135,6 @@ export const getRevenueByMonth = async (req, res) => {
     const data = await orderService.getRevenueByMonth();
     res.status(200).json({ EC: 0, EM: "OK", DT: data });
   } catch (e) {
-    console.error(e);
     res.status(500).json({ EC: -1, EM: "Server error" });
   }
 };

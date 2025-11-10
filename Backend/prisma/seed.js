@@ -363,7 +363,7 @@ const main = async () => {
 
     for (const product of products) {
       const reviewers = [...users].sort(() => 0.5 - Math.random()).slice(0, 3);
-
+      const nowVN = new Date(Date.now() + 7 * 60 * 60 * 1000);
       for (const user of reviewers) {
         await prisma.order.create({
           data: {
@@ -373,10 +373,10 @@ const main = async () => {
             address: "123 Đường ABC, TP.HCM",
             phone: "0901234567",
             status: "COMPLETED",
-            orderDate: new Date(),
+            orderDate: nowVN,
             trackingCode: `TRACK-${product.id}-${user.id}`,
-            deliveryDate: new Date(),
-            receivedDate: new Date(),
+            deliveryDate: nowVN,
+            receivedDate: nowVN,
             orderItems: {
               create: [
                 {
@@ -420,7 +420,7 @@ const main = async () => {
 
 main()
   .catch((err) => {
-    console.error("❌ Lỗi seed:", err);
+    console.error("Lỗi seed:", err);
     process.exit(1);
   })
   .finally(async () => {
