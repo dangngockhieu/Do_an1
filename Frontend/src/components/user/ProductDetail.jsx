@@ -136,10 +136,6 @@ const handleBuyNow = async (productID) => {
                 <FaRegCircleCheck className="policy-icon" />
                 Kỹ thuật viên hỗ trợ trực tuyến
               </div>
-              <div className="policy-item">
-                <FaRegCircleCheck className="policy-icon" />
-                Chiết khấu dành riêng cho doanh nghiệp
-              </div>
             </div>
           </div>
         </div>
@@ -276,7 +272,14 @@ const handleBuyNow = async (productID) => {
               {filteredReviews.length > 0 ? (
                 filteredReviews.map((r) => (
                   <div key={r.id} className="review-item">
-                    <strong>{r.userName}</strong>
+                    <div className="review-header">
+                      <strong>{r.userName}:</strong>
+                      <span className="review-date">
+                        {new Date(r.createdAt).toLocaleDateString("vi-VN", {
+                          timeZone: "Asia/Ho_Chi_Minh",
+                        })}
+                      </span>
+                    </div>
                     <div className="stars">
                       {Array(r.rating)
                         .fill(null)

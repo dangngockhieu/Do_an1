@@ -205,7 +205,6 @@ export const sendPasswordResetEmail = async (email) => {
   }
 
 // ==================== RESET MẬT KHẨU ====================
-
 export const resetPassword = async (email, code, newPassword) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error('User not found');
@@ -317,10 +316,10 @@ export const postrefresh_token = async (refresh_token) => {
       email: user.email,
       name: user.name,
       role: user.role,
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: process.env.JWT_EXPIRED }
-);
+      },
+        process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRED }
+    );
 
     return {
       access_token,

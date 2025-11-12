@@ -357,6 +357,17 @@
         flex-direction: column;
         gap: 20px;
 
+        .review-list{
+          .review-item{
+            .review-header{
+              .review-date{
+                margin-left: 10px;
+                color: #888;
+                font-size: 0.9rem;}
+            }
+          }
+        }
+
         .filter-buttons {
           display: flex;
           gap: 8px;

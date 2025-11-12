@@ -44,8 +44,6 @@ export const updateCartQuantity = async (req, res) => {
                 EM: 'Dữ liệu đầu vào không hợp lệ (productId hoặc newNumber).',
             });
         }
-
-        // Gọi đến tầng Service
         const response = await cartService.updateQuantity(userID, productID, newNumber);
 
         return res.status(200).json({

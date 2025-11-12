@@ -15,7 +15,7 @@ const authRoutes = (app) => {
   router.post('/logout', jwtAuth, logout);
   // Refresh token
   router.post('/refresh-token', refreshToken);
-
+  // Verify Email
   router.get('/verify', verifyEmail);
   // Resend verification email
   router.post('/resend', resendVerificationEmail);

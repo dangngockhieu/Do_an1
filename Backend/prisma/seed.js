@@ -13,11 +13,11 @@ const main = async () => {
     const passwordHash = await argon.hash("123456");
     await prisma.user.createMany({
       data: [
+        { name: "Admin", email: "admin@gmail.com", password: passwordHash, role: "ADMIN", isVerified: true },
+        { name: "User", email: "user@gmail.com", password: passwordHash, role: "USER", isVerified: true },        
         { name: "Nguyễn Văn A", email: "a@gmail.com", password: passwordHash, role: "USER", isVerified: true },
         { name: "Trần Thị B", email: "b@gmail.com", password: passwordHash, role: "USER", isVerified: true },
-        { name: "Lê Văn C", email: "c@gmail.com", password: passwordHash, role: "USER", isVerified: true },
-        { name: "User", email: "user@gmail.com", password: passwordHash, role: "USER", isVerified: true },
-        { name: "Admin", email: "admin@gmail.com", password: passwordHash, role: "ADMIN", isVerified: true },
+        { name: "Lê Văn C", email: "c@gmail.com", password: passwordHash, role: "USER", isVerified: true }, 
       ],
     });
   }
