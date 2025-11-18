@@ -13,7 +13,7 @@ import { getProductsWithPaginate, deleteProduct } from "../../../services/apiSer
 import "./ManageProduct.scss";
 
 const ManageProduct = () => {
-  const LIMIT = 7;
+  const LIMIT = 5;
   const [products, setProducts] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);

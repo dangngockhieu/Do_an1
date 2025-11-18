@@ -14,7 +14,8 @@ const ManageOrder = () => {
   const [activeTab, setActiveTab] = useState(TAB_STATES.PENDING);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 5, totalPages: 1 });
+
 
   const fetchOrders = useCallback(
     async (status = TAB_STATES.PENDING, page = 1) => {
@@ -26,7 +27,7 @@ const ManageOrder = () => {
             : await getOrderShippingforAdmin(page, pagination.limit);
 
         if (res?.EC === 0 && res.DT) {
-          const { orders, pagination: pg } = res.DT;
+          const { orders, pg } = res.DT;
           setOrders(orders || []);
           setPagination({
             page: pg?.currentPage || 1,
@@ -82,7 +83,6 @@ const ManageOrder = () => {
             orders={orders}
             pagination={pagination}
             setPage={p => fetchOrders(activeTab, p)}
-            onRefresh={() => fetchOrders(activeTab, pagination.page)}
           />
         )}
       </main>

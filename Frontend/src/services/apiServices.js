@@ -23,11 +23,6 @@ export const changeRoleUserforAdmin = (id, role) => {
   return axios.patch(URL_BACKEND, { role });
 };
 
-export const deleteUserforAdmin = (id) => {
-  const URL_BACKEND = `/user/users/${id}`;
-  return axios.delete(URL_BACKEND);
-};
-
 // ==================== AUTH API ====================
 export const register = (email, name, password) => {
   const URL_BACKEND = '/auth/register';

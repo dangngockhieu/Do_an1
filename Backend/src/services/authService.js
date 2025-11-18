@@ -145,7 +145,7 @@ export const sendPasswordResetEmail = async (email) => {
     const mailOptions = {
       from: process.env.MAIL_USER,
       to: email,
-      subject: 'Xác thực tài khoản TechZone',
+      subject: 'Đặt lại mật khẩu tại TechZone',
       html: `
         <!doctype html>
     <html lang="vi">

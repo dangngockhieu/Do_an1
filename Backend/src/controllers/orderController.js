@@ -26,11 +26,11 @@ export const getOrderPendingforAdmin = async (req, res) => {
     try {
         const page = +req.query.page || 1;
         const limit = +req.query.limit || 10;
-        const orders = await orderService.getOrderPendingforAdmin(page, limit);
+        const {orders, pg} = await orderService.getOrderPendingforAdmin(page, limit);
         return res.status(200).json({
             EC: 0,
             EM: "Lấy danh sách đơn hàng thành công",
-            DT: orders
+            DT: {orders, pg}
         });
     } catch (error) {
         return res.status(500).json({
@@ -44,11 +44,11 @@ export const getOrderShippingforAdmin = async (req, res) => {
     try {
         const page = +req.query.page || 1;
         const limit = +req.query.limit || 10;
-        const orders = await orderService.getOrderShippingforAdmin(page, limit);
+        const {orders, pg} = await orderService.getOrderShippingforAdmin(page, limit);
         return res.status(200).json({
             EC: 0,
             EM: "Lấy danh sách đơn hàng thành công",
-            DT: orders
+            DT: {orders, pg}
         });
     } catch (error) {
         return res.status(500).json({

@@ -6,12 +6,11 @@ import TableUserPaginate from "./TableUserPaginate";
 import ModelCreateUser from "./ModelCreateUser";
 import ModelUpdateUser from "./ModelUpdateUser";
 import ModelViewUser from "./ModelViewUser";
-import ModelDeleteUser from "./ModelDeleteUser";
 import { getUserWithPaginate } from '../../../services/apiServices';
 import './ManageUser.scss';
 
 const ManagerUser = () => {
-  const LIMIT = 2;
+  const LIMIT = 5;
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [listUsers, setListUsers] = useState([]);
@@ -21,10 +20,8 @@ const ManagerUser = () => {
   const [showModelCreateUser, setShowModelCreateUser] = useState(false);
   const [showModelUpdateUser, setShowModelUpdateUser] = useState(false);
   const [showModelViewUser, setShowModelViewUser] = useState(false);
-  const [showModelDeleteUser, setShowModelDeleteUser] = useState(false);
 
   const [dataUpdate, setDataUpdate] = useState({});
-  const [dataDelete, setDataDelete] = useState({});
 
   useEffect(() => {
     fetchAndNotify(currentPage, searchTerm);
@@ -90,10 +87,6 @@ const ManagerUser = () => {
     setDataUpdate(user);
   };
 
-  const handleClickBtnDelete = (user) => {
-    setShowModelDeleteUser(true);
-    setDataDelete(user);
-  };
 
   const resetUpdateData = () => {
     setDataUpdate({});
@@ -139,7 +132,6 @@ const ManagerUser = () => {
             listUsers={listUsers}
             handleClickBtnUpdate={handleClickBtnUpdate}
             handleClickBtnView={handleClickBtnView}
-            handleClickBtnDelete={handleClickBtnDelete}
             fetchListUsersWithPaginate={fetchListUsersWithPaginate}
             pageCount={pageCount}
             currentPage={currentPage}
@@ -170,15 +162,6 @@ const ManagerUser = () => {
           show={showModelViewUser}
           setShow={setShowModelViewUser}
           dataUpdate={dataUpdate}
-        />
-
-        <ModelDeleteUser
-          show={showModelDeleteUser}
-          setShow={setShowModelDeleteUser}
-          dataDelete={dataDelete}
-          fetchListUsersWithPaginate={fetchListUsersWithPaginate}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
         />
       </div>
     </div>

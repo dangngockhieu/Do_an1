@@ -2,10 +2,21 @@ import { useState } from 'react';
 import { FaShippingFast } from 'react-icons/fa';
 import './OrderShipping.scss';
 import OrderViewModal from './OrderViewModal';
+import ReactPaginate from "react-paginate";
+import { BsArrowRightCircleFill } from "react-icons/bs";
 
-const OrderShipping = ({ orders = [] }) => {
+const OrderShipping = ({ orders = [], pagination = {}, setPage }) => {
   const [viewOrder, setViewOrder] = useState(null);
   const ordersList = Array.isArray(orders) ? orders : [];
+
+  const handlePageClick = (event) => {
+    const newPage = event.selected + 1;
+    setPage(newPage);
+  };
+
+  const getSerialNumber = (index) => {
+    return (pagination.page - 1) * pagination.limit + index + 1;
+  };
 
   return (
     <div className="order-shipping-wrap">
@@ -36,7 +47,7 @@ const OrderShipping = ({ orders = [] }) => {
               <tbody>
                 {ordersList.map((order, index) => (
                   <tr key={index}>
-                    <td className="mono">{index+1}</td>
+                    <td className="mono">{getSerialNumber(index)}</td>
                     <td>{order.recipientName}</td>
                     <td className="amount">{Number(order.totalPrice || 0).toLocaleString()} ₫</td>
                     <td>{order.paymentMethod || '—'}</td>
@@ -58,9 +69,26 @@ const OrderShipping = ({ orders = [] }) => {
           </div>
         </>
       )}
-
+      {pagination.totalPages > 0 && (
+      <ReactPaginate
+        nextLabel={<BsArrowRightCircleFill style={{ fontSize: "1.5rem" }} />}
+        previousLabel={
+          <BsArrowRightCircleFill
+            style={{ fontSize: "1.5rem", transform: "scaleX(-1)" }}
+          />
+        }
+        onPageChange={handlePageClick}
+        pageCount={pagination.totalPages}
+        forcePage={pagination.page - 1}
+        containerClassName="pagination"
+        activeClassName="active"
+      />
+      )}
       {viewOrder && (
-        <OrderViewModal order={viewOrder} onClose={() => setViewOrder(null)} showUpdateButton={false} />
+        <OrderViewModal 
+          order={viewOrder} 
+          onClose={() => setViewOrder(null)} 
+          showUpdateButton={false} />
       )}
     </div>
   );

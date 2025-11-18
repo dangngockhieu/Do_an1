@@ -83,17 +83,6 @@ export const changeRoleUser = async (req, res) => {
   }
 };
 
-// ==================== ADMIN DELETE USER ====================
-export const deleteUser = async (req, res) => {
-  try {
-    const id = +req.params.id;
-    await userService.deleteUser(id);
-    return res.status(200).json({ EM: 'Delete user successful', EC: 0 });
-  } catch (error) {
-    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
-  }
-};
-
 // ==================== COUNT USERS ====================
 export const countUsers = async (req, res) => {
   try {

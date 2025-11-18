@@ -99,6 +99,26 @@
       top: 90px;
       height: fit-content;
       z-index: 5;
+      position: sticky;
+      top: 80px;          
+      height: calc(100vh - 100px);  // chiều cao tối đa hiển thị
+      overflow-y: auto;   // bật thanh cuộn dọc
+      overflow-x: hidden; 
+
+      padding-right: 6px; 
+
+
+
+    .filter-section::-webkit-scrollbar {
+      width: 1px !important;
+    }
+    .filter-section::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+    .filter-section::-webkit-scrollbar-thumb:hover {
+      background: #bbbbbb;
+    }
 
       .filter-header {
         display: flex;
@@ -304,6 +324,32 @@
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
         gap: 20px;
       }
+      .load-more-container{
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        .load-more-icon {
+          margin-left: 8px;
+          font-size: 14px;
+          vertical-align: middle;
+          font-size: 16px;
+        }
+
+        .load-more-button {
+          background: #68696a;
+          color: #fff;
+          border: none;
+          padding: 10px 20px;
+          font-size: 16px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: 0.3s;
+
+          &:hover {
+            background: #4b4b4c;
+          }
+        }
+      }
 
       .product-card {
         background: #fff;
@@ -439,6 +485,7 @@
       flex-direction: column;
       padding: 0 10px;
       padding-top: 0;
+      align-items: none;
       .product-list{
         margin-top: 20px;
       }

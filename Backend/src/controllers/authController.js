@@ -56,7 +56,7 @@ export const login = async (req, res) => {
   }
 };
 
-// ==================== LOGOUT khi vẫn còn phiên ====================
+// ==================== LOGOUT  ====================
 export const logout = async (req, res) => {
   try {
     const email = req.user.email;

@@ -88,7 +88,7 @@ export const getOrderPendingforAdmin = async (page = 1, limit = 10) => {
 
   return {
     orders,
-    pagination: {
+    pg: {
       totalRecords,
       totalPages,
       currentPage: page,
@@ -138,7 +138,7 @@ export const getOrderShippingforAdmin = async (page = 1, limit = 10) => {
 
   return {
     orders,
-    pagination: {
+    pg: {
       totalRecords,
       totalPages,
       currentPage: page,

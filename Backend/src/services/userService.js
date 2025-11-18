@@ -71,7 +71,7 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
     );
   }
 
-  // 🔧 Chuyển BigInt → Number an toàn
+  //  Chuyển BigInt → Number 
   const safeUsers = users.map((u) =>
     Object.fromEntries(
       Object.entries(u).map(([k, v]) => [
@@ -162,13 +162,6 @@ export const changeRoleUser = async (id, role) => {
   });
 };
 
-// ==================== DELETE USER ====================
-export const deleteUser = async (id) => {
-  const user = await prisma.user.findUnique({ where: { id:id } });
-  if (!user) throw new Error('User không tồn tại!');
-
-  await prisma.user.delete({ where: { id } });
-};
 
 // ==================== Count User ====================
 export const countUser = async () => {

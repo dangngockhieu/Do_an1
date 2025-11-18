@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaStar, FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { FaStar, FaChevronDown, FaChevronUp, FaAngleDown } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
 import { setCartCount } from "../../redux/action/cartAction";
 import { addProductToCart, getNumberCart, getFilteredProducts, buyNow } from "../../services/apiServices";
@@ -151,6 +151,8 @@ const Product = () => {
 
   const [products, setProducts] = useState([]);
   const [count, setCount] = useState(0);
+  // Ban đầu hiển thị 24 sản phẩm
+  const [visibleCount, setVisibleCount] = useState(24);
   const [initialLaptops, setInitialLaptops] = useState([]);
   const [initialLaptopCount, setInitialLaptopCount] = useState(0);
   const [initialPhones, setInitialPhones] = useState([]);
@@ -281,6 +283,7 @@ const handleBuyNow = async (productID) => {
     setSelectedFilters({});
     setSelectedPrice(null);
     setCustomPrice({ min: "", max: "" });
+    setVisibleCount(24);
 
     if (category === "LAPTOP") {
       setCurrentFactories(FACTORIES.slice(0, 7));
@@ -353,7 +356,7 @@ const handleBuyNow = async (productID) => {
 
 
   const handleFilter = async () => {
-    // tạo bản sao specs để xử lý riêng CPU và Cạc đồ họa rời
+    setVisibleCount(24);
     const processedSpecs = { ...selectedFilters };
     // Chuyển name → label cho CPU
     if (processedSpecs.CPU && processedSpecs.CPU.length > 0) {
@@ -443,6 +446,7 @@ const handleBuyNow = async (productID) => {
     setCustomPrice({ min: "", max: "" });
     setProducts(category === "LAPTOP" ? initialLaptops : initialPhones);
     setCount(category === "LAPTOP" ? initialLaptopCount : initialPhoneCount);
+    setVisibleCount(24);
   };
 
   const toggleFactory = (id) => {
@@ -610,10 +614,22 @@ const handleBuyNow = async (productID) => {
         </div>
 
         <div className="product-list">
-          <h3>Kết quả lọc: {count} sản phẩm</h3>
+          <h3>Tìm thấy: {count} sản phẩm</h3>
           <div className="product-grid">
-            {count > 0 ? renderProducts(products) : <p>Không có sản phẩm thỏa mãn</p>}
+            {count > 0 ? (renderProducts(products.slice(0, visibleCount))) : (<p>Không có sản phẩm thỏa mãn</p>)}
           </div>
+          {products.length > visibleCount && (
+            <div className="load-more-container">
+              <button
+                className="load-more-button"
+                onClick={() =>
+                  setVisibleCount((prev) => prev + 24)
+                }
+              >
+                Xem thêm {Math.min(24, products.length - visibleCount)} sản phẩm <FaAngleDown className="load-more-icon" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

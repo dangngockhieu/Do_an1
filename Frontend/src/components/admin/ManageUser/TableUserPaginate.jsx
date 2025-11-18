@@ -50,12 +50,6 @@ const TableUserPaginate = (props) => {
                   >
                     <BsFillPencilFill style={{ fontSize: '1.1rem' }} />
                   </button>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => props.handleClickBtnDelete(item)}
-                  >
-                    <RiDeleteBin6Fill style={{ fontSize: '1.1rem' }} />
-                  </button>
                 </td>
               </tr>
             ))

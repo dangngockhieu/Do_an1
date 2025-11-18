@@ -8,7 +8,6 @@ import {
   findUserByEmail,
   createUser,
   changeRoleUser,
-  deleteUser,
   countUsers
 } from '../controllers/userController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
@@ -31,8 +30,6 @@ const userRoutes = (app) => {
   router.patch('/change-password', jwtAuth, changePassword);
   // Thay đổi vai trò người dùng
   router.patch('/user-role/:id', jwtAuth, authorizeRole(['ADMIN']), changeRoleUser);
-  // Xóa người dùng
-  router.delete('/users/:id', jwtAuth, authorizeRole(['ADMIN']), deleteUser);
   // Lấy tổng số người dùng
   router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countUsers);
 
