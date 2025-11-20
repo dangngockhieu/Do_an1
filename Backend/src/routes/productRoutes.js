@@ -16,7 +16,8 @@ import {
   deleteProductImage,
   deleteProduct,
   getFilteredProducts,
-  countProducts
+  countProducts,
+  getTopSellingProduct
 } from '../controllers/productController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
@@ -48,6 +49,8 @@ const productRoutes = (app) => {
   router.get('/top-selling-laptop', getTopSellingLaptop);
   // Lấy 5 sp Phone bán chạy nhất
   router.get('/top-selling-phone', getTopSellingPhone);
+  // Lấy 5 sp bán chạy nhất
+  router.get('/top-selling-product', jwtAuth, authorizeRole(['ADMIN']), getTopSellingProduct);
   // Lọc sp
   router.post("/filter-products", getFilteredProducts);
   // Thêm nhiều đặc điểm cho sản phẩm
@@ -80,6 +83,7 @@ const productRoutes = (app) => {
   );
   // Lấy tổng số sản phẩm
   router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countProducts);
+
 
   app.use('/product', router);
 };

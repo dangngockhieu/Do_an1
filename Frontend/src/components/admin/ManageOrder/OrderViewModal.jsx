@@ -48,6 +48,9 @@ const OrderViewModal = ({ order, onClose}) => {
                 <strong>Người nhận:</strong> {order.recipientName}
               </p>
               <p>
+                <strong>Email:</strong> {order.userEmail}
+              </p>
+              <p>
                 <strong>Điện thoại:</strong> {order.phone}
               </p>
               <p>
@@ -138,17 +141,6 @@ const OrderViewModal = ({ order, onClose}) => {
             </div>
           </aside>
         </section>
-
-        <footer className="ovm-footer">
-          <small>
-            <FaCalendarAlt />{' '}
-            {order.orderDate
-              ? new Date(order.orderDate).toLocaleDateString('vi-VN', {
-                  timeZone: 'Asia/Ho_Chi_Minh',
-                })
-              : ''}
-          </small>
-        </footer>
       </div>
     </div>
   );

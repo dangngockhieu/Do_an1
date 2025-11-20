@@ -2,6 +2,12 @@
 import prisma from '../lib/prisma.js';
 import fs from 'fs';
 import path from 'path';
+import dayjs from 'dayjs';
+import utc from "dayjs/plugin/utc.js";            
+import timezone from "dayjs/plugin/timezone.js"; 
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Lấy tất cả sản phẩm có phân trang
 export const getProductsWithPaginate = async (page = 1, limit = 10, search = "", category, factory) => {
@@ -154,6 +160,27 @@ export const getTopSellingPhone = async () => {
   });
 
   return safeProducts;
+}
+
+export const getTopSellingProduct = async () => {
+  const vnNow = dayjs().tz("Asia/Ho_Chi_Minh");
+  const startOfMonth = vnNow.startOf('month').toDate();
+  const endOfMonth = vnNow.endOf('month').toDate();
+
+  const products = await prisma.$queryRaw`
+    SELECT p.id, p.name, SUM(oi.quantity) AS sold
+    FROM order_items oi
+    INNER JOIN orders o ON oi.orderID = o.id
+    INNER JOIN products p ON oi.productID = p.id
+    WHERE o.status = 'COMPLETED'
+      AND o.orderDate >= ${startOfMonth} 
+      AND o.orderDate <= ${endOfMonth}
+    GROUP BY p.id, p.name
+    ORDER BY sold DESC
+    LIMIT 5;
+  `;
+
+  return products;
 }
 
 

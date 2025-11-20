@@ -35,6 +35,10 @@
         font-size: 13px;
       }
 
+      tr:hover td {
+        background: rgba(37,99,235,0.03);
+      }
+
       .amount { font-weight: 700; }
       .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace; }
 
@@ -47,8 +51,7 @@
           border: none;
           cursor: pointer;
           font-weight: 600;
-          &.view { background: #f4f004; }
-          &.delivered { background: #bbf7d0; }
+          &.view { background: #fde68a; }
         }
       }
     }
@@ -86,3 +89,30 @@
     }
   }
 }
+@media (max-width: 768px) {
+  .order-shipping-wrap, .order-pending-wrap {
+    .table-wrap {
+      overflow-x: auto;
+
+      .order-table {
+        min-width: 600px; // vẫn scroll được
+        th, td { padding: 8px 10px; font-size: 12px; }
+      }
+    }
+
+    .actions-col .btn {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .pagination li a { width: 30px; height: 30px; font-size: 12px; }
+  }
+}
+
+@media (max-width: 480px) {
+  .order-shipping-wrap, .order-pending-wrap {
+    .list-head h3 { font-size: 14px; }
+    .empty-state p { font-size: 14px; }
+  }
+}
+

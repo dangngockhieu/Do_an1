@@ -92,3 +92,13 @@ export const countUsers = async (req, res) => {
     return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
   }
 };
+
+// ==================== COUNT USERS this MONTH ====================
+export const countUsersThisMonth = async (req, res) => {
+  try {
+    const count = await userService.countUsersThisMonth();
+    return res.status(200).json({ DT: { count }, EM: 'Count users this month successful', EC: 0 });
+  } catch (error) {
+    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
+  }
+};

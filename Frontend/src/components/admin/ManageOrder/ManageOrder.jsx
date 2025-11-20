@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import './ManageOrder.scss';
 import OrderPending from './OrderPending';
 import OrderShipping from './OrderShipping';
+import OrderCompleted from './OrderCompleted';
 import {
   getOrderPendingforAdmin,
-  getOrderShippingforAdmin,
+  getOrderforAdmin,
 } from '../../../services/apiServices';
 import { toast } from 'react-toastify';
 
-const TAB_STATES = { PENDING: 'PENDING', SHIPPING: 'SHIPPING' };
+const TAB_STATES = { PENDING: 'PENDING', SHIPPING: 'SHIPPING', COMPLETED: 'COMPLETED', CANCELLED: 'CANCELLED' };
 
 const ManageOrder = () => {
   const [activeTab, setActiveTab] = useState(TAB_STATES.PENDING);
@@ -22,9 +23,13 @@ const ManageOrder = () => {
       setLoading(true);
       setOrders([]);
       try {
-        let res = status === TAB_STATES.PENDING
-            ? await getOrderPendingforAdmin(page, pagination.limit)
-            : await getOrderShippingforAdmin(page, pagination.limit);
+        let res;
+        if(status === TAB_STATES.PENDING){
+          res = await getOrderPendingforAdmin(page, pagination.limit)
+        }
+        else{
+          res = await getOrderforAdmin(page, pagination.limit, status)
+        }
 
         if (res?.EC === 0 && res.DT) {
           const { orders, pg } = res.DT;
@@ -53,18 +58,14 @@ const ManageOrder = () => {
       <header className="manage-order-header">
         <h1>Quản lý đơn hàng</h1>
         <div className="tabs">
-          <button
-            className={`tab-btn ${activeTab === TAB_STATES.PENDING ? 'active' : ''}`}
-            onClick={() => setActiveTab(TAB_STATES.PENDING)}
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
           >
-            Đơn chờ xử lý
-          </button>
-          <button
-            className={`tab-btn ${activeTab === TAB_STATES.SHIPPING ? 'active' : ''}`}
-            onClick={() => setActiveTab(TAB_STATES.SHIPPING)}
-          >
-            Đang giao
-          </button>
+            <option className='option' value={TAB_STATES.PENDING}>Chờ xử lý</option>
+            <option className='option' value={TAB_STATES.SHIPPING}>Đang giao</option>
+            <option className='option' value={TAB_STATES.COMPLETED}>Hoàn thành</option>
+          </select>
         </div>
       </header>
 
@@ -78,13 +79,19 @@ const ManageOrder = () => {
             setPage={p => fetchOrders(activeTab, p)}
             onRefresh={() => fetchOrders(activeTab, pagination.page)}
           />
-        ) : (
-          <OrderShipping
-            orders={orders}
-            pagination={pagination}
-            setPage={p => fetchOrders(activeTab, p)}
-          />
-        )}
+        ) : (activeTab === TAB_STATES.SHIPPING ?(
+            <OrderShipping
+              orders={orders}
+              pagination={pagination}
+              setPage={p => fetchOrders(activeTab, p)}
+            />
+          ): (activeTab === TAB_STATES.COMPLETED ? (
+              <OrderCompleted
+                orders={orders}
+                pagination={pagination}
+                setPage={p => fetchOrders(activeTab, p)}
+              />
+            ):null))}
       </main>
     </div>
   );

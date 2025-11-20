@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 const OrderUpdateModal = ({ order, onClose, onSuccess }) => {
   const [trackingCode, setTrackingCode] = useState(order.trackingCode || '');
-  const [receivedDate, setReceivedDate] = useState(order.receivedDate || '');
+  const [expectedDate, setExpectedDate] = useState(order.expectedDate || '');
   const [isSaving, setIsSaving] = useState(false);
   const [items, setItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
@@ -33,7 +33,7 @@ const OrderUpdateModal = ({ order, onClose, onSuccess }) => {
     setIsSaving(true);
     try {
       const realOrderId = order.orderID || order.id;
-      const res = await updatePendingtoShipping(realOrderId, trackingCode.trim(), receivedDate);
+      const res = await updatePendingtoShipping(realOrderId, trackingCode.trim(), expectedDate);
       if (res?.EC === 0) {
         toast.success('Cập nhật đơn hàng thành công.');
         onSuccess?.();
@@ -66,7 +66,7 @@ const OrderUpdateModal = ({ order, onClose, onSuccess }) => {
           </div>
           <div className="form-row">
             <label><FaCalendarCheck /> Ngày nhận</label>
-            <input type="date" value={formatDateInput(receivedDate)} onChange={e => setReceivedDate(e.target.value)} />
+            <input type="date" value={formatDateInput(expectedDate)} onChange={e => setExpectedDate(e.target.value)} />
           </div>
 
           <div className="order-items-preview">

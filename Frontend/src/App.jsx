@@ -9,16 +9,17 @@ import Login from './pages/login.jsx';
 import Register from './pages/register.jsx';
 import ResetPassword from "./pages/resetPassword.jsx";
 
-import LandingPage from './components/user/LandingPage.jsx';
-import Product from './components/user/Product.jsx';
-import ProductDetail from './components/user/ProductDetail.jsx';
-import CartPage from './components/user/CartPage.jsx';
-import Checkout from './components/user/CheckOut.jsx';
+import LandingPage from './components/user/Product/LandingPage.jsx';
+import Product from './components/user/Product/Product.jsx';
+import ProductDetail from './components/user/Product/ProductDetail.jsx';
+import CartPage from './components/user/Cart-Checkout/CartPage.jsx';
+import Checkout from './components/user/Cart-Checkout/CheckOut.jsx';
 
 import ManageProduct from './components/admin/ManageProduct/ManageProduct.jsx';
 import ManagerUser from './components/admin/ManageUser/ManagerUser.jsx';
 import ManageOrder from './components/admin/ManageOrder/ManageOrder.jsx';
 import Dashboard from './components/admin/DashBoard/DashBoard.jsx';
+// import OrderHistory from './components/user/Order/OrderHistory.jsx';
 
 const App = () => {
   return (
@@ -29,7 +30,8 @@ const App = () => {
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         <Route path="checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
-        <Route path="orders" element={<PrivateRoute><div>My Orders</div></PrivateRoute>} />
+        {/* <Route path="orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} /> */}
+        <Route path="orders" element={<PrivateRoute><div>Orders</div></PrivateRoute>} />
       </Route>
 
       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

@@ -50,6 +50,7 @@ model Order {
   orderDate     DateTime
   trackingCode  String?   @db.VarChar(100)
   deliveryDate  DateTime?
+  expectedDate  DateTime?
   receivedDate  DateTime?
 
   user       User        @relation(fields: [userID], references: [id])

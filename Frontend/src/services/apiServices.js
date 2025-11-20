@@ -82,6 +82,12 @@ export const getTopSellingPhone = () => {
   return axios.get(URL_BACKEND);
 };
 
+// Lấy 5 sp bán chạy nhất
+export const getTopSellingProduct = () => {
+  const URL_BACKEND = `/product/top-selling-product`;
+  return axios.get(URL_BACKEND);
+};
+
 // Lọc sản phẩm
 export const getFilteredProducts = async (category, filters) => {
   const URL_BACKEND = `/product/filter-products?category=${category}`;
@@ -172,9 +178,9 @@ export const checkout = (productID) =>{
 
 
 // ORDER API
-export const createOrder = (recipientName, address, phone, items, totalPrice, paymentMethod) => {
+export const createOrder = (name, address, phone, items, totalPrice, paymentMethod) => {
   const URL_BACKEND = '/order/order';
-  const data = { recipientName: recipientName, address: address, phone: phone, items: items, totalPrice: totalPrice, paymentMethod: paymentMethod };
+  const data = { recipientName: name, address: address, phone: phone, items: items, totalPrice: totalPrice, paymentMethod: paymentMethod };
   return axios.post(URL_BACKEND, data);
 }
 
@@ -183,8 +189,8 @@ export const getOrderPendingforAdmin = (page, limit) => {
   return axios.get(URL_BACKEND);
 };
 
-export const getOrderShippingforAdmin = (page, limit) => {
-  const URL_BACKEND = `/order/orders/shipping?page=${page}&limit=${limit}`;
+export const getOrderforAdmin = (page, limit, status) => {
+  const URL_BACKEND = `/order/orders?page=${page}&limit=${limit}&status=${status}`;
   return axios.get(URL_BACKEND);
 }
 
@@ -193,9 +199,9 @@ export const getOrderItem = (orderID) => {
   return axios.get(URL_BACKEND);
 }
 
-export const updatePendingtoShipping = (orderID, trackingCode, receivedDate) => {
+export const updatePendingtoShipping = (orderID, trackingCode, expectedDate) => {
   const URL_BACKEND = `/order/order-to-shipping?orderID=${orderID}`;
-  return axios.patch(URL_BACKEND, { trackingCode, receivedDate });
+  return axios.patch(URL_BACKEND, { trackingCode, expectedDate });
 }
 
 export const updateOrderComplete = (orderID) => {
@@ -203,9 +209,19 @@ export const updateOrderComplete = (orderID) => {
   return axios.patch(URL_BACKEND);
 }
 
+export const getMyOrders = () => {
+  const URL_BACKEND = '/order/my-orders'; 
+  return axios.get(URL_BACKEND);
+};
+
 // ==================== COUNT USERS API (Admin) ====================
 export const countUsersforAdmin = () => {
   const URL_BACKEND = '/user/count';
+  return axios.get(URL_BACKEND);
+};
+
+export const countUsersThisMonthforAdmin = () => {
+  const URL_BACKEND = '/user/count-this-month';
   return axios.get(URL_BACKEND);
 };
 
@@ -231,4 +247,10 @@ export const getRevenueThisMonthforAdmin = () => {
 export const getRevenueByMonthforAdmin = () => {
   const URL_BACKEND = '/order/revenue-by-month';
   return axios.get(URL_BACKEND);
+};
+
+// ==================== VNPay API ====================
+export const createVnpayPayment = async (orderID) => {
+  const URL_BACKEND = `/vnpay/create`;
+  return axios.post(URL_BACKEND, { orderID });
 };

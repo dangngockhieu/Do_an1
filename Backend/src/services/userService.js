@@ -1,6 +1,12 @@
 'use strict';
 import prisma from '../lib/prisma.js';
 import argon from 'argon2';
+import dayjs from 'dayjs';
+import utc from "dayjs/plugin/utc.js";            
+import timezone from "dayjs/plugin/timezone.js";   
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // ==================== CHECK EMAIL EXIST ====================
 export const isEmailExist = async (email) => {
@@ -170,3 +176,23 @@ export const countUser = async () => {
   });
   return count;
 };
+
+export const countUsersThisMonth = async () => {
+  const vnNow = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
+
+  const startOfMonth = dayjs(vnNow).startOf('month').toDate();
+  const endOfMonth = dayjs(vnNow).endOf('month').toDate();
+  const count = await prisma.user.count({
+    where: {
+      sent_at: {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      },
+      isVerified: true
+    },
+  });
+
+  return count;
+};
+
+

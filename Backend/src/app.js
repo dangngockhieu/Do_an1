@@ -7,9 +7,11 @@ import userRoutes from './routes/userRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import vnpayRoutes from './routes/vnpayRoutes.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import './jobs/cleanupJob.js';
+import './jobs/cleanupOrder.js';
+import './jobs/cleanupUser.js';
 import { seedDatabase } from './lib/seed.js';
 
 
@@ -44,6 +46,7 @@ const startServer = async () => {
     cartRoutes(app);
     productRoutes(app);
     orderRoutes(app);
+    vnpayRoutes(app);
 
     // test route
     app.get('/', (req, res) => res.send('Server is running...'));

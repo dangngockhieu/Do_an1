@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { decrementCart } from "../../redux/action/cartAction";
-import { getCart, updateCartQuantity, deleteCartItem, checkout } from "../../services/apiServices";
+import { decrementCart } from "../../../redux/action/cartAction";
+import { getCart, updateCartQuantity, deleteCartItem, checkout } from "../../../services/apiServices";
 import "./CartPage.scss";
 import { toast } from "react-toastify";
 import { RiDeleteBin6Fill } from "react-icons/ri";

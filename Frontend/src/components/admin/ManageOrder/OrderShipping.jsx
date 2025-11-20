@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaShippingFast } from 'react-icons/fa';
-import './OrderShipping.scss';
+import './Order.scss';
 import OrderViewModal from './OrderViewModal';
 import ReactPaginate from "react-paginate";
 import { BsArrowRightCircleFill } from "react-icons/bs";
@@ -28,7 +28,7 @@ const OrderShipping = ({ orders = [], pagination = {}, setPage }) => {
       ) : (
         <>
           <div className="list-head shipping">
-            <h3>Đơn hàng đang giao ({ordersList.length})</h3>
+            <h3>Số đơn hàng đang giao ({ordersList.length})</h3>
           </div>
 
           <div className="table-wrap">
@@ -53,8 +53,8 @@ const OrderShipping = ({ orders = [], pagination = {}, setPage }) => {
                     <td>{order.paymentMethod || '—'}</td>
                     <td>{order.paymentStatus || '—'}</td>
                     <td>
-                        {order.receivedDate
-                        ? new Date(order.receivedDate).toLocaleDateString('vi-VN', {
+                        {order.expectedDate
+                        ? new Date(order.expectedDate).toLocaleDateString('vi-VN', {
                             timeZone: 'Asia/Ho_Chi_Minh',
                             })
                             : '—'}

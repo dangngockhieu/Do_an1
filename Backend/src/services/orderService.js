@@ -1,43 +1,66 @@
 'use strict';
 import prisma from '../lib/prisma.js';
+import dayjs from 'dayjs';
+import utc from "dayjs/plugin/utc.js";            
+import timezone from "dayjs/plugin/timezone.js"; 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const createOrder = async (userID, recipientName, address, phone, items, totalPrice, paymentMethod) => {
-    const orderItemsData = items.map(item => ({
-        productID: +item.productID, 
+    const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
+    return await prisma.$transaction(async (prismaTx) => {
+      // Kiểm tra tồn kho cho từng sản phẩm
+      for (const item of items) {
+        const product = await prismaTx.product.findUnique({
+          where: { id: +item.productID },
+        });
+        if (!product) throw new Error(`Sản phẩm ID ${item.productID} không tồn tại`);
+        if (product.quantity < item.quantity) {
+          throw new Error(`Sản phẩm ${product.name} chỉ còn ${product.quantity} trong kho`);
+        }
+      }
+
+      // Tạo đơn hàng
+      const orderItemsData = items.map(item => ({
+        productID: +item.productID,
         quantity: +item.quantity,
         price: +item.price,
-    }));
-    const nowVN = new Date(Date.now() + 7 * 60 * 60 * 1000);
-    const newOrder = await prisma.order.create({
-        data: {
-            userID: userID,
-            recipientName: recipientName,
-            address: address,
-            phone: phone,
-            totalPrice: +totalPrice,
-            status: 'PENDING', 
-            orderDate: nowVN,
-            payment: {
-                create: {
-                    amount: +totalPrice,
-                    method: paymentMethod,
-                    status: 'UNPAID', 
-                    createdAt: nowVN,
-                },
-            },
-            orderItems: {
-                createMany: {
-                    data: orderItemsData,
-                },
-            },
-        },
-        include: {
-            payment: true,
-            orderItems: true,
-        }
-    });
+      }));
 
-    return newOrder;
+      const newOrder = await prismaTx.order.create({
+        data: {
+          userID,
+          recipientName,
+          address,
+          phone,
+          totalPrice: +totalPrice,
+          status: 'PENDING',
+          orderDate: nowVN,
+          payment: {
+            create: {
+              amount: +totalPrice,
+              method: paymentMethod,
+              status: 'UNPAID',
+              createdAt: nowVN,
+            },
+          },
+          orderItems: {
+            createMany: { data: orderItemsData },
+          },
+        },
+        include: { payment: true, orderItems: true }
+      });
+
+      //  Cập nhật số lượng tồn kho
+      await prismaTx.$executeRaw`
+        UPDATE products p
+        JOIN order_items oi ON p.id = oi.productID
+          SET p.quantity = p.quantity - oi.quantity
+        WHERE oi.orderID = ${newOrder.id};
+      `;
+
+      return newOrder;
+    });
 };
 export const getOrderPendingforAdmin = async (page = 1, limit = 10) => {
   page = +page || 1;
@@ -69,7 +92,8 @@ export const getOrderPendingforAdmin = async (page = 1, limit = 10) => {
         o.totalPrice, 
         o.orderDate, 
         p.method AS paymentMethod, 
-        p.status AS paymentStatus
+        p.status AS paymentStatus,
+        (SELECT u.email FROM users u WHERE u.id = o.userID) AS userEmail
     FROM 
         orders o
     LEFT JOIN 
@@ -96,7 +120,7 @@ export const getOrderPendingforAdmin = async (page = 1, limit = 10) => {
   };
 };
 
-export const getOrderShippingforAdmin = async (page = 1, limit = 10) => {
+export const getOrderforAdmin = async (page = 1, limit = 10, status) => {
   page = +page || 1;
   limit = +limit || 10;
   const offset = (page - 1) * limit;
@@ -105,7 +129,7 @@ export const getOrderShippingforAdmin = async (page = 1, limit = 10) => {
     SELECT COUNT(*) AS total
     FROM orders o
     LEFT JOIN payments p ON o.id = p.orderID
-    WHERE o.status = 'SHIPPING';
+    WHERE o.status = ${status};
   `;
   const totalRecords = Number(totalResult[0]?.total || 0);
   const totalPages = Math.ceil(totalRecords / limit);
@@ -121,16 +145,18 @@ export const getOrderShippingforAdmin = async (page = 1, limit = 10) => {
         o.totalPrice, 
         o.trackingCode, 
         o.deliveryDate,
+        o.expectedDate,
         o.receivedDate,
         o.orderDate, 
         p.method AS paymentMethod, 
-        p.status AS paymentStatus
+        p.status AS paymentStatus,
+        (SELECT u.email FROM users u WHERE u.id = o.userID) AS userEmail
     FROM 
         orders o
     LEFT JOIN 
         payments p ON o.id = p.orderID
     WHERE 
-        o.status = 'SHIPPING'
+        o.status = ${status}
     ORDER BY 
         o.orderDate DESC
     LIMIT ${limit} OFFSET ${offset};
@@ -146,31 +172,41 @@ export const getOrderShippingforAdmin = async (page = 1, limit = 10) => {
   };
 };
 
-export const updatePendingtoShipping = async(orderID, trackingCode, receivedDate) =>{
-    const nowVN = new Date(Date.now() + 7 * 60 * 60 * 1000);
+export const updatePendingtoShipping = async(orderID, trackingCode, expectedDate) =>{
+    const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
+    const expectedVN = expectedDate ? dayjs(expectedDate).tz("Asia/Ho_Chi_Minh").toDate() : null;
+
     const updatedOrder = await prisma.order.update({
         where: { id: +orderID },
         data: {
             status: 'SHIPPING',
             trackingCode: trackingCode,
             deliveryDate: nowVN,
-            receivedDate: receivedDate ? new Date(new Date(receivedDate).getTime() + 7 * 60 * 60 * 1000) : null,
+            expectedDate: expectedVN,
         },
     });
 
     return updatedOrder;
 };
 
-export const updateOrderComplete = async(orderID) =>{   // Dành cho ng dùng
+export const updateOrderforUser = async(orderID) =>{   
     const updatedOrder = await prisma.order.update({
         where: { id: +orderID },
         data: {
             status: 'COMPLETED',
         },
     });
+    await prisma.$executeRaw`
+        UPDATE products p
+        JOIN order_items oi ON p.id = oi.productID
+        SET 
+          p.sold = p.sold + oi.quantity
+        WHERE oi.orderID = ${orderID};
+    `;
 
     return updatedOrder;
 };
+
 
 export const getOrderItem = async(orderID) =>{
     const products = await prisma.$queryRaw`
@@ -196,59 +232,109 @@ export const getOrderItem = async(orderID) =>{
     return products;
 };
 
+export const getUserOrders = async(userID) =>{
+    const orders = await prisma.order.findMany({
+        where: { userID: +userID },
+    });
+
+    return orders;
+};
+
 export const countOrders = async () => {
-  const now = new Date();
-  const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+  const vnNow = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
 
-  const startOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), 1);
-  const endOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), vnNow.getDate(), 23, 59, 59);
-
+  const startOfMonth = dayjs(vnNow).startOf('month').toDate();
+  const endOfMonth = dayjs(vnNow).endOf('month').toDate();
   const count = await prisma.order.count({
     where: {
       orderDate: {
         gte: startOfMonth,
         lte: endOfMonth,
       },
+      status: { not: 'CANCELLED' },
     },
   });
 
-  return count;
-};
-
-export const getRevenueThisMonth = async () => {
-  const now = new Date();
-  const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000);
-
-  const startOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), 1);
-  const endOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), vnNow.getDate(), 23, 59, 59);
-
-  const result = await prisma.order.aggregate({
-    _sum: {
-      totalPrice: true,
-    },
+  const countPending = await prisma.order.count({
     where: {
       orderDate: {
         gte: startOfMonth,
         lte: endOfMonth,
       },
-      status: "COMPLETED",
+      status: 'PENDING',
     },
   });
 
-  const totalRevenue = result._sum.totalPrice || 0;
-  return totalRevenue;
+  const countShipping = await prisma.order.count({
+    where: {
+      orderDate: {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      },
+      status: 'SHIPPING',
+    },
+  });
+
+  const countCompleted = await prisma.order.count({
+    where: {
+      orderDate: {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      },
+      status: 'COMPLETED',
+    },
+  });
+
+  return {count, countPending, countShipping, countCompleted};
 };
 
-const toVietnamTime = (date) => {
-  return new Date(date.getTime() + 7 * 60 * 60 * 1000);
+export const getRevenueThisMonth = async () => {
+  const vnNow = dayjs().tz("Asia/Ho_Chi_Minh");
+
+  const startOfCurrentMonth = vnNow.startOf('month').toDate();
+  const endOfCurrentMonth = vnNow.endOf('month').toDate();
+
+  const startOfPrevMonth = vnNow.subtract(1, 'month').startOf('month').toDate();
+  const endOfPrevMonth = vnNow.subtract(1, 'month').endOf('month').toDate();
+
+  const currentMonthResult = await prisma.order.aggregate({
+    _sum: { totalPrice: true },
+    where: {
+      status: "COMPLETED",
+      orderDate: { gte: startOfCurrentMonth, lte: endOfCurrentMonth },
+    },
+  });
+  const currentMonthRevenue = currentMonthResult._sum.totalPrice || 0;
+
+  const prevMonthResult = await prisma.order.aggregate({
+    _sum: { totalPrice: true },
+    where: {
+      status: "COMPLETED",
+      orderDate: { gte: startOfPrevMonth, lte: endOfPrevMonth },
+    },
+  });
+  const prevMonthRevenue = prevMonthResult._sum.totalPrice || 0;
+
+  let growth = 0;
+  if (prevMonthRevenue > 0) {
+    growth = ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100;
+  } else if (currentMonthRevenue > 0) {
+    growth = 100;
+  }
+
+  return {
+    currentMonthRevenue,
+    growth: Number(growth.toFixed(2)), 
+  };
 };
+
+
 export const getRevenueByMonth = async () => {
-  const now = new Date();
-  const vnNow = toVietnamTime(now);
-  const year = vnNow.getFullYear();
+  const vnNow = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
+  const year = dayjs(vnNow).year();
 
-  const startOfYear = new Date(Date.UTC(year, 0, 1, 0, 0, 0)); 
-  const endOfYear = new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+  const startOfYear = dayjs().tz("Asia/Ho_Chi_Minh").year(year).startOf('year').toDate();
+  const endOfYear = dayjs().tz("Asia/Ho_Chi_Minh").year(year).endOf('year').toDate();
 
   const result = await prisma.order.findMany({
     where: {
@@ -266,11 +352,13 @@ export const getRevenueByMonth = async () => {
 
   const monthlyRevenue = Array(12).fill(0);
   result.forEach((r) => {
-    const vnDate = toVietnamTime(new Date(r.orderDate));
-    const month = vnDate.getMonth(); 
+    const vnDate = dayjs(r.orderDate).tz("Asia/Ho_Chi_Minh");
+    const month = vnDate.month(); 
     monthlyRevenue[month] += r.totalPrice;
   });
 
   return monthlyRevenue;
 };
+
+
 

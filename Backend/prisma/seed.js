@@ -407,7 +407,7 @@ const main = async () => {
         });
       }
 
-      // 🧮 Cập nhật số lượng bán ra = số người mua
+      //  Cập nhật số lượng bán ra = số người mua
       await prisma.product.update({
         where: { id: product.id },
         data: { sold: reviewers.length },

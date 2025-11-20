@@ -1,5 +1,7 @@
 'use strict';
 import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
+dotenv.config();
 // Singleton pattern cho Prisma Client để tránh tạo nhiều instances
 let prisma;
 

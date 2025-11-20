@@ -2,11 +2,17 @@
 import argon from 'argon2';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
+import utc from "dayjs/plugin/utc.js";            
+import timezone from "dayjs/plugin/timezone.js";  
+
 import { v4 as uuid4 } from 'uuid';
 import prisma from '../lib/prisma.js';
 import transporter from '../config/mailer.js';
 import dotenv from 'dotenv';
 dotenv.config();
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // ==================== GỬI EMAIL XÁC THỰC ====================
 const sendVerificationEmail = async (email, name, token) => {
@@ -100,8 +106,8 @@ export const resendVerificationEmail = async (email) => {
   const now = dayjs();
   if (lastSent) {
     const diffMinutes = now.diff(dayjs(lastSent), 'minutes');
-    if (diffMinutes < 10) {
-      throw new Error(`Bạn chỉ được yêu cầu gửi lại mã xác thực sau ${10 - diffMinutes} phút nữa.`);
+    if (diffMinutes < 30) {
+      throw new Error(`Bạn chỉ được yêu cầu gửi lại mã xác thực sau ${30 - diffMinutes} phút nữa.`);
     }
   }
   const codeId = uuid4();
@@ -340,7 +346,7 @@ export const verifyByToken = async (token, email) => {
 
     await prisma.user.update({
       where: { email },
-      data: { isVerified: true, verification_code: null, sent_at: null, code_expired: null },
+      data: { isVerified: true, verification_code: null, sent_at: dayjs().tz("Asia/Ho_Chi_Minh").toDate(), code_expired: null },
     });
     return 'Email verified'; 
   }

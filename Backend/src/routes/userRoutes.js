@@ -8,7 +8,8 @@ import {
   findUserByEmail,
   createUser,
   changeRoleUser,
-  countUsers
+  countUsers,
+  countUsersThisMonth
 } from '../controllers/userController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
@@ -32,6 +33,8 @@ const userRoutes = (app) => {
   router.patch('/user-role/:id', jwtAuth, authorizeRole(['ADMIN']), changeRoleUser);
   // Lấy tổng số người dùng
   router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countUsers);
+  // Lấy tổng số người dùng mới trong tháng hiện tại
+  router.get('/count-this-month', jwtAuth, authorizeRole(['ADMIN']), countUsersThisMonth);
 
 app.use('/user', router);
 };

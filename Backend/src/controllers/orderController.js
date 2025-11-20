@@ -17,7 +17,7 @@ export const createOrder = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             EC: 1,
-            EM: "Lỗi tạo đơn hàng"
+            EM: error.message ||"Lỗi tạo đơn hàng"
         });
     }
 };
@@ -40,11 +40,12 @@ export const getOrderPendingforAdmin = async (req, res) => {
     }
 };
 
-export const getOrderShippingforAdmin = async (req, res) => {
+export const getOrderforAdmin = async (req, res) => {
     try {
         const page = +req.query.page || 1;
         const limit = +req.query.limit || 10;
-        const {orders, pg} = await orderService.getOrderShippingforAdmin(page, limit);
+        const status = req.query.status || 'PENDING';
+        const {orders, pg} = await orderService.getOrderforAdmin(page, limit, status);
         return res.status(200).json({
             EC: 0,
             EM: "Lấy danh sách đơn hàng thành công",
@@ -75,11 +76,28 @@ export const getOrderItem = async (req, res) => {
     }
 };
 
+export const getMyOrders = async (req, res) => {
+    try {
+        const userID = +req.user.id;
+        const orders = await orderService.getUserOrders(userID);
+        return res.status(200).json({
+            EC: 0,
+            EM: "Lấy danh sách đơn hàng thành công",
+            DT: orders
+        });
+    } catch (error) {
+        return res.status(500).json({
+            EC: 1,
+            EM: error.message || "Lỗi lấy danh sách đơn hàng"
+        });
+    }
+};
+
 export const updatePendingtoShipping = async (req, res) => {
     try {
         const orderID = Number(req.query.orderID);
-        const { trackingCode, receivedDate } = req.body;
-        const updatedOrder = await orderService.updatePendingtoShipping(orderID, trackingCode, receivedDate);
+        const { trackingCode, expectedDate } = req.body;
+        const updatedOrder = await orderService.updatePendingtoShipping(orderID, trackingCode, expectedDate);
         return res.status(200).json({
             EC: 0,
             EM: "Cập nhật đơn hàng thành công!",
@@ -93,10 +111,10 @@ export const updatePendingtoShipping = async (req, res) => {
     }
 };
 
-export const updateOrderComplete = async (req, res) => {
+export const updateOrderforUser = async (req, res) => {
     try {
         const orderID = +req.query.orderID;
-        const updatedOrder = await orderService.updateOrderComplete(orderID);
+        const updatedOrder = await orderService.updateOrderforUser(orderID);
         return res.status(200).json({
             EC: 0,
             EM: "Cập nhật đơn hàng thành công!",
@@ -113,8 +131,9 @@ export const updateOrderComplete = async (req, res) => {
 // ==================== COUNT ORDERS ====================
 export const countOrders = async (req, res) => {
   try {
-    const count = await orderService.countOrders();
-    return res.status(200).json({ DT: { count }, EM: 'Count orders successful', EC: 0 });
+    const {count, countPending, countShipping, countCompleted} = await orderService.countOrders();
+    return res.status(200).json({ DT: {count, countPending, countShipping, countCompleted}, 
+                    EM: 'Count orders successful', EC: 0 });
   } catch (error) {
     return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
   }
@@ -123,8 +142,8 @@ export const countOrders = async (req, res) => {
 // ==================== Revenue ====================
 export const getRevenueThisMonth = async (req, res) => {
   try {
-    const revenue = await orderService.getRevenueThisMonth();
-    return res.status(200).json({ DT: { revenue }, EM: 'Get revenue successful', EC: 0 });
+    const {currentMonthRevenue, growth} = await orderService.getRevenueThisMonth();
+    return res.status(200).json({ DT: {currentMonthRevenue, growth}, EM: 'Get revenue successful', EC: 0 });
   } catch (error) {
     return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
   }
@@ -138,3 +157,4 @@ export const getRevenueByMonth = async (req, res) => {
     res.status(500).json({ EC: -1, EM: "Server error" });
   }
 };
+

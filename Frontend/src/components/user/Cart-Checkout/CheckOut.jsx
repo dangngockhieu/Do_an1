@@ -5,8 +5,8 @@ import { toast } from 'react-toastify';
 import { FaArrowCircleLeft } from "react-icons/fa";
 import { BsCart4 } from "react-icons/bs";
 import { useDispatch } from "react-redux";
-import { decrementCart } from "../../redux/action/cartAction";
-import { createOrder, deleteCartItem } from '../../services/apiServices';
+import { decrementCart } from "../../../redux/action/cartAction";
+import { createOrder, deleteCartItem, createVnpayPayment } from '../../../services/apiServices';
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const Checkout = () => {
     const location = useLocation();
@@ -26,8 +26,7 @@ const Checkout = () => {
     }, [checkoutItems, totalAmount]);
 
     const methods = [{ label: "Thanh toán khi nhận hàng (COD)", value: "COD" },
-    { label: "Chuyển khoản ngân hàng", value: "BANK" },
-    { label: "Thanh toán qua ví MOMO", value: "MOMO" }
+    { label: "Thanh toán bằng VNPAY", value: "BANK" }
     ];
     const [paymentMethod, setPaymentMethod] = useState("COD");
     const [recipient, setRecipient] = useState({
@@ -49,41 +48,66 @@ const Checkout = () => {
   };
 
   const handleCheckout = async () => {
-    try {
-      const orderItems = items.map(item => ({
-        productID: item.id,
-        quantity: item.number,
-        price: item.price
-      }));
+  try {
+    const orderItems = items.map(item => ({
+      productID: item.id,
+      quantity: item.number,
+      price: item.price
+    }));
 
-      const response = await createOrder(
-        recipient.name,
-        recipient.address,
-        recipient.phone,
-        orderItems,
-        total,
-        paymentMethod
-      );
-
-      if (response.EC === 0) {
-        toast.success("Đặt hàng thành công!");
-        for (const item of items) {
-          const response = await deleteCartItem(item.id);
-          if (response.EC === 0) {
-            dispatch(decrementCart());
-          }
-        }
-        navigate('/orders');
-
-      } else {
-        toast.error("Đặt hàng thất bại. Vui lòng thử lại.");
-        navigate('/cart');
-      }
-    } catch (error) {
-      toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
-      navigate('/cart');
+    // 1. Tạo Order
+    const response = await createOrder(
+      recipient.name,
+      recipient.address,
+      recipient.phone,
+      orderItems,
+      total,
+      paymentMethod
+    );
+    console.log('Create Order Response:', response);
+    if (response.EC != 0) {
+      toast.error("Đặt hàng thất bại. Vui lòng thử lại.");
+      return navigate('/cart');
     }
-  };
+
+    const newOrder = response.DT;
+    const orderID = newOrder.id;
+
+    // COD thì giữ nguyên
+    if (paymentMethod === "COD") {
+      toast.success("Đặt hàng thành công!");
+      for (const item of items) {
+        const res = await deleteCartItem(item.id);
+        if (res.EC === 0) dispatch(decrementCart());
+      }
+      return navigate('/orders');
+    }
+
+    // BANK → VNPay
+    if (paymentMethod === "BANK") {
+      const res = await createVnpayPayment(orderID);
+
+      if (res.EC !== 0) {
+        toast.error("Tạo thanh toán VNPay thất bại.");
+        return;
+      }
+
+      // Clear cart
+      for (const item of items) {
+        const res = await deleteCartItem(item.id);
+        if (res.EC === 0) dispatch(decrementCart());
+      }
+
+      window.location.href = res.DT.paymentUrl;
+      return;
+    }
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
+    navigate('/cart');
+  }
+};
   
 
   return (

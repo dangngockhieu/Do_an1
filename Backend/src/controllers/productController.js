@@ -35,6 +35,16 @@ export const getTopSellingPhone = async (req, res) => {
   }
 };
 
+export const getTopSellingProduct = async (req, res) => {
+  try {
+    const products = await productService.getTopSellingProduct();
+    if (!products) return res.status(404).json({ EC: 1, EM: 'Not found' });
+    res.status(200).json({ EC: 0, DT: products });
+  } catch (err) {
+    res.status(500).json({ EC: 1, EM: err.message });
+  }
+};
+
 export const addProductFeatures = async (req, res) => {
   try {
     let { featureIDs } = req.body;

@@ -89,8 +89,29 @@
   }
 }
 
-/* responsive */
-@media (max-width: 520px) {
+@media (max-width: 768px) {
+  .oum-card {
+    width: 90%;
+    padding: 12px;
+  }
+
+  .oum-body .form-row {
+    flex-direction: column;
+  }
+
+  .order-items-preview {
+    font-size: 14px;
+  }
+
+  .oum-footer .btn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
   .oum-card { width: 96%; }
   .oum-footer { flex-direction: column-reverse; gap: 8px; align-items: stretch; }
+  .oum-header h3 { font-size: 16px; }
 }
+

@@ -4,8 +4,8 @@ import "./ProductDetail.scss";
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 import { FaStar, FaRegCircleCheck } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
-import { setCartCount } from "../../redux/action/cartAction";
-import { addProductToCart, getNumberCart, getProductById, buyNow } from "../../services/apiServices";
+import { setCartCount } from "../../../redux/action/cartAction";
+import { addProductToCart, getNumberCart, getProductById, buyNow } from "../../../services/apiServices";
 import { toast } from "react-toastify";
 
 const ProductDetail = () => {
