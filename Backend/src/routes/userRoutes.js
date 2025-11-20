@@ -3,7 +3,6 @@ import express from 'express';
 import {
   getAllUsers,
   getUsersWithPaginate,
-  getUserById,
   changePassword,
   findUserByEmail,
   createUser,
@@ -21,8 +20,6 @@ const userRoutes = (app) => {
   router.get('/users', jwtAuth, authorizeRole(['ADMIN']), getAllUsers);
   // Lấy danh sách người dùng có phân trang
   router.get('/users-paginate', jwtAuth, authorizeRole(['ADMIN']), getUsersWithPaginate);
-  // Lấy thông tin người dùng theo ID
-  router.get('/users/:id', jwtAuth, authorizeRole(['ADMIN']), getUserById);
   // Tìm kiếm người dùng theo email
   router.get('/find-user', jwtAuth, authorizeRole(['ADMIN']), findUserByEmail);
   // Tạo mới người dùng

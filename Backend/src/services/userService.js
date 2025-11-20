@@ -95,20 +95,6 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
   return { users: safeUsers, total };
 };
 
-// ==================== GET USER BY ID ====================
-export const getUserById = async (id) => {
-  const user = await prisma.user.findUnique({
-    where: { id: id, isVerified: true },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-    }
-  });
-  return user || null;
-};
-
 // ==================== FIND USER BY EMAIL ====================
 export const findUserByEmail = async (email) => {
   const user = await prisma.user.findUnique({ 

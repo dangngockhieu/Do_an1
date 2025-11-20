@@ -114,7 +114,8 @@ export const updatePendingtoShipping = async (req, res) => {
 export const updateOrderforUser = async (req, res) => {
     try {
         const orderID = +req.query.orderID;
-        const updatedOrder = await orderService.updateOrderforUser(orderID);
+        const userID = +req.user.id;
+        const updatedOrder = await orderService.updateOrderforUser(orderID, userID);
         return res.status(200).json({
             EC: 0,
             EM: "Cập nhật đơn hàng thành công!",
@@ -158,3 +159,20 @@ export const getRevenueByMonth = async (req, res) => {
   }
 };
 
+export const cancelOrder = async (req, res) => {
+    try {
+        const orderID = +req.params.orderID;
+        const userID = +req.user.id;
+        const updatedOrder = await orderService.cancelOrder(orderID, userID);
+        return res.status(200).json({
+            EC: 0,
+            EM: "Hủy đơn hàng thành công!",
+            DT: updatedOrder
+        });
+    } catch (error) {
+        return res.status(500).json({
+            EC: 1,
+            EM: "Lỗi hủy đơn hàng"
+        });
+    }
+};

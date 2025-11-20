@@ -62,7 +62,7 @@ export const updateQuantity = async (userID, productID, newNumber) => {
   if (newNumber <= 0) {
     return { 
       EC: -6, 
-      EM: 'Số lượng phải lớn hơn 0. Vui lòng sử dụng chức năng xóa nếu muốn loại bỏ sản phẩm.' 
+      EM: 'Số lượng phải lớn hơn 0.' 
     };
   }
 

@@ -1,6 +1,6 @@
 'use strict';
 import express from 'express';
-import { createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getMyOrders,
+import { createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getMyOrders, cancelOrder,
   updateOrderforUser, updatePendingtoShipping, countOrders, getRevenueThisMonth, getRevenueByMonth
  } from '../controllers/orderController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
@@ -29,6 +29,8 @@ const orderRoutes = (app) => {
   router.get('/revenue-this-month', jwtAuth, authorizeRole(['ADMIN']), getRevenueThisMonth);
   // Thống kê doanh thu theo tháng
   router.get('/revenue-by-month', jwtAuth, authorizeRole(['ADMIN']), getRevenueByMonth);
+  // Hủy đơn hàng
+  router.patch('/cancel-order/:orderID', jwtAuth, cancelOrder);
 
 
   app.use('/order', router);

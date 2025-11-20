@@ -23,16 +23,6 @@ export const getUsersWithPaginate = async (req, res) => {
   }
 };
 
-// ==================== GET USER BY ID ====================
-export const getUserById = async (req, res) => {
-  try {
-    const id = +req.params.id;
-    const user = await userService.getUserById(id);
-    return res.status(200).json({ DT: user, EM: 'Get user successful', EC: 0 });
-  } catch (error) {    
-    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
-  }
-};
 
 // ==================== CHANGE PASSWORD ====================
 export const changePassword = async (req, res) => {
