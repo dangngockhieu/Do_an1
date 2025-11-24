@@ -95,30 +95,27 @@
       padding: 20px;
       margin-bottom: 30px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      position: sticky;
-      top: 90px;
       height: fit-content;
       z-index: 5;
-      position: sticky;
-      top: 80px;          
-      height: calc(100vh - 100px);  // chiều cao tối đa hiển thị
-      overflow-y: auto;   // bật thanh cuộn dọc
-      overflow-x: hidden; 
+      .filter-divider{
+        position: sticky;
+        top: 80px;          
+        height: calc(100vh - 100px); 
+        overflow-y: auto;  
+        overflow-x: hidden; 
+        padding-right: 6px; 
 
-      padding-right: 6px; 
-
-
-
-    .filter-section::-webkit-scrollbar {
-      width: 1px !important;
-    }
-    .filter-section::-webkit-scrollbar-thumb {
-      background: #ccc;
-      border-radius: 10px;
-    }
-    .filter-section::-webkit-scrollbar-thumb:hover {
-      background: #bbbbbb;
-    }
+        .filter-section::-webkit-scrollbar {
+          width: 1px !important;
+        }
+        .filter-section::-webkit-scrollbar-thumb {
+          background: #ccc;
+          border-radius: 10px;
+        }
+        .filter-section::-webkit-scrollbar-thumb:hover {
+          background: #bbbbbb;
+        }
+      }
 
       .filter-header {
         display: flex;

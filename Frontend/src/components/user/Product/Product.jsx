@@ -493,7 +493,8 @@ const handleBuyNow = async (productID) => {
               <button className="btn-reset" onClick={handleReset}>Reset</button>
             </div>
           </div>
-
+          <hr/>
+          <div className="filter-divider">
           {/* Hãng */}
           <div className="filter-item">
             <div className="filter-title" onClick={() => toggleSection("brand")}>
@@ -611,6 +612,7 @@ const handleBuyNow = async (productID) => {
               )}
             </div>
           ))}
+          </div>
         </div>
 
         <div className="product-list">
