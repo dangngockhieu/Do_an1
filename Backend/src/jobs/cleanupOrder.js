@@ -11,7 +11,6 @@ const cleanupUnpaidOrders = async () => {
   try {
     const nowVN = dayjs().tz('Asia/Ho_Chi_Minh');
     const threshold = nowVN.subtract(24, 'hour').toDate();
-
     // Lấy các order chưa thanh toán quá 24h và không phải COD
     const ordersToDelete = await prisma.order.findMany({
       where: {
@@ -28,11 +27,6 @@ const cleanupUnpaidOrders = async () => {
       },
     });
 
-    if (ordersToDelete.length === 0) {
-      console.log('Không có đơn hàng nào cần xóa.');
-      return;
-    }
-
     await prisma.$transaction(
       ordersToDelete.map(order => 
         prisma.$executeRaw`
@@ -41,20 +35,15 @@ const cleanupUnpaidOrders = async () => {
           JOIN order_items oi ON p.id = oi.productID
           SET p.quantity = p.quantity + oi.quantity
           WHERE oi.orderID = ${order.id};
-          
           -- Xóa orderItems
           DELETE FROM order_items WHERE orderID = ${order.id};
-          
           -- Xóa payment
           DELETE FROM payments WHERE orderID = ${order.id};
-          
           -- Xóa order
           DELETE FROM orders WHERE id = ${order.id};
         `
       )
     );
-
-    console.log(`Đã xóa ${ordersToDelete.length} đơn hàng chưa thanh toán và trả lại số lượng sản phẩm.`);
   } catch (err) {
     console.error('Cleanup unpaid orders failed:', err);
   }

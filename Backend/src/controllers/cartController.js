@@ -38,10 +38,10 @@ export const updateCartQuantity = async (req, res) => {
         const productID = +req.query.productID;
         const userID = +req.user.id; 
 
-        if (!productID || typeof newNumber !== 'number' || newNumber <= 0) {
+        if (!productID || newNumber <= 0) {
             return res.status(400).json({
                 EC: -1,
-                EM: 'Dữ liệu đầu vào không hợp lệ (productId hoặc newNumber).',
+                EM: 'Dữ liệu đầu vào không hợp lệ.',
             });
         }
         const response = await cartService.updateQuantity(userID, productID, newNumber);
@@ -55,7 +55,7 @@ export const updateCartQuantity = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             EC: -1,
-            EM: 'Lỗi server nội bộ. Vui lòng thử lại sau.',
+            EM: 'Lỗi server. Vui lòng thử lại sau.',
         });
     }
 };

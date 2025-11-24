@@ -1,10 +1,6 @@
 import axios from '../utils/axiosCustomize';
 
 // ==================== USER API (Admin) ====================
-export const getAllUsersforAdmin = () => {
-  const URL_BACKEND = '/user/users';
-  return axios.get(URL_BACKEND);
-};
 
 export const getUserWithPaginate = (page, limit, search = "") => {
   const URL_BACKEND = `/user/users-paginate?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`;
@@ -61,8 +57,8 @@ export const changePassword = (oldPassword, newPassword) => {
 
 // ==================== PRODUCT API ====================
 // Lấy danh sách sản phẩm có phân trang + tìm kiếm
-export const getProductsWithPaginate = (page, limit, search = "", category, factory) => {
-  const URL_BACKEND = `/product/products-paginate?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&factory=${encodeURIComponent(factory)}`;
+export const getProductsWithPaginate = (page, limit, keyword = "", category, factory) => {
+  const URL_BACKEND = `/product/products-paginate?page=${page}&limit=${limit}&keyword=${encodeURIComponent(keyword)}&category=${encodeURIComponent(category)}&factory=${encodeURIComponent(factory)}`;
   return axios.get(URL_BACKEND);
 };
 
@@ -128,7 +124,6 @@ export const addProductImages = (id, formData) => {
   });
 };
 
-
 // Xóa 1 ảnh
 export const deleteProductImage = (imageId) => {
   const URL_BACKEND = `/product/product-image/${imageId}`;
@@ -177,7 +172,7 @@ export const checkout = (productID) =>{
 };
 
 
-// ORDER API
+// ====================== ORDER API  ====================
 export const createOrder = (name, address, phone, items, totalPrice, paymentMethod) => {
   const URL_BACKEND = '/order/order';
   const data = { recipientName: name, address: address, phone: phone, items: items, totalPrice: totalPrice, paymentMethod: paymentMethod };
@@ -199,14 +194,21 @@ export const getOrderItem = (orderID) => {
   return axios.get(URL_BACKEND);
 }
 
+// Cancel ORDER 
+export const cancelOrder = (orderID) => {
+  const URL_BACKEND = `/order/cancel-order/${orderID}`;
+  return axios.patch(URL_BACKEND);
+};
+
 export const updatePendingtoShipping = (orderID, trackingCode, expectedDate) => {
   const URL_BACKEND = `/order/order-to-shipping?orderID=${orderID}`;
   return axios.patch(URL_BACKEND, { trackingCode, expectedDate });
 }
 
-export const updateOrderComplete = (orderID) => {
-  const URL_BACKEND = `/order/order-complete?orderID=${orderID}`;
-  return axios.patch(URL_BACKEND);
+export const updateOrderforUser = (orderID, status) => {
+  const URL_BACKEND = `/order/order?orderID=${orderID}`;
+  const data = { status };
+  return axios.patch(URL_BACKEND, data);
 }
 
 export const getMyOrders = () => {
@@ -254,3 +256,5 @@ export const createVnpayPayment = async (orderID) => {
   const URL_BACKEND = `/vnpay/create`;
   return axios.post(URL_BACKEND, { orderID });
 };
+
+

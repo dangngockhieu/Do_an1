@@ -14,20 +14,6 @@ export const isEmailExist = async (email) => {
   return !!user;
 };
 
-// ==================== GET ALL USERS ====================
-export const getAllUsers = async () => {
-  const users = await prisma.user.findMany({
-    where: { isVerified: true },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-    }
-  });
-  return users;
-};
-
 // ==================== GET USERS WITH PAGINATION ====================
 export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => {
   page = +page || 1;

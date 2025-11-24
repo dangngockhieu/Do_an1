@@ -1,14 +1,5 @@
 'use strict';
 import * as userService from '../services/userService.js';
-// ==================== GET ALL USERS ====================
-export const getAllUsers = async (req, res) => {
-  try {
-    const data = await userService.getAllUsers();
-    return res.status(200).json({ DT: data, EM: 'Get all users successful', EC: 0 });
-  } catch (error) {
-    return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
-  }
-};
 
 // ==================== GET USERS WITH PAGINATION ====================
 export const getUsersWithPaginate = async (req, res) => {

@@ -44,7 +44,7 @@ export const getOrderforAdmin = async (req, res) => {
     try {
         const page = +req.query.page || 1;
         const limit = +req.query.limit || 10;
-        const status = req.query.status || 'PENDING';
+        const status = req.query.status || 'SHIPPING';
         const {orders, pg} = await orderService.getOrderforAdmin(page, limit, status);
         return res.status(200).json({
             EC: 0,
@@ -76,7 +76,7 @@ export const getOrderItem = async (req, res) => {
     }
 };
 
-export const getMyOrders = async (req, res) => {
+export const getUserOrders = async (req, res) => {
     try {
         const userID = +req.user.id;
         const orders = await orderService.getUserOrders(userID);
@@ -115,7 +115,8 @@ export const updateOrderforUser = async (req, res) => {
     try {
         const orderID = +req.query.orderID;
         const userID = +req.user.id;
-        const updatedOrder = await orderService.updateOrderforUser(orderID, userID);
+        const status = req.body.status;
+        const updatedOrder = await orderService.updateOrderforUser(orderID, userID, status);
         return res.status(200).json({
             EC: 0,
             EM: "Cập nhật đơn hàng thành công!",
@@ -153,7 +154,7 @@ export const getRevenueThisMonth = async (req, res) => {
 export const getRevenueByMonth = async (req, res) => {
   try {
     const data = await orderService.getRevenueByMonth();
-    res.status(200).json({ EC: 0, EM: "OK", DT: data });
+    res.status(200).json({ EC: 0, EM: "Success", DT: data });
   } catch (e) {
     res.status(500).json({ EC: -1, EM: "Server error" });
   }

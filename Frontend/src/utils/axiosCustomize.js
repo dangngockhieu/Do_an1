@@ -58,7 +58,6 @@ instance.interceptors.response.use(
 
     const originalRequest = error.config;
 
-    // Kiểm tra nếu lỗi không có response (server chết, network lỗi)
     if (!error.response) {
       toast.error('Không thể kết nối đến máy chủ!');
       return Promise.reject(error);

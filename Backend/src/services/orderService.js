@@ -5,7 +5,7 @@ import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js"; 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-// Tạo đơn hàng
+// ===================== Tạo đơn hàng =====================
 export const createOrder = async (userID, recipientName, address, phone, items, totalPrice, paymentMethod) => {
     const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
     return await prisma.$transaction(async (prismaTx) => {
@@ -62,7 +62,8 @@ export const createOrder = async (userID, recipientName, address, phone, items, 
       return newOrder;
     });
 };
-// Lấy danh sách đơn hàng đang chờ xử lý cho admin
+
+// =================== Lấy danh sách đơn hàng đang chờ xử lý cho admin ===================
 export const getOrderPendingforAdmin = async (page = 1, limit = 10) => {
   page = +page || 1;
   limit = +limit || 10;
@@ -120,7 +121,8 @@ export const getOrderPendingforAdmin = async (page = 1, limit = 10) => {
     },
   };
 };
-// Lấy danh sách đơn hàng cho admin theo trạng thái
+
+// =========================== Lấy danh sách đơn hàng cho admin theo trạng thái ==========================
 export const getOrderforAdmin = async (page = 1, limit = 10, status) => {
   page = +page || 1;
   limit = +limit || 10;
@@ -172,7 +174,8 @@ export const getOrderforAdmin = async (page = 1, limit = 10, status) => {
     },
   };
 };
-//  Cập nhật trạng thái đơn hàng sang quá trình vận chuyển
+
+//  ========================== Cập nhật trạng thái đơn hàng sang quá trình vận chuyển ==========================
 export const updatePendingtoShipping = async(orderID, trackingCode, expectedDate) =>{
     const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
     const expectedVN = expectedDate ? dayjs(expectedDate).tz("Asia/Ho_Chi_Minh").toDate() : null;
@@ -189,13 +192,14 @@ export const updatePendingtoShipping = async(orderID, trackingCode, expectedDate
 
     return updatedOrder;
 };
-// Cập nhật trạng thái đơn hàng cho user khi nhận hàng
-export const updateOrderforUser = async(orderID, userID) =>{  
+
+// =========================== Cập nhật trạng thái đơn hàng cho user khi nhận hàng ==========================
+export const updateOrderforUser = async(orderID, userID, status) =>{  
 
     const updatedOrder = await prisma.order.update({
         where: { id: +orderID, userID: +userID },
         data: {
-            status: 'COMPLETED',
+            status: `${status}`,
         },
     });
     await prisma.$executeRaw`
@@ -209,7 +213,7 @@ export const updateOrderforUser = async(orderID, userID) =>{
     return updatedOrder;
 };
 
-// Lấy chi tiết đơn hàng
+// =========================== Lấy chi tiết đơn hàng ==========================
 export const getOrderItem = async(orderID) =>{
     const products = await prisma.$queryRaw`
     SELECT 
@@ -218,11 +222,11 @@ export const getOrderItem = async(orderID) =>{
         oi.quantity,                
         oi.price AS unitPrice,      
         (
-            SELECT pi.url
-            FROM product_images pi
-            WHERE pi.productID = p.id
-            ORDER BY pi.id ASC
-            LIMIT 1
+          SELECT pi.url
+          FROM product_images pi
+          WHERE pi.productID = p.id
+          ORDER BY pi.id ASC
+          LIMIT 1
         ) AS imageUrl
     FROM 
         order_items oi
@@ -233,7 +237,8 @@ export const getOrderItem = async(orderID) =>{
     `;
     return products;
 };
-// Lấy danh sách đơn hàng của người dùng
+
+// =========================== Lấy danh sách đơn hàng của người dùng ==========================
 export const getUserOrders = async(userID) =>{
     const orders = await prisma.order.findMany({
         where: { userID: +userID },
@@ -241,7 +246,8 @@ export const getUserOrders = async(userID) =>{
 
     return orders;
 };
-// Thống kê số lượng đơn hàng trong tháng
+
+// =========================== Thống kê số lượng đơn hàng trong tháng ==========================
 export const countOrders = async () => {
   const vnNow = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
 
@@ -289,7 +295,8 @@ export const countOrders = async () => {
 
   return {count, countPending, countShipping, countCompleted};
 };
-// Thống kê doanh thu trong tháng hiện tại
+
+// ====================== Thống kê doanh thu trong tháng hiện tại =======================
 export const getRevenueThisMonth = async () => {
   const vnNow = dayjs().tz("Asia/Ho_Chi_Minh");
 
@@ -329,7 +336,8 @@ export const getRevenueThisMonth = async () => {
     growth: Number(growth.toFixed(2)), 
   };
 };
-// Thống kê doanh thu theo tháng
+
+// ================== Thống kê doanh thu theo tháng ===================
 export const getRevenueByMonth = async () => {
   const vnNow = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
   const year = dayjs(vnNow).year();
@@ -360,7 +368,8 @@ export const getRevenueByMonth = async () => {
 
   return monthlyRevenue;
 };
-// Hủy đơn hàng
+
+// =========================== Hủy đơn hàng ==========================
 export const cancelOrder = async (orderID, userID) => {
   const updatedOrder = await prisma.order.update({
       where: { id: +orderID, userID: +userID },

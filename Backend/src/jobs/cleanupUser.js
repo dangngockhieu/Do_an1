@@ -4,7 +4,7 @@ import prisma from '../lib/prisma.js';
 const cleanupExpiredUsers = async () => {
   try {
     const now = new Date();
-    const result = await prisma.user.deleteMany({
+    await prisma.user.deleteMany({
       where: {
         isVerified: false,
         code_expired: {
@@ -13,9 +13,6 @@ const cleanupExpiredUsers = async () => {
         },
       },
     });
-    if (result.count > 0) {
-      console.log(`Deleted ${result.count} expired users`);
-    }
   } catch (err) {
     console.error('Cleanup job failed:', err);
   }

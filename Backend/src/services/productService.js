@@ -9,8 +9,8 @@ import timezone from "dayjs/plugin/timezone.js";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// Lấy tất cả sản phẩm có phân trang
-export const getProductsWithPaginate = async (page = 1, limit = 10, search = "", category, factory) => {
+// ============ Lấy tất cả sản phẩm ===============
+export const getProductsWithPaginate = async (page = 1, limit = 10, keyword = "", category, factory) => {
   page = +page || 1;
   limit = +limit || 10;
   const offset = (page - 1) * limit;
@@ -25,11 +25,10 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, search = "",
   if (factory && factory !== "ALL") {
     whereClauses.push(`p.factory = '${factory}'`);
   }
-
-  if (search && search.trim() !== "") {
-    const keyword = `%${search.trim()}%`;
-    whereClauses.push(`(p.name LIKE ${prisma.raw("'" + keyword + "'")} OR p.infor LIKE ${prisma.raw("'" + keyword + "'")})`);
-  }
+  if (keyword && keyword.trim() !== "") {
+    const search = `%${keyword.trim()}%`;
+    whereClauses.push(`p.name LIKE '${search}'`);
+}
 
   const whereSQL = whereClauses.join(" AND ");
 
@@ -77,7 +76,8 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, search = "",
 
   return { products: safeProducts, total };
 };
-// Lấy 5 sp Laptop bán chạy nhất
+
+// ============ Lấy 5 sp Laptop bán chạy nhất ===============
 export const getTopSellingLaptop = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
@@ -120,7 +120,7 @@ export const getTopSellingLaptop = async () => {
 };
 
 
-// Lấy 5 sp Phone bán chạy nhất
+// =================== Lấy 5 sp Phone bán chạy nhất ===================
 export const getTopSellingPhone = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
@@ -162,6 +162,7 @@ export const getTopSellingPhone = async () => {
   return safeProducts;
 }
 
+// =================== Lấy 5 sp bán chạy nhất trong tháng ===================
 export const getTopSellingProduct = async () => {
   const vnNow = dayjs().tz("Asia/Ho_Chi_Minh");
   const startOfMonth = vnNow.startOf('month').toDate();
@@ -183,7 +184,7 @@ export const getTopSellingProduct = async () => {
   return products;
 }
 
-
+// ============ Lấy tất cả sản phẩm với filter ===============
 export const getAllProducts = async (category, filters) => {
   const whereClauses = [`p.category = '${category}'`];
 
@@ -345,8 +346,7 @@ if (filters?.specs) {
   return safeProducts;
 };
 
-
-
+// Lấy chi tiết sản phẩm theo ID
 export const getProductById = async (id) => {
   const result = await prisma.$queryRaw`
     SELECT 
@@ -398,8 +398,7 @@ export const getProductById = async (id) => {
   return {product, reviews};
 }
 
-
-// Add đặc điểm cho sản phẩm
+// =========================== Add đặc điểm cho sản phẩm ==========================
 export const addProductFeatures = async (productID, featureIDs) => {
   if (!Array.isArray(featureIDs) || featureIDs.length === 0) {
         throw new Error("featureIDs must be a non-empty array.");
@@ -429,8 +428,7 @@ export const deleteProductFeature = async (productID, featureID) => {
   });
 };
 
-
-// Tạo sản phẩm mới
+// =========================== Tạo sản phẩm mới ==========================
 export const createProduct = async (data, files) => {
   let finalPrice = +data.originalPrice;
   const couponValue = +data.coupon;
@@ -465,7 +463,7 @@ export const createProduct = async (data, files) => {
   return product;
 };
 
-// Cập nhật thông tin sản phẩm
+// =========================== Cập nhật thông tin sản phẩm ==========================
 export const updateProduct = async (id, data) => {
   // Ép kiểu cho các trường số
   if ('originalPrice' in data)
@@ -491,7 +489,7 @@ export const updateProduct = async (id, data) => {
 };
 
 
-// Thêm nhiều ảnh (khi edit muốn thêm ảnh mới)
+// =========================== Thêm nhiều ảnh (khi edit muốn thêm ảnh mới) ==========================
 export const addProductImages = async (productID, files) => {
   if (!files?.length) return;
   const imagesData = files.map((f) => ({
@@ -513,7 +511,7 @@ export const deleteProductImage = async (imageId) => {
   await prisma.productImage.delete({ where: { id: imageId } });
 };
 
-// Xóa sản phẩm + ảnh
+// =================== Xóa sản phẩm + ảnh ===================
 export const deleteProduct = async (id) => {
   try {
     // Lấy toàn bộ ảnh của sản phẩm

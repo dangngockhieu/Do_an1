@@ -5,10 +5,10 @@ export const getProductsWithPaginate = async (req, res) => {
   try {
     const page = +req.query.page || 1;
     const limit = +req.query.limit || 10;
-    const search = req.query.search || '';
+    const keyword = req.query.keyword || '';
     const category = req.query.category || '';
     const factory = req.query.factory || '';
-    const data = await productService.getProductsWithPaginate(page, limit, search, category, factory);
+    const data = await productService.getProductsWithPaginate(page, limit, keyword, category, factory);
     return res.status(200).json({ EC: 0, DT: data });
   } catch (err) {
     return res.status(500).json({ EC: 1, EM: err.message });
@@ -100,7 +100,6 @@ export const getFilteredProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    // build body from form-data fields
     const body = {};
     for (const key in req.body) {
       const val = req.body[key];

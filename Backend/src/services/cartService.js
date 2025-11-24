@@ -1,7 +1,7 @@
 'use strict';
 import prisma from '../lib/prisma.js';
 
-// Thêm item vào cart
+// ================ Thêm item vào cart =================
 export const addProductToCart = async (userID, productID) => {
   const product = await prisma.product.findFirst({
     where: { id: productID, quantity: { gt: 0 } }
@@ -27,6 +27,7 @@ export const addProductToCart = async (userID, productID) => {
   }
 };
 
+// ================ Đếm số item trong cart =================
 export const numberCart = async (userID) =>{
   if (!userID) throw new Error("userID is missing");
 
@@ -40,7 +41,7 @@ export const numberCart = async (userID) =>{
   return Number(count);
 };
 
-
+// ================ Lấy thông tin giỏ hàng =================
 export const getCart = async (userID) => {
   const cartItems = await prisma.$queryRaw`
     SELECT p.id, p.name, p.price, p.quantity, p.originalPrice, c.number, c.isSelected,
@@ -58,6 +59,7 @@ export const getCart = async (userID) => {
   return cartItems;
 };
 
+// ================ Update số lượng sản phẩm trong giỏ hàng =================
 export const updateQuantity = async (userID, productID, newNumber) => {
   if (newNumber <= 0) {
     return { 
@@ -107,12 +109,14 @@ export const updateQuantity = async (userID, productID, newNumber) => {
 };
 };
 
+// ================ Xoá sản phẩm khỏi giỏ hàng =================
 export const deleteCart = async (userID, productID) => {
   await prisma.cart.deleteMany({
     where: { userID, productID },
   });
 }
 
+// ================ Mua ngay sản phẩm =================
 export const buyNow = async (userID, productID) => {
   const product = await prisma.product.findFirst({
     where: { id: productID, quantity: { gt: 0 } }
@@ -138,6 +142,7 @@ export const buyNow = async (userID, productID) => {
   }
 };
 
+// ================ Thanh toán sản phẩm =================
 export const checkout = async (userID, productID) => {
   await prisma.cart.updateMany({
     where: { userID, productID },

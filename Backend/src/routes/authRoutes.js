@@ -7,20 +7,28 @@ import { jwtAuth } from '../middleware/jwtAuth.js';
 const router = express.Router();
 
 const authRoutes = (app) => {
+  
   // Register 
   router.post('/register', register);
+
   // Login
   router.post('/login', login);
-  // Logout (requires valid access token)
+
+  // Logout
   router.post('/logout', jwtAuth, logout);
+
   // Refresh token
   router.post('/refresh-token', refreshToken);
+
   // Verify Email
   router.get('/verify', verifyEmail);
+
   // Resend verification email
   router.post('/resend', resendVerificationEmail);
+
   // Send Reset Password Email
   router.post('/send-reset-password', sendResetPassword);
+  
   // Reset Password 
   router.patch('/reset-password', resetPassword);
 

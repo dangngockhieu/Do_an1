@@ -21,8 +21,6 @@ const AdminLayout = () => {
           <Outlet />
         </main>
       </div>
-
-      {/* mobile overlay */}
       {mobileOpen && <div className="admin-overlay" onClick={closeMobile} aria-hidden="true" />}
     </div>
   );
