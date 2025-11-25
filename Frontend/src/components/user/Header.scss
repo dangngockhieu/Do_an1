@@ -4,8 +4,7 @@
   background: #fff;
   position: relative;
   z-index: 1000;
-
-  /* ===== TOP BAR ===== */
+  width: 100%; 
   &__top {
     background: #1ea971;
     color: #fff;
@@ -13,16 +12,13 @@
     display: block;
     min-height: 70px;
     box-shadow: 0 1px 0 rgba(0,0,0,0.04) inset;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
+    
+    width: 100%; 
+    z-index: 2;
     padding-left: 1rem;
     padding-right: 1rem;
     padding-top: 0.7rem;
-    width: 100vw;
-    z-index: 2;
+    
 
     a {
       color: #fff;

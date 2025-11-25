@@ -1,0 +1,207 @@
+.order-history-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+
+    .title {
+        font-size: 27px;
+        font-weight: 600;
+        padding-left: 10px;
+        margin-bottom: 25px;
+        color: #222;
+    }
+}
+
+.tabs-container {
+    display: flex;
+    background: #edf4f6;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #c9c6c6;
+    gap: 6px;
+    margin-bottom: 22px;
+
+    .tab-item {
+        flex: 1;
+        text-align: center;
+        padding: 12px 0;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        color: #666;
+        border-radius: 6px;
+        transition: all 0.25s ease;
+
+        &:hover {
+            background: #ffe7e3;
+            color: #ee4d2d;
+            transform: translateY(-1px);
+        }
+
+        &.active {
+            background: #ee4d2d;
+            color: white;
+            box-shadow: 0 3px 8px rgba(238, 77, 45, 0.3);
+        }
+    }
+}
+
+.order-list-content {
+    width: 100%;
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 16px;
+    padding: 20px 0;
+}
+
+.no-orders-img {
+    text-align: center;
+    margin-top: 40px;
+
+    img {
+        width: 180px;
+        opacity: 0.8;
+    }
+
+    p {
+        margin-top: 12px;
+        font-size: 16px;
+        color: #777;
+    }
+}
+
+.order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.order-card {
+    background-color: #edf4f6;
+    padding: 18px 20px;
+    border-radius: 10px;
+    border: 1px solid #c9c6c6;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    hr {
+        margin: 14px 0;
+        border: none;
+        border-top: 1px solid #f1f1f1;
+    }
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 600;
+
+    .order-id {
+        color: #333;
+    }
+
+    .status-text {
+        font-weight: 700;
+        text-transform: uppercase;
+
+        &.PENDING, &.UNPAID {
+            color: #ee4d2d;
+        }
+        &.SHIPPING, &.CONFIRMED {
+            color: #007bff;
+        }
+        &.COMPLETED {
+            color: #28a745;
+        }
+        &.CANCELLED {
+            color: #999;
+        }
+    }
+}
+
+.card-body {
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        color: #555;
+        font-size: 15px;
+
+        @media (max-width: 600px) {
+            flex-direction: column;
+            gap: 6px;
+        }
+    }
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .total-money {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+
+        span {
+            color: #ee4d2d;
+        }
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+
+        .btn {
+            padding: 8px 14px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.25s;
+
+            &.btn-buy-again {
+                background: #0048ff;
+                color: white;
+
+                &:hover {
+                    background: #0036c4;
+                }
+            }
+
+            &.btn-review {
+                background: #28a745;
+                color: white;
+
+                &:hover {
+                    background: #1f8a39;
+                }
+            }
+
+            &.btn-cancel {
+                background: #ff4d4d;
+                color: white;
+
+                &:hover {
+                    background: #e60000;
+                }
+            }
+        }
+    }
+}

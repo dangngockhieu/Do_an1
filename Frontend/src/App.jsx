@@ -19,7 +19,7 @@ import ManageProduct from './components/admin/ManageProduct/ManageProduct.jsx';
 import ManagerUser from './components/admin/ManageUser/ManagerUser.jsx';
 import ManageOrder from './components/admin/ManageOrder/ManageOrder.jsx';
 import Dashboard from './components/admin/DashBoard/DashBoard.jsx';
-// import OrderHistory from './components/user/Order/OrderHistory.jsx';
+import OrderHistory from './components/user/Order/OrderHistory.jsx';
 
 const App = () => {
   return (
@@ -30,8 +30,7 @@ const App = () => {
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         <Route path="checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
-        {/* <Route path="orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} /> */}
-        <Route path="orders" element={<PrivateRoute><div>Orders</div></PrivateRoute>} />
+        <Route path="orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} />
       </Route>
 
       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
