@@ -165,3 +165,21 @@ export const countProducts = async (req, res) => {
     return res.status(500).json({ EM: error.message || 'Server Internal Error', EC: -1 });
   }
 };
+
+// ==================== Create Review ====================
+export const createReview = async (req, res) => {
+  try {
+    const productID = +req.params.productID;
+    const orderItemID = +req.body.orderItemID;
+    const userID = req.user?.id;
+    const comment = req.body.comment;
+    const rating = +req.body.rating;
+
+    if (!userID) return res.status(401).json({ EC: 1, EM: 'Unauthorized' });
+
+    const created = await productService.createReview( productID, userID, rating, comment, orderItemID );
+    return res.status(200).json({ EC: 0, DT: created, EM: 'Đã đánh giá sản phẩm' });
+  } catch (err) {
+    return res.status(400).json({ EC: 1, EM: err.message });
+  }
+};

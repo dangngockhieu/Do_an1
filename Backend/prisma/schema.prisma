@@ -46,7 +46,7 @@ model Order {
   recipientName String    @db.VarChar(100)
   address       String    @db.VarChar(255)
   phone         String    @db.VarChar(20)
-  status        String    @db.VarChar(20) // PENDING, SHIPPING, COMPLETED
+  status        String    @db.VarChar(20) // PENDING, SHIPPING, COMPLETED, CANCELED
   orderDate     DateTime
   trackingCode  String?   @db.VarChar(100)
   deliveryDate  DateTime?
@@ -76,11 +76,12 @@ model Payment {
 }
 
 model OrderItem {
-  id        Int @id @default(autoincrement())
-  orderID   Int
-  productID Int
-  quantity  Int
-  price     Int
+  id         Int     @id @default(autoincrement())
+  orderID    Int
+  productID  Int
+  quantity   Int
+  price      Int
+  isReviewed Boolean @default(false)
 
   order   Order   @relation(fields: [orderID], references: [id])
   product Product @relation(fields: [productID], references: [id])

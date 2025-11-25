@@ -56,6 +56,14 @@ export const changePassword = (oldPassword, newPassword) => {
 };
 
 // ==================== PRODUCT API ====================
+
+// Tạo Review cho sản phẩm
+export const createReview = (productID, rating, comment, orderItemID) => {
+  const URL_BACKEND = `/product/reviews/${productID}`;
+  return axios.post(URL_BACKEND, { orderItemID, rating, comment });
+};
+
+
 // Lấy danh sách sản phẩm có phân trang + tìm kiếm
 export const getProductsWithPaginate = (page, limit, keyword = "", category, factory) => {
   const URL_BACKEND = `/product/products-paginate?page=${page}&limit=${limit}&keyword=${encodeURIComponent(keyword)}&category=${encodeURIComponent(category)}&factory=${encodeURIComponent(factory)}`;
@@ -194,12 +202,6 @@ export const getOrderItem = (orderID) => {
   return axios.get(URL_BACKEND);
 }
 
-// Cancel ORDER 
-export const cancelOrder = (orderID) => {
-  const URL_BACKEND = `/order/cancel-order/${orderID}`;
-  return axios.patch(URL_BACKEND);
-};
-
 export const updatePendingtoShipping = (orderID, trackingCode, expectedDate) => {
   const URL_BACKEND = `/order/order-to-shipping?orderID=${orderID}`;
   return axios.patch(URL_BACKEND, { trackingCode, expectedDate });
@@ -211,10 +213,15 @@ export const updateOrderforUser = (orderID, status) => {
   return axios.patch(URL_BACKEND, data);
 }
 
-export const getMyOrders = () => {
-  const URL_BACKEND = '/order/my-orders'; 
+export const getMyOrders = (status) => {
+  const URL_BACKEND = `/order/my-orders?status=${status}`; 
   return axios.get(URL_BACKEND);
 };
+
+export const buyAgain = (products) => {
+  const URL_BACKEND = `/order/buy-again`;
+  return axios.post(URL_BACKEND, { products });
+}
 
 // ==================== COUNT USERS API (Admin) ====================
 export const countUsersforAdmin = () => {

@@ -239,12 +239,68 @@ export const getOrderItem = async(orderID) =>{
 };
 
 // =========================== Lấy danh sách đơn hàng của người dùng ==========================
-export const getUserOrders = async(userID) =>{
-    const orders = await prisma.order.findMany({
-        where: { userID: +userID },
-    });
+export const getUserOrders = async (userID, status) => {
+  const rows = await prisma.$queryRaw`
+    SELECT 
+      o.id AS orderID,
+      o.totalPrice,
+      o.status,
+      o.orderDate,
+      pm.method AS paymentMethod,
+      pm.status AS paymentStatus,
+      p.id AS productID,
+      p.name AS productName,
+      oi.id AS orderItemID,
+      oi.quantity,
+      oi.price AS unitPrice,
+      oi.isReviewed,
+      (
+        SELECT pi.url
+        FROM product_images pi
+        WHERE pi.productID = p.id
+        ORDER BY pi.id ASC
+        LIMIT 1
+      ) AS imageUrl
+    FROM orders o
+    JOIN payments pm ON pm.orderID = o.id
+    JOIN order_items oi ON oi.orderID = o.id
+    JOIN products p ON p.id = oi.productID
 
-    return orders;
+    WHERE o.userID = ${userID}
+    AND o.status = ${status}
+
+    ORDER BY o.orderDate DESC;
+  `;
+
+  const orders = {};
+
+  for (const row of rows) {
+    const id = row.orderID;
+
+    if (!orders[id]) {
+      orders[id] = {
+        orderID: row.orderID,
+        totalPrice: row.totalPrice,
+        status: row.status,
+        orderDate: row.orderDate,
+        paymentMethod: row.paymentMethod,
+        paymentStatus: row.paymentStatus,
+        products: []   
+      };
+    }
+
+    orders[id].products.push({
+      productID: row.productID,
+      name: row.productName,
+      orderItemID: row.orderItemID,
+      quantity: row.quantity,
+      unitPrice: row.unitPrice,
+      isReviewed: row.isReviewed,
+      imageUrl: row.imageUrl
+    });
+  }
+
+  return Object.values(orders);
 };
 
 // =========================== Thống kê số lượng đơn hàng trong tháng ==========================
@@ -369,16 +425,32 @@ export const getRevenueByMonth = async () => {
   return monthlyRevenue;
 };
 
-// =========================== Hủy đơn hàng ==========================
-export const cancelOrder = async (orderID, userID) => {
-  const updatedOrder = await prisma.order.update({
-      where: { id: +orderID, userID: +userID },
-      data: {
-          status: 'CANCELED',
-      },
-  });
-  return updatedOrder;
+export const buyAgain = async (userID, products) => {
+    for (const p of products) {
+        const product = await prisma.product.findFirst({
+            where: { id: p.productID, quantity: { gt: 0 } }
+        });
+        if (!product) {                 
+            continue; 
+        }
+
+        const existingCart = await prisma.cart.findFirst({
+            where: { userID: userID, productID : p.productID },
+        });
+
+        if (existingCart) {
+            await prisma.cart.update({
+            where: { userID_productID: { userID: userID, productID : p.productID } },
+            data: { isSelected: true },
+        });
+        } else {
+            await prisma.cart.create({
+                data: { userID: userID, productID : p.productID, number: 1, isSelected: true },
+            });
+        }
+    }
 };
+
 
 
 

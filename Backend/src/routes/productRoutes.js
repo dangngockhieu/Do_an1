@@ -17,7 +17,8 @@ import {
   deleteProduct,
   getFilteredProducts,
   countProducts,
-  getTopSellingProduct
+  getTopSellingProduct,
+  createReview 
 } from '../controllers/productController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
@@ -83,6 +84,9 @@ const productRoutes = (app) => {
 
   // Lấy tổng số sản phẩm
   router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countProducts);
+
+  // Tạo đánh giá cho sản phẩm
+  router.post('/reviews/:productID', jwtAuth, createReview);
 
   app.use('/product', router);
 };

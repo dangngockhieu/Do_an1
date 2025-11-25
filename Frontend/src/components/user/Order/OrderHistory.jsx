@@ -1,55 +1,89 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCartCount } from "../../../redux/action/cartAction";
 import './OrderHistory.scss';
 import img from '../../../assets/order.png';
-import { getMyOrders, cancelOrder } from '../../../services/apiServices';
+import { getMyOrders, updateOrderforUser, buyAgain, getNumberCart, createReview } from '../../../services/apiServices';
+import ConfirmReceive from './ConfirmRecieve.jsx';
+import { set } from 'nprogress';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const OrderHistory = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('PENDING');
+    const [confirmOrder, setConfirmOrder] = useState(null);
+    const [isOpenConfirm, setIsOpenConfirm] = useState(false);
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    const [reviewItem, setReviewItem] = useState(null);
 
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewComment, setReviewComment] = useState('');
+    const [submittingReview, setSubmittingReview] = useState(false);
+
+    const handleOpenReviewModal = (item) => {
+        setReviewItem(item);
+        setReviewModalOpen(true);
+        setReviewRating(5);
+        setReviewComment('');
+    }
+
+    const closeReviewModal = () => {
+        setReviewModalOpen(false);
+        setReviewItem(null);
+        setReviewRating(5);
+        setReviewComment('');
+    }
+
+    const submitReview = async () => {
+        if (!reviewItem) return;
+        setSubmittingReview(true);
+        try {
+            const res = await createReview(reviewItem.productID, reviewRating, reviewComment, reviewItem.orderItemID);
+            if (res?.EC === 0) {
+                toast.success("Gửi đánh giá thành công!");
+                fetchOrders();
+                closeReviewModal();
+            } else {
+                toast.error(res.EM || "Gửi đánh giá thất bại");
+            }
+        } catch (err) {
+            console.log(err);
+            toast.error("Lỗi kết nối server");
+        } finally {
+            setSubmittingReview(false);
+        }
+    };
+
+    const handleOpenConfirm = (item) => {
+        setConfirmOrder(item);
+        setIsOpenConfirm(true);
+    };
 
     const tabs = [
         { id: 'PENDING', label: 'Chờ xác nhận' },
         { id: 'SHIPPING', label: 'Chờ giao hàng' },
-        { id: 'COMPLETED', label: 'Thành công' },
-        { id: 'CANCELLED', label: 'Đã hủy' },
+        { id: 'COMPLETED', label: 'Hoàn thành' },
+        { id: 'CANCELED', label: 'Đã hủy' },
     ];
-    useEffect(() => {
-        const paymentStatus = searchParams.get("payment");
-
-        if (paymentStatus) {
-            if (paymentStatus === "success") {
-                toast.success("Thanh toán VNPay thành công!");
-            } else if (paymentStatus === "failed") {
-                toast.error("Thanh toán thất bại hoặc bị hủy.");
-            } else if (paymentStatus === "error") {
-                toast.error("Có lỗi xảy ra trong quá trình xử lý.");
-            }
-            const timer = setTimeout(() => {
-                setSearchParams({}); 
-            }, 500);
-
-            return () => clearTimeout(timer);
-        }
-    }, [searchParams, setSearchParams]);
-
-    // LẤY DANH SÁCH ĐƠN HÀNG
+   
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [activeTab]);
 
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            let res = await getMyOrders();
+            let res = await getMyOrders(activeTab);
             if (res && res.EC === 0) {
-                // Sắp xếp đơn mới nhất lên đầu
-                const sortedOrders = res.DT.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const sortedOrders = res.DT.sort(
+                    (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+                );
                 setOrders(sortedOrders);
             } else {
                 console.log("Lỗi data:", res.EM);
@@ -60,12 +94,10 @@ const OrderHistory = () => {
             setLoading(false);
         }
     };
-    // Xử lý Hủy Đơn
-    const handleCancelOrder = async (orderID) => {
-        if (!window.confirm(`Bạn chắc chắn muốn hủy đơn hàng #${orderID}?`)) return;
 
+    const handleCancelOrder = async (orderID) => {
         try {
-            let res = await cancelOrder(orderID);
+            let res = await updateOrderforUser(orderID, 'CANCELED');
             if (res && res.EC === 0) {
                 toast.success("Đã hủy đơn hàng thành công.");
                 fetchOrders(); 
@@ -73,42 +105,41 @@ const OrderHistory = () => {
                 toast.error(res.EM || "Hủy đơn thất bại");
             }
         } catch (error) {
-            console.log(error);
             toast.error("Lỗi kết nối server");
         }
     };
 
-    const handleBuyAgain = (item) => {
-        navigate('/');
-    };
-
-    const handleReview = (orderID) => {
-        toast.info("Chức năng đánh giá đang phát triển!");
-    };
-
-    const getFilteredOrders = () => {
-        if (!orders) return [];
-        return orders.filter(order => {
-            const status = order.status; 
-            switch (activeTab) {
-                case 'PENDING': return status === 'PENDING' || status === 'UNPAID';
-                case 'SHIPPING': return status === 'SHIPPING' || status === 'CONFIRMED';
-                case 'COMPLETED': return status === 'COMPLETED';
-                case 'CANCELLED': return status === 'CANCELLED';
-                default: return false;
+    const handleConfirmReceive = async () => {
+        try {
+            let res = await updateOrderforUser(confirmOrder.orderID, 'COMPLETED');
+            if (res && res.EC === 0) {
+                toast.success("Đã xác nhận nhận hàng thành công.");
+                fetchOrders();
+                setIsOpenConfirm(false); 
+            } else {
+                toast.error(res.EM || "Xác nhận nhận hàng thất bại");
             }
-        });
+        } catch (error) {
+            toast.error("Lỗi kết nối server");
+        }
     };
 
-    const filteredOrders = getFilteredOrders();
+    const handleBuyAgain = async (products) => {
+        const res = await buyAgain(products);
+        try{
+            if (res?.EC === 0) {
+                const cartRes = await getNumberCart();
+                if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
+                navigate('/cart');
+            } 
+        } catch (err){
+            toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+        }
+    };
 
     const formatCurrency = (amount) => {
         const value = amount ? amount : 0;
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN') + ' ' + new Date(dateString).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
     };
 
     return (
@@ -130,55 +161,51 @@ const OrderHistory = () => {
                 <div className="loading-text">Đang tải dữ liệu...</div>
             ) : (
                 <div className="order-list-content">
-                    {filteredOrders && filteredOrders.length > 0 ? (
+                    {orders && orders.length > 0 ? (
                         <div className="order-items">
-                            {filteredOrders.map((item) => (
-                                <div key={item.id} className="order-card">
-                                    {/* Header Card */}
-                                    <div className="card-header">
-                                        <span className="order-id">Mã đơn: #{item.id}</span>
-                                        <span className={`status-text ${item.status}`}>
-                                            {item.status === 'PENDING' && 'CHỜ XÁC NHẬN'}
-                                            {item.status === 'SHIPPING' && 'ĐANG VẬN CHUYỂN'}
-                                            {item.status === 'COMPLETED' && 'GIAO HÀNG THÀNH CÔNG'}
-                                            {item.status === 'CANCELLED' && 'ĐÃ HỦY'}
-                                        </span>
-                                    </div>
-                                    
-                                    <hr />
-
+                            {orders.map((item) => (
+                                <div key={item.orderID} className="order-card">
                                     <div className="card-body">
-                                        <div className="info-row">
-                                            <span><strong>Ngày đặt:</strong> {formatDate(item.createdAt)}</span>
-                                            <span><strong>Thanh toán:</strong> {item.paymentMethod === 'BANK' ? 'VNPay' : 'Tiền mặt (COD)'}</span>
+                                        <div className="info-column">
+                                            <span><strong>Thanh toán:</strong> {item.paymentMethod === 'BANK' ? 'Bank' : 'COD'}</span>
+                                            <span><strong>Ngày đặt:</strong> {new Date(item.orderDate).toLocaleDateString()}</span>
                                         </div>
-                                    </div>
 
-                                    <hr />
-
-                                    <div className="card-footer">
-                                        <div className="total-money">
-                                            Tổng tiền: <span>{formatCurrency(item.totalPrice || item.payment?.amount)}</span>
+                                        <div className="products-column">
+                                        {item.products.map(prod => (
+                                            <div key={prod.productID} className="product-item">
+                                                <img src={`${BASE_URL}${prod.imageUrl}`} alt={prod.name} className="item-img-preview"/>
+                                                <div className="product-name">{prod.name}</div>
+                                                <div className="product-quantity">x{prod.quantity}</div>
+                                                {item.status === 'COMPLETED' && !prod.isReviewed &&(
+                                                    <button className="btn btn-review" onClick={() => handleOpenReviewModal(prod)}>Đánh Giá</button>
+                                                )}
+                                            </div>
+                                        ))}
                                         </div>
-                                        
-                                        <div className="action-buttons">
-                                            {item.status === 'COMPLETED' && (
-                                                <>
-                                                    <button className="btn btn-review" onClick={() => handleReview(item.id)}>Đánh Giá</button>
-                                                    <button className="btn btn-buy-again" onClick={() => handleBuyAgain(item)}>Mua Lại</button>
-                                                </>
-                                            )}
 
-                                            {item.status === 'CANCELLED' && (
-                                                <button className="btn btn-buy-again" onClick={() => handleBuyAgain(item)}>Mua Lại</button>
-                                            )}
-
-                                            {item.status === 'PENDING' && (
-                                                 <button className="btn btn-cancel" onClick={() => handleCancelOrder(item.id)}>Hủy Đơn</button>
-                                            )}
+                                        <div className="action-column">
+                                            <div className="total-money">
+                                                Tổng tiền: <span>{formatCurrency(item.totalPrice)}</span>
+                                            </div>
+                                            <div className="action-buttons">
+                                                {item.status === 'COMPLETED' && (
+                                                    <button className="btn btn-buy-again" onClick={() => handleBuyAgain(item.products)}>Mua Lại</button>
+                                                )}
+                                                {item.status === 'SHIPPING' && (
+                                                    <button className="btn btn-confirm" onClick={() => handleOpenConfirm(item)}>Đã nhận được hàng</button>
+                                                )}
+                                                {item.status === 'CANCELED' && (
+                                                    <button className="btn btn-buy-again" onClick={() => handleBuyAgain(item.products)}>Mua Lại</button>
+                                                )}
+                                                {item.status === 'PENDING' && item.paymentMethod==='COD' && (
+                                                    <button className="btn btn-cancel" onClick={() => handleCancelOrder(item.orderID)}>Hủy Đơn</button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
                             ))}
                         </div>
                     ) : (
@@ -187,6 +214,70 @@ const OrderHistory = () => {
                             <p>Chưa có đơn hàng nào ở mục này</p>
                         </div>
                     )}
+                </div>
+            )}
+
+            <ConfirmReceive 
+                open={isOpenConfirm}
+                confirmOrder={confirmOrder}
+                onClose={() => setIsOpenConfirm(false)}
+                onConfirm={handleConfirmReceive}
+            />
+
+            {reviewModalOpen && reviewItem && (
+                <div className="review-modal-overlay">
+                    <div className="review-modal">
+                        <h3>Đánh giá sản phẩm</h3>
+
+                        <div className="review-item-info">
+                            <img
+                                className="ri-thumb"
+                                src={`${BASE_URL}${reviewItem.imageUrl}`}
+                                alt={reviewItem.name}
+                                onError={(e) => { e.target.src = '/no-image.png'; }}
+                            />
+                            <div className="ri-main">
+                                <div className="ri-name">{reviewItem.name}</div>
+                            </div>
+                        </div>
+
+                        <div className="review-form">
+                            <label>Điểm</label>
+                            <select
+                                value={reviewRating}
+                                onChange={(e) => setReviewRating(+e.target.value)}
+                            >
+                                <option value={5}>5 - Xuất sắc</option>
+                                <option value={4}>4 - Tốt</option>
+                                <option value={3}>3 - Trung bình</option>
+                                <option value={2}>2 - Kém</option>
+                                <option value={1}>1 - Rất kém</option>
+                            </select>
+
+                            <label>Bình luận (tùy chọn)</label>
+                            <textarea
+                                value={reviewComment}
+                                onChange={(e) => setReviewComment(e.target.value)}
+                                placeholder="Viết nhận xét của bạn..."
+                            />
+
+                            <div className="rf-actions">
+                                <button
+                                    className="btn btn-cancel"
+                                    onClick={closeReviewModal}
+                                >
+                                    Đóng
+                                </button>
+                                <button
+                                    className="btn btn-review"
+                                    onClick={submitReview}
+                                    disabled={submittingReview}
+                                >
+                                    {submittingReview ? 'Đang gửi...' : 'Gửi đánh giá'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

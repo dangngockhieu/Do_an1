@@ -79,7 +79,8 @@ export const getOrderItem = async (req, res) => {
 export const getUserOrders = async (req, res) => {
     try {
         const userID = +req.user.id;
-        const orders = await orderService.getUserOrders(userID);
+        const status = req.query.status;
+        const orders = await orderService.getUserOrders(userID, status);
         return res.status(200).json({
             EC: 0,
             EM: "Lấy danh sách đơn hàng thành công",
@@ -160,20 +161,19 @@ export const getRevenueByMonth = async (req, res) => {
   }
 };
 
-export const cancelOrder = async (req, res) => {
-    try {
-        const orderID = +req.params.orderID;
-        const userID = +req.user.id;
-        const updatedOrder = await orderService.cancelOrder(orderID, userID);
-        return res.status(200).json({
-            EC: 0,
-            EM: "Hủy đơn hàng thành công!",
-            DT: updatedOrder
-        });
-    } catch (error) {
-        return res.status(500).json({
-            EC: 1,
-            EM: "Lỗi hủy đơn hàng"
-        });
-    }
+export const buyAgain = async (req, res) => {
+  try {
+    const userID = +req.user.id;
+    const { products } = req.body;
+    await orderService.buyAgain(userID, products);
+    return res.status(200).json({   
+        EC: 0,
+        EM: "Thêm sản phẩm từ đơn hàng cũ vào giỏ hàng thành công"
+    });
+  } catch (error) {
+    return res.status(500).json({   
+        EC: 1,
+        EM: error.message || "Lỗi thêm sản phẩm vào giỏ hàng"
+    });
+  }
 };

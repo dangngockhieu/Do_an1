@@ -551,3 +551,38 @@ export const countProducts = async () => {
   const count = await prisma.product.count();
   return count;
 }
+
+// =================== Tạo đánh giá cho sản phẩm (user đã mua và hoàn thành đơn) ===================
+export const createReview = async (productID, userID, rating, comment, orderItemID) => {
+
+  const purchased = await prisma.$queryRaw`
+    SELECT oi.id, oi.orderID
+    FROM order_items oi
+    INNER JOIN orders o ON oi.orderID = o.id
+    WHERE oi.id = ${orderItemID} 
+      AND o.userID = ${userID} 
+      AND o.status = 'COMPLETED'
+      AND oi.isReviewed = false
+    LIMIT 1;
+  `;
+
+  if (!purchased || purchased.length === 0) {
+    throw new Error('Bạn chỉ có thể đánh giá sản phẩm đã mua và đã nhận hàng');
+  }
+
+  const created = await prisma.review.create({
+    data: {
+      productID,
+      userID,
+      rating,                  // lúc này rating chắc chắn là số
+      comment: comment || '',
+    },
+  });
+
+  await prisma.orderItem.update({
+  where: { id: orderItemID },
+  data: { isReviewed: true }
+});
+
+  return created;
+};

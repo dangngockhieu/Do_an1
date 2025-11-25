@@ -1,6 +1,6 @@
 'use strict';
 import express from 'express';
-import { createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getUserOrders, cancelOrder,
+import { createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getUserOrders, buyAgain,
   updateOrderforUser, updatePendingtoShipping, countOrders, getRevenueThisMonth, getRevenueByMonth
  } from '../controllers/orderController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
@@ -39,8 +39,8 @@ const orderRoutes = (app) => {
   // Thống kê doanh thu theo tháng
   router.get('/revenue-by-month', jwtAuth, authorizeRole(['ADMIN']), getRevenueByMonth);
 
-  // Hủy đơn hàng
-  router.patch('/cancel-order/:orderID', jwtAuth, cancelOrder);
+  // Thêm sản phẩm từ đơn hàng cũ vào giỏ hàng
+  router.post('/buy-again', jwtAuth, buyAgain);
 
   app.use('/order', router);
 };
