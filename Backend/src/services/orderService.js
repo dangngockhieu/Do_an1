@@ -1,66 +1,66 @@
 'use strict';
 import prisma from '../lib/prisma.js';
 import dayjs from 'dayjs';
-import utc from "dayjs/plugin/utc.js";            
-import timezone from "dayjs/plugin/timezone.js"; 
+import utc from "dayjs/plugin/utc.js";
+import timezone from "dayjs/plugin/timezone.js";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 // ===================== Tạo đơn hàng =====================
 export const createOrder = async (userID, recipientName, address, phone, items, totalPrice, paymentMethod) => {
-    const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
-    return await prisma.$transaction(async (prismaTx) => {
-      // Kiểm tra tồn kho cho từng sản phẩm
-      for (const item of items) {
-        const product = await prismaTx.product.findUnique({
-          where: { id: +item.productID },
-        });
-        if (!product) throw new Error(`Sản phẩm ID ${item.productID} không tồn tại`);
-        if (product.quantity < item.quantity) {
-          throw new Error(`Sản phẩm ${product.name} chỉ còn ${product.quantity} trong kho`);
-        }
+  const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
+  return await prisma.$transaction(async (prismaTx) => {
+    // Kiểm tra tồn kho cho từng sản phẩm
+    for (const item of items) {
+      const product = await prismaTx.product.findUnique({
+        where: { id: +item.productID },
+      });
+      if (!product) throw new Error(`Sản phẩm ID ${item.productID} không tồn tại`);
+      if (product.quantity < item.quantity) {
+        throw new Error(`Sản phẩm ${product.name} chỉ còn ${product.quantity} trong kho`);
       }
+    }
 
-      // Tạo đơn hàng
-      const orderItemsData = items.map(item => ({
-        productID: +item.productID,
-        quantity: +item.quantity,
-        price: +item.price,
-      }));
+    // Tạo đơn hàng
+    const orderItemsData = items.map(item => ({
+      productID: +item.productID,
+      quantity: +item.quantity,
+      price: +item.price,
+    }));
 
-      const newOrder = await prismaTx.order.create({
-        data: {
-          userID,
-          recipientName,
-          address,
-          phone,
-          totalPrice: +totalPrice,
-          status: 'PENDING',
-          orderDate: nowVN,
-          payment: {
-            create: {
-              amount: +totalPrice,
-              method: paymentMethod,
-              status: 'UNPAID',
-              createdAt: nowVN,
-            },
-          },
-          orderItems: {
-            createMany: { data: orderItemsData },
+    const newOrder = await prismaTx.order.create({
+      data: {
+        userID,
+        recipientName,
+        address,
+        phone,
+        totalPrice: +totalPrice,
+        status: 'PENDING',
+        orderDate: nowVN,
+        payment: {
+          create: {
+            amount: +totalPrice,
+            method: paymentMethod,
+            status: 'UNPAID',
+            createdAt: nowVN,
           },
         },
-        include: { payment: true, orderItems: true }
-      });
+        orderItems: {
+          createMany: { data: orderItemsData },
+        },
+      },
+      include: { payment: true, orderItems: true }
+    });
 
-      //  Cập nhật số lượng tồn kho
-      await prismaTx.$executeRaw`
+    //  Cập nhật số lượng tồn kho
+    await prismaTx.$executeRaw`
         UPDATE products p
         JOIN order_items oi ON p.id = oi.productID
           SET p.quantity = p.quantity - oi.quantity
         WHERE oi.orderID = ${newOrder.id};
       `;
 
-      return newOrder;
-    });
+    return newOrder;
+  });
 };
 
 // =================== Lấy danh sách đơn hàng đang chờ xử lý cho admin ===================
@@ -176,33 +176,33 @@ export const getOrderforAdmin = async (page = 1, limit = 10, status) => {
 };
 
 //  ========================== Cập nhật trạng thái đơn hàng sang quá trình vận chuyển ==========================
-export const updatePendingtoShipping = async(orderID, trackingCode, expectedDate) =>{
-    const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
-    const expectedVN = expectedDate ? dayjs(expectedDate).tz("Asia/Ho_Chi_Minh").toDate() : null;
+export const updatePendingtoShipping = async (orderID, trackingCode, expectedDate) => {
+  const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
+  const expectedVN = expectedDate ? dayjs(expectedDate).tz("Asia/Ho_Chi_Minh").toDate() : null;
 
-    const updatedOrder = await prisma.order.update({
-        where: { id: +orderID },
-        data: {
-            status: 'SHIPPING',
-            trackingCode: trackingCode,
-            deliveryDate: nowVN,
-            expectedDate: expectedVN,
-        },
-    });
+  const updatedOrder = await prisma.order.update({
+    where: { id: +orderID },
+    data: {
+      status: 'SHIPPING',
+      trackingCode: trackingCode,
+      deliveryDate: nowVN,
+      expectedDate: expectedVN,
+    },
+  });
 
-    return updatedOrder;
+  return updatedOrder;
 };
 
 // =========================== Cập nhật trạng thái đơn hàng cho user khi nhận hàng ==========================
-export const updateOrderforUser = async(orderID, userID, status) =>{  
+export const updateOrderforUser = async (orderID, userID, status) => {
 
-    const updatedOrder = await prisma.order.update({
-        where: { id: +orderID, userID: +userID },
-        data: {
-            status: `${status}`,
-        },
-    });
-    await prisma.$executeRaw`
+  const updatedOrder = await prisma.order.update({
+    where: { id: +orderID, userID: +userID },
+    data: {
+      status: `${status}`,
+    },
+  });
+  await prisma.$executeRaw`
         UPDATE products p
         JOIN order_items oi ON p.id = oi.productID
         SET 
@@ -210,12 +210,12 @@ export const updateOrderforUser = async(orderID, userID, status) =>{
         WHERE oi.orderID = ${orderID};
     `;
 
-    return updatedOrder;
+  return updatedOrder;
 };
 
 // =========================== Lấy chi tiết đơn hàng ==========================
-export const getOrderItem = async(orderID) =>{
-    const products = await prisma.$queryRaw`
+export const getOrderItem = async (orderID) => {
+  const products = await prisma.$queryRaw`
     SELECT 
         p.id AS productID,          
         p.name,                     
@@ -235,16 +235,24 @@ export const getOrderItem = async(orderID) =>{
     WHERE 
         oi.orderID = ${orderID};
     `;
-    return products;
+  return products;
 };
 
 // =========================== Lấy danh sách đơn hàng của người dùng ==========================
-export const getUserOrders = async(userID) =>{
-    const orders = await prisma.order.findMany({
-        where: { userID: +userID },
-    });
+export const getUserOrders = async (userID) => {
+  const orders = await prisma.order.findMany({
+    where: { userID: +userID },
+  });
 
-    return orders;
+  return orders;
+};
+
+// Lấy thông tin đơn (nhỏ) theo ID - dùng để kiểm tra quyền sở hữu
+export const getOrderById = async (orderID) => {
+  return await prisma.order.findUnique({
+    where: { id: +orderID },
+    select: { id: true, userID: true },
+  });
 };
 
 // =========================== Thống kê số lượng đơn hàng trong tháng ==========================
@@ -293,7 +301,7 @@ export const countOrders = async () => {
     },
   });
 
-  return {count, countPending, countShipping, countCompleted};
+  return { count, countPending, countShipping, countCompleted };
 };
 
 // ====================== Thống kê doanh thu trong tháng hiện tại =======================
@@ -333,7 +341,7 @@ export const getRevenueThisMonth = async () => {
 
   return {
     currentMonthRevenue,
-    growth: Number(growth.toFixed(2)), 
+    growth: Number(growth.toFixed(2)),
   };
 };
 
@@ -362,7 +370,7 @@ export const getRevenueByMonth = async () => {
   const monthlyRevenue = Array(12).fill(0);
   result.forEach((r) => {
     const vnDate = dayjs(r.orderDate).tz("Asia/Ho_Chi_Minh");
-    const month = vnDate.month(); 
+    const month = vnDate.month();
     monthlyRevenue[month] += r.totalPrice;
   });
 
@@ -372,10 +380,10 @@ export const getRevenueByMonth = async () => {
 // =========================== Hủy đơn hàng ==========================
 export const cancelOrder = async (orderID, userID) => {
   const updatedOrder = await prisma.order.update({
-      where: { id: +orderID, userID: +userID },
-      data: {
-          status: 'CANCELED',
-      },
+    where: { id: +orderID, userID: +userID },
+    data: {
+      status: 'CANCELED',
+    },
   });
   return updatedOrder;
 };

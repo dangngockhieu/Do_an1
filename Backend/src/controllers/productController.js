@@ -79,6 +79,21 @@ export const getProductById = async (req, res) => {
   }
 }
 
+export const createReview = async (req, res) => {
+  try {
+    const productId = +req.params.id;
+    const userId = req.user?.id;
+    const { rating, comment } = req.body;
+
+    if (!userId) return res.status(401).json({ EC: 1, EM: 'Unauthorized' });
+
+    const created = await productService.createReview({ productId, userId, rating, comment });
+    return res.status(200).json({ EC: 0, DT: created, EM: 'Đã đánh giá sản phẩm' });
+  } catch (err) {
+    return res.status(400).json({ EC: 1, EM: err.message });
+  }
+};
+
 export const getFilteredProducts = async (req, res) => {
   try {
     const { category } = req.query;

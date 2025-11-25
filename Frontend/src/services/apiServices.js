@@ -216,6 +216,13 @@ export const getMyOrders = () => {
   return axios.get(URL_BACKEND);
 };
 
+// Tạo đánh giá cho sản phẩm (user đã mua và đã hoàn thành đơn)
+export const createReview = (productId, rating, comment) => {
+  const URL_BACKEND = `/product/products/${productId}/review`;
+  const data = { rating, comment };
+  return axios.post(URL_BACKEND, data);
+};
+
 // ==================== COUNT USERS API (Admin) ====================
 export const countUsersforAdmin = () => {
   const URL_BACKEND = '/user/count';

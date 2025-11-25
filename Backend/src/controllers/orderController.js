@@ -62,6 +62,16 @@ export const getOrderforAdmin = async (req, res) => {
 export const getOrderItem = async (req, res) => {
     try {
         const orderID = +req.query.orderID;
+        // Authorization: ADMIN can access any order; USER only their own orders
+        const role = req.user?.role;
+        if (role !== 'ADMIN') {
+            const order = await orderService.getOrderById(orderID);
+            if (!order) return res.status(404).json({ EC: 1, EM: 'Order not found' });
+            if (+order.userID !== +req.user.id) {
+                return res.status(403).json({ EC: 1, EM: 'Forbidden: you do not own this order' });
+            }
+        }
+
         const orderItems = await orderService.getOrderItem(orderID);
         return res.status(200).json({
             EC: 0,

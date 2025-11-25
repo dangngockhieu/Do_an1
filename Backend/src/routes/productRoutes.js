@@ -10,6 +10,7 @@ import {
   addProductFeatures,
   deleteProductFeature,
   getProductById,
+  createReview,
   createProduct,
   updateProduct,
   addProductImages,
@@ -47,6 +48,9 @@ const productRoutes = (app) => {
 
   // Lấy chi tiết đánh giá sản phẩm theo ID
   router.get('/products/:id', getProductById);
+
+  // Tạo đánh giá cho sản phẩm (user đã mua và hoàn thành đơn)
+  router.post('/products/:id/review', jwtAuth, createReview);
 
   // Lấy 5 sp Laptop bán chạy nhất
   router.get('/top-selling-laptop', getTopSellingLaptop);

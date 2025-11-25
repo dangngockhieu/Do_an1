@@ -3,8 +3,8 @@ import prisma from '../lib/prisma.js';
 import fs from 'fs';
 import path from 'path';
 import dayjs from 'dayjs';
-import utc from "dayjs/plugin/utc.js";            
-import timezone from "dayjs/plugin/timezone.js"; 
+import utc from "dayjs/plugin/utc.js";
+import timezone from "dayjs/plugin/timezone.js";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,7 +28,7 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, keyword = ""
   if (keyword && keyword.trim() !== "") {
     const search = `%${keyword.trim()}%`;
     whereClauses.push(`p.name LIKE '${search}'`);
-}
+  }
 
   const whereSQL = whereClauses.join(" AND ");
 
@@ -196,113 +196,113 @@ export const getAllProducts = async (category, filters) => {
 
   // --- Nhu cầu ---
   if (filters?.product_features?.length) {
-  const featureIds = filters.product_features.join(", ");
-  whereClauses.push(`
+    const featureIds = filters.product_features.join(", ");
+    whereClauses.push(`
     EXISTS (
       SELECT 1 FROM product_features pf
       WHERE pf.productID = p.id AND pf.featureID IN (${featureIds})
     )
   `);
-}
+  }
 
   // --- Khoảng giá ---
- if (filters?.price) {
-  const { min, max } = filters.price;
+  if (filters?.price) {
+    const { min, max } = filters.price;
 
-  if (min != null && max != null) {
-    whereClauses.push(`p.price BETWEEN ${min} AND ${max}`);
-  } else if (min != null) {
-    whereClauses.push(`p.price >= ${min}`);
-  } else if (max != null) {
-    whereClauses.push(`p.price <= ${max}`);
-  }
-}
-
- // ======= Lọc SPECIFIC =======
-if (filters?.specs) {
-  const specs = filters.specs;
-
-  // === Lọc CPU ===
-  if (specs.CPU?.length && !specs.CPU.includes("Tất cả")) {
-    const cpuVals = specs.CPU
-    .filter(v => v && v !== "Tất cả") 
-    .map(v =>
-      `REPLACE(LOWER(p.cpu), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
-    ).join(" OR ");
-    if (cpuVals) whereClauses.push(`(${cpuVals})`);
+    if (min != null && max != null) {
+      whereClauses.push(`p.price BETWEEN ${min} AND ${max}`);
+    } else if (min != null) {
+      whereClauses.push(`p.price >= ${min}`);
+    } else if (max != null) {
+      whereClauses.push(`p.price <= ${max}`);
+    }
   }
 
-  // === Lọc RAM ===
-  if (specs.RAM?.length && !specs.RAM.includes("Tất cả")) {
-    const ramVals = specs.RAM
-    .filter(v => v && v !== "Tất cả") 
-    .map(v =>
-      `REPLACE(LOWER(p.ram), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
-    ).join(" OR ");
-    if (ramVals) whereClauses.push(`(${ramVals})`);
+  // ======= Lọc SPECIFIC =======
+  if (filters?.specs) {
+    const specs = filters.specs;
+
+    // === Lọc CPU ===
+    if (specs.CPU?.length && !specs.CPU.includes("Tất cả")) {
+      const cpuVals = specs.CPU
+        .filter(v => v && v !== "Tất cả")
+        .map(v =>
+          `REPLACE(LOWER(p.cpu), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+        ).join(" OR ");
+      if (cpuVals) whereClauses.push(`(${cpuVals})`);
+    }
+
+    // === Lọc RAM ===
+    if (specs.RAM?.length && !specs.RAM.includes("Tất cả")) {
+      const ramVals = specs.RAM
+        .filter(v => v && v !== "Tất cả")
+        .map(v =>
+          `REPLACE(LOWER(p.ram), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+        ).join(" OR ");
+      if (ramVals) whereClauses.push(`(${ramVals})`);
+    }
+
+
+    // === Lọc Cạc đồ họa rời ===
+    if (specs.GPU?.length && !specs.GPU.includes("Tất cả")) {
+      const gpuVals = specs.GPU
+        .filter(v => v && v !== "Tất cả")
+        .map(v =>
+          `REPLACE(LOWER(p.graphicsCard), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+        )
+        .join(" OR ");
+      if (gpuVals) whereClauses.push(`(${gpuVals})`);
+    }
+
+    // === Lọc Ổ cứng ===
+    if (specs.Storage?.length && !specs.Storage.includes("Tất cả")) {
+      const ssdVals = specs.Storage
+        .filter(v => v && v !== "Tất cả")
+        .map(v =>
+          `REPLACE(LOWER(p.storage), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+        )
+        .join(" OR ");
+      if (ssdVals) whereClauses.push(`(${ssdVals})`);
+    }
+
+    // === Lọc kích thước màn hình ===
+    if (specs.ScreenSize?.length && !specs.ScreenSize.includes("Tất cả")) {
+      const screenVals = specs.ScreenSize
+        .filter(v => v && v !== "Tất cả")
+        .map(v =>
+          `REPLACE(LOWER(p.screen), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+        )
+        .join(" OR ");
+      if (screenVals) whereClauses.push(`(${screenVals})`);
+    }
+
+    // === Lọc Pin (nếu là điện thoại) ===
+    if (specs.PIN?.length && !specs.PIN.includes("Tất cả")) {
+      const pinConditions = specs.PIN
+        .filter(v => v && v !== "Tất cả")
+        .map(v => {
+          // lấy phần số (vd: "3000" → 3000)
+          const num = parseInt(v.match(/\d+/)?.[0] || 0, 10);
+          const min = num;
+          const max = num + 1000;
+          return `CAST(REGEXP_SUBSTR(p.battery, '[0-9]+') AS UNSIGNED) >= ${min} AND CAST(REGEXP_SUBSTR(p.battery, '[0-9]+') AS UNSIGNED) < ${max}`;
+        })
+        .join(" OR ");
+
+      if (pinConditions) whereClauses.push(`(${pinConditions})`);
+    }
+
+    // === Lọc Màn hình (nếu là điện thoại) ===
+    if (specs.Screen?.length && !specs.Screen.includes("Tất cả")) {
+      const displayVals = specs.Screen
+        .filter(v => v && v !== "Tất cả")
+        .map(v =>
+          `REPLACE(LOWER(p.screen), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
+        )
+        .join(" OR ");
+      if (displayVals) whereClauses.push(`(${displayVals})`);
+    }
   }
-
-
-  // === Lọc Cạc đồ họa rời ===
-  if (specs.GPU?.length && !specs.GPU.includes("Tất cả")) {
-    const gpuVals = specs.GPU
-    .filter(v => v && v !== "Tất cả") 
-    .map(v =>
-      `REPLACE(LOWER(p.graphicsCard), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
-    )
-    .join(" OR ");
-    if (gpuVals) whereClauses.push(`(${gpuVals})`);
-}
-
-  // === Lọc Ổ cứng ===
-  if (specs.Storage?.length && !specs.Storage.includes("Tất cả")) {
-    const ssdVals = specs.Storage
-    .filter(v => v && v !== "Tất cả") 
-    .map(v =>
-      `REPLACE(LOWER(p.storage), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
-    )
-    .join(" OR ");
-    if (ssdVals) whereClauses.push(`(${ssdVals})`);
-}
-
-  // === Lọc kích thước màn hình ===
-  if (specs.ScreenSize?.length && !specs.ScreenSize.includes("Tất cả")) {
-    const screenVals = specs.ScreenSize
-    .filter(v => v && v !== "Tất cả") 
-    .map(v =>
-      `REPLACE(LOWER(p.screen), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
-    )
-    .join(" OR ");
-    if (screenVals) whereClauses.push(`(${screenVals})`);
-  }
-
-  // === Lọc Pin (nếu là điện thoại) ===
-  if (specs.PIN?.length && !specs.PIN.includes("Tất cả")) {
-  const pinConditions = specs.PIN
-    .filter(v => v && v !== "Tất cả")
-    .map(v => {
-      // lấy phần số (vd: "3000" → 3000)
-      const num = parseInt(v.match(/\d+/)?.[0] || 0, 10);
-      const min = num;
-      const max = num + 1000; 
-      return `CAST(REGEXP_SUBSTR(p.battery, '[0-9]+') AS UNSIGNED) >= ${min} AND CAST(REGEXP_SUBSTR(p.battery, '[0-9]+') AS UNSIGNED) < ${max}`;
-    })
-    .join(" OR ");
-
-  if (pinConditions) whereClauses.push(`(${pinConditions})`);
-}
-
-  // === Lọc Màn hình (nếu là điện thoại) ===
-  if (specs.Screen?.length && !specs.Screen.includes("Tất cả")) {
-    const displayVals = specs.Screen
-    .filter(v => v && v !== "Tất cả") 
-    .map(v =>
-      `REPLACE(LOWER(p.screen), ' ', '') LIKE CONCAT('%', '${v.toLowerCase().replace(/\s/g, '')}', '%')`
-    )
-    .join(" OR ");
-    if (displayVals) whereClauses.push(`(${displayVals})`);
-}
-}
 
 
   const whereSQL = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
@@ -382,7 +382,7 @@ export const getProductById = async (id) => {
     }
   }
 
-    const reviews = await prisma.$queryRaw`
+  const reviews = await prisma.$queryRaw`
     SELECT 
       r.id,
       r.rating,
@@ -395,25 +395,25 @@ export const getProductById = async (id) => {
     ORDER BY r.createdAt DESC;
   `;
 
-  return {product, reviews};
+  return { product, reviews };
 }
 
 // =========================== Add đặc điểm cho sản phẩm ==========================
 export const addProductFeatures = async (productID, featureIDs) => {
   if (!Array.isArray(featureIDs) || featureIDs.length === 0) {
-        throw new Error("featureIDs must be a non-empty array.");
-    }
-    // Tạo mảng dữ liệu (Data Array)
-    const dataToCreate = featureIDs.map(featureID => ({
-        productID: productID,
-        featureID: featureID,
-    }));
+    throw new Error("featureIDs must be a non-empty array.");
+  }
+  // Tạo mảng dữ liệu (Data Array)
+  const dataToCreate = featureIDs.map(featureID => ({
+    productID: productID,
+    featureID: featureID,
+  }));
 
-    // Sử dụng createMany với mảng data
-    await prisma.productFeature.createMany({
-        data: dataToCreate,
-        skipDuplicates: true, 
-    });
+  // Sử dụng createMany với mảng data
+  await prisma.productFeature.createMany({
+    data: dataToCreate,
+    skipDuplicates: true,
+  });
 };
 
 // Xóa đặc điểm sản phẩm
@@ -438,7 +438,7 @@ export const createProduct = async (data, files) => {
     roundedPrice = Math.floor(finalPrice / 10000) * 10000;
   }
 
-  
+
   const product = await prisma.product.create({
     data: {
       ...data,
@@ -475,7 +475,7 @@ export const updateProduct = async (id, data) => {
   if ('releaseYear' in data)
     data.releaseYear = data.releaseYear.toString();
 
-  const basePrice = data.originalPrice ;
+  const basePrice = data.originalPrice;
   const couponValue = data.coupon ?? 0;
 
   // Tính lại giá mới
@@ -551,3 +551,38 @@ export const countProducts = async () => {
   const count = await prisma.product.count();
   return count;
 }
+
+// =================== Tạo đánh giá cho sản phẩm (user đã mua và hoàn thành đơn) ===================
+export const createReview = async ({ productId, userId, rating, comment }) => {
+  // validate rating
+  const r = Number(rating);
+  if (!r || r < 1 || r > 5) throw new Error('Rating must be an integer between 1 and 5');
+
+  // Kiểm tra user đã từng mua sản phẩm này và đơn ở trạng thái COMPLETED
+  const purchased = await prisma.$queryRaw`
+    SELECT 1
+    FROM order_items oi
+    INNER JOIN orders o ON oi.orderID = o.id
+    WHERE oi.productID = ${productId} AND o.userID = ${userId} AND o.status = 'COMPLETED'
+    LIMIT 1;
+  `;
+
+  if (!purchased || purchased.length === 0) {
+    throw new Error('Bạn chỉ có thể đánh giá sản phẩm đã mua và đã nhận hàng');
+  }
+
+  // Optional: chặn duplicate review
+  const existing = await prisma.review.findFirst({ where: { productID: productId, userID: userId } });
+  if (existing) throw new Error('Bạn đã đánh giá sản phẩm này trước đó');
+
+  const created = await prisma.review.create({
+    data: {
+      productID: productId,
+      userID: userId,
+      rating: r,
+      comment: comment || '',
+    },
+  });
+
+  return created;
+};

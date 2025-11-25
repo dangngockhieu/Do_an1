@@ -1,8 +1,9 @@
 'use strict';
 import express from 'express';
-import { createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getUserOrders, cancelOrder,
+import {
+  createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getUserOrders, cancelOrder,
   updateOrderforUser, updatePendingtoShipping, countOrders, getRevenueThisMonth, getRevenueByMonth
- } from '../controllers/orderController.js';
+} from '../controllers/orderController.js';
 import { jwtAuth } from '../middleware/jwtAuth.js';
 import { authorizeRole } from '../middleware/authorizeRole.js';
 const router = express.Router();
@@ -19,7 +20,7 @@ const orderRoutes = (app) => {
   router.get('/orders', jwtAuth, authorizeRole(['ADMIN']), getOrderforAdmin);
 
   // Lấy chi tiết đơn hàng
-  router.get('/orders-item', jwtAuth, authorizeRole(['ADMIN']), getOrderItem);
+  router.get('/orders-item', jwtAuth, authorizeRole(['ADMIN', 'USER']), getOrderItem);
 
   // Cập nhật trạng thái đơn hàng sang quá trình vận chuyển 
   router.patch('/order-to-shipping', jwtAuth, authorizeRole(['ADMIN']), updatePendingtoShipping);
