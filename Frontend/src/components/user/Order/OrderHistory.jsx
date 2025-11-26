@@ -82,7 +82,7 @@ const OrderHistory = () => {
             let res = await getMyOrders(activeTab);
             if (res && res.EC === 0) {
                 const sortedOrders = res.DT.sort(
-                    (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+                    (a, b) => new Date(a.orderDate) - new Date(b.orderDate)
                 );
                 setOrders(sortedOrders);
             } else {
