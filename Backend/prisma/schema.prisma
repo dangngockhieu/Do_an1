@@ -65,7 +65,7 @@ model Payment {
   orderID       Int
   amount        Int
   method        String   @db.VarChar(50) // COD, VNPay, Momo...
-  status        String   @db.VarChar(50) // UNPAID, PAIDED
+  status        String   @db.VarChar(50) // UNPAID, PAID
   transactionID String?  @db.VarChar(100) // mã giao dịch từ cổng thanh toán
   createdAt     DateTime @default(now())
 

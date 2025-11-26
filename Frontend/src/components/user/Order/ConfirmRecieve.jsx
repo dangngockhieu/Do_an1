@@ -11,8 +11,8 @@ const ConfirmReceive = ({ open, onClose, confirmOrder, onConfirm }) => {
                 <button className="close-btn" onClick={onClose}>×</button>
 
                 <h3>Xác nhận đã nhận hàng</h3>
-                <p>Vui lòng thanh toán {confirmOrder.paymentMethod != 'COD' && confirmOrder.totalPrice 
-                    ? formatCurrency(confirmOrder.totalPrice): 0} cho Shipper</p> 
+                <p>Vui lòng thanh toán {confirmOrder.paymentMethod === 'COD' && confirmOrder.totalPrice 
+                    ? formatCurrency(confirmOrder.totalPrice): formatCurrency(0)} cho Shipper</p> 
                 <div className="confirm-actions">
                     <button className="btn cancel" onClick={onClose}>Hủy</button>
                     <button className="btn ok" onClick={onConfirm}>Xác nhận</button>

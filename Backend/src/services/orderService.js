@@ -200,6 +200,7 @@ export const updateOrderforUser = async(orderID, userID, status) =>{
         where: { id: +orderID, userID: +userID },
         data: {
             status: `${status}`,
+            receivedDate: status === 'COMPLETED' ? dayjs().tz("Asia/Ho_Chi_Minh").toDate() : null,
         },
     });
     await prisma.$executeRaw`
@@ -209,6 +210,14 @@ export const updateOrderforUser = async(orderID, userID, status) =>{
           p.sold = p.sold + oi.quantity
         WHERE oi.orderID = ${orderID};
     `;
+
+    if(status === 'COMPLETED'){
+        await prisma.$executeRaw`
+            UPDATE payments
+            SET status = 'PAID'
+            WHERE orderID = ${orderID};
+        `;
+    }
 
     return updatedOrder;
 };

@@ -37,6 +37,7 @@ CREATE TABLE `orders` (
     `orderDate` DATETIME(3) NOT NULL,
     `trackingCode` VARCHAR(100) NULL,
     `deliveryDate` DATETIME(3) NULL,
+    `expectedDate` DATETIME(3) NULL,
     `receivedDate` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)
@@ -63,6 +64,7 @@ CREATE TABLE `order_items` (
     `productID` INTEGER NOT NULL,
     `quantity` INTEGER NOT NULL,
     `price` INTEGER NOT NULL,
+    `isReviewed` BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

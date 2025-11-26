@@ -383,6 +383,7 @@ const main = async () => {
                   productID: product.id,
                   quantity: 1,
                   price: product.price || product.originalPrice,
+                  isReviewed: true
                 },
               ],
             },
@@ -391,7 +392,7 @@ const main = async () => {
                 {
                   amount: product.price || product.originalPrice,
                   method: "COD",
-                  status: "PAIDED",
+                  status: "PAID",
                 },
             },
           },

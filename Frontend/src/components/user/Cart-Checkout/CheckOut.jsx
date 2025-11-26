@@ -25,7 +25,7 @@ const Checkout = () => {
         }
     }, [checkoutItems, totalAmount]);
 
-    const methods = [{ label: "Thanh toán khi nhận hàng (COD)", value: "COD" },
+    const methods = [{ label: "Thanh toán khi nhận hàng", value: "COD" },
     { label: "Thanh toán bằng VNPAY", value: "BANK" }
     ];
     const [paymentMethod, setPaymentMethod] = useState("COD");
