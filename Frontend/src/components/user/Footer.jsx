@@ -20,18 +20,17 @@ const Footer = () => {
                 </div>
                 <div className="app-footer__column">
                     <h4>Shop</h4>
-                    <Link to="#laptops">Performance laptops</Link>
-                    <Link to="#phones">Flagship phones</Link>
-                    <Link to="#deals">Bundle deals</Link>
-                    <Link to="#services">Services</Link>
+                    <div>Performance laptops</div>
+                    <div>Flagship phones</div>
+                    <div>Bundle deals</div>
+                    <div>Services</div>
                 </div>
             </div>
             <div className="container app-footer__bottom">
                 <span>© {currentYear} TechZone. All rights reserved.</span>
                 <div className="app-footer__legal">
-                    <Link to="#privacy">Privacy</Link>
-                    <Link to="#terms">Terms</Link>
-                    <Link to="#support">Warranty policy</Link>
+                    <Link to="privacy">Privacy Policy</Link>
+                    <Link to="warranty">Warranty Policy</Link>
                 </div>
             </div>
         </footer>

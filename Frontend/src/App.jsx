@@ -21,6 +21,9 @@ import ManageOrder from './components/admin/ManageOrder/ManageOrder.jsx';
 import Dashboard from './components/admin/DashBoard/DashBoard.jsx';
 import OrderHistory from './components/user/Order/OrderHistory.jsx';
 
+import Warranty from './components/term/Warranty.jsx';
+import Privacy from './components/term/Privacy.jsx';
+
 const App = () => {
   return (
     <Routes>
@@ -31,6 +34,8 @@ const App = () => {
         <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         <Route path="checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
         <Route path="orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} />
+        <Route path="warranty" element={<Warranty />} />
+        <Route path="privacy" element={<Privacy />} />
       </Route>
 
       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

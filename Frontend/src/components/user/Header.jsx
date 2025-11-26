@@ -90,7 +90,7 @@ const Header = () => {
             </span>
           </div>
           <div className="header__top-right">
-            <Link to="#">Điều khoản sử dụng</Link> / <Link to="#">Hỗ trợ</Link>
+            <Link to="privacy">Chính sách bảo mật</Link> / <Link to="warranty">Hỗ trợ Bảo hành</Link>
           </div>
         </div>
       </div>
