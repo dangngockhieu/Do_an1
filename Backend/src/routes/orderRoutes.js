@@ -3,14 +3,16 @@ import express from 'express';
 import { createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getUserOrders, buyAgain,
   updateOrderforUser, updatePendingtoShipping, countOrders, getRevenueThisMonth, getRevenueByMonth
  } from '../controllers/orderController.js';
-import { jwtAuth } from '../middleware/jwtAuth.js';
-import { authorizeRole } from '../middleware/authorizeRole.js';
+import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
+import { authorizeRole } from '../middleware/Auth/authorizeRole.js';
+import { createOrderValidator } from '../middleware/Validator/ruleValidator.js';
+import { validate } from '../middleware/Validator/validatorInput.js';
 const router = express.Router();
 
 const orderRoutes = (app) => {
 
   // Tạo đơn hàng
-  router.post('/order', jwtAuth, createOrder);
+  router.post('/order', jwtAuth, createOrderValidator, validate, createOrder);
 
   // Lấy danh sách đơn hàng đang chờ xử lý
   router.get('/orders/pending', jwtAuth, authorizeRole(['ADMIN']), getOrderPendingforAdmin);

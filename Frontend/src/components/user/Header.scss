@@ -91,7 +91,6 @@
       display: flex;
       gap: 2rem;
 
-      // Sử dụng selector cho các NavLink
       .nav-item { 
         text-decoration: none;
         font-size: 1.2rem;
@@ -99,13 +98,11 @@
         font-weight: 500;
         position: relative;
     
-      // Selector mà NavLink tự thêm vào khi đường dẫn khớp
         &.active,
         &:hover {
           color: #67b438;
         }
 
-        // Gạch chân cho trạng thái active
         &.active::after {
           content: "";
           position: absolute;

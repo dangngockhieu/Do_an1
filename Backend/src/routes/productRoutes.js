@@ -20,8 +20,10 @@ import {
   getTopSellingProduct,
   createReview 
 } from '../controllers/productController.js';
-import { jwtAuth } from '../middleware/jwtAuth.js';
-import { authorizeRole } from '../middleware/authorizeRole.js';
+import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
+import { authorizeRole } from '../middleware/Auth/authorizeRole.js';
+import { createReviewValidator } from '../middleware/Validator/ruleValidator.js';
+import { validate } from '../middleware/Validator/validatorInput.js';
 
 const router = express.Router();
 
@@ -86,7 +88,7 @@ const productRoutes = (app) => {
   router.get('/count', jwtAuth, authorizeRole(['ADMIN']), countProducts);
 
   // Tạo đánh giá cho sản phẩm
-  router.post('/reviews/:productID', jwtAuth, createReview);
+  router.post('/reviews/:productID', jwtAuth, createReviewValidator, validate, createReview);
 
   app.use('/product', router);
 };

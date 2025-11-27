@@ -1,5 +1,6 @@
 'use strict';
 import * as userService from '../services/userService.js';
+import { matchedData } from 'express-validator';
 
 // ==================== GET USERS WITH PAGINATION ====================
 export const getUsersWithPaginate = async (req, res) => {
@@ -18,7 +19,8 @@ export const getUsersWithPaginate = async (req, res) => {
 // ==================== CHANGE PASSWORD ====================
 export const changePassword = async (req, res) => {
   try {
-    const { oldPassword, newPassword } = req.body;
+    const dataChangePassword = matchedData(req);
+    const { oldPassword, newPassword } = dataChangePassword;
     const email = req.user?.email;
     if (!email || !oldPassword || !newPassword) {
       return res.status(400).json({ EM: 'Missing required fields', EC: -1 });

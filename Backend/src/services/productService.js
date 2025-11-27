@@ -15,7 +15,6 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, keyword = ""
   limit = +limit || 10;
   const offset = (page - 1) * limit;
 
-  // Tạo điều kiện WHERE động
   let whereClauses = [`1=1`];
 
   if (category && ["LAPTOP", "PHONE"].includes(category)) {
@@ -65,7 +64,6 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, keyword = ""
     WHERE ${whereSQL};
   `);
 
-  // Convert BigInt
   const safeProducts = products.map((p) =>
     Object.fromEntries(Object.entries(p).map(([k, v]) => [k, typeof v === "bigint" ? Number(v) : v]))
   );
@@ -281,7 +279,6 @@ if (filters?.specs) {
   const pinConditions = specs.PIN
     .filter(v => v && v !== "Tất cả")
     .map(v => {
-      // lấy phần số (vd: "3000" → 3000)
       const num = parseInt(v.match(/\d+/)?.[0] || 0, 10);
       const min = num;
       const max = num + 1000; 

@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-// --- Hàm tiện ích Debounce ---
 const useDebounce = (callback, delay) => {
   const timeoutRef = useRef(null);
   return useCallback(
@@ -24,7 +23,6 @@ const useDebounce = (callback, delay) => {
     [callback, delay]
   );
 };
-// -----------------------------
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -142,7 +140,7 @@ const CartPage = () => {
     }
   };
 
-  // Chỉ toggle trạng thái chọn (Logic checkout nằm ở unmount)
+  // Chỉ toggle trạng thái chọn 
   const handleSelect = (id) => {
     setSelectedItems((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -174,7 +172,7 @@ const CartPage = () => {
     }
   };
 
-  // HÀM XỬ LÝ CHECKOUT VÀ TRUYỀN DỮ LIỆU
+  // HÀM XỬ LÝ CHECKOUT 
   const handleCheckout = () => {
 
     const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id));

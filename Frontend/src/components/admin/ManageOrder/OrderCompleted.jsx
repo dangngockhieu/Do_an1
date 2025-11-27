@@ -8,7 +8,6 @@ import { BsArrowRightCircleFill } from "react-icons/bs";
 const OrderCompleted = ({ orders = [], pagination = {}, setPage }) => {
   const [viewOrder, setViewOrder] = useState(null);
   const ordersList = Array.isArray(orders) ? orders : [];
-
   const handlePageClick = (event) => {
     const newPage = event.selected + 1;
     setPage(newPage);
@@ -39,7 +38,6 @@ const OrderCompleted = ({ orders = [], pagination = {}, setPage }) => {
                   <th>Người nhận</th>
                   <th>Tổng tiền</th>
                   <th>Phương thức</th>
-                  <th>Trạng thái thanh toán</th>
                   <th>Ngày giao</th>
                   <th>Hành động</th>
                 </tr>
@@ -51,14 +49,15 @@ const OrderCompleted = ({ orders = [], pagination = {}, setPage }) => {
                     <td>{order.recipientName}</td>
                     <td className="amount">{Number(order.totalPrice || 0).toLocaleString()} ₫</td>
                     <td>{order.paymentMethod || '—'}</td>
-                    <td>{order.paymentStatus || '—'}</td>
                     <td>
                         {order.receivedDate
-                        ? new Date(order.receivedDate).toLocaleDateString('vi-VN', {
-                            timeZone: 'Asia/Ho_Chi_Minh',
-                            })
-                            : '—'}
+                        ? new Date(order.receivedDate).toLocaleString('vi-VN', {
+                            dateStyle: 'short',
+                            timeStyle: 'short',
+                          })
+                        : '—'}
                         </td>
+                        
                     <td className="actions-col">
                       <button className="btn view" onClick={() => setViewOrder(order)}>Xem</button>
                     </td>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./ProductDetail.scss";
-
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ProductDetail = ({ show, setShow, product }) => {
@@ -117,8 +117,23 @@ const ProductDetail = ({ show, setShow, product }) => {
 
       {/* Overlay zoom ảnh */}
       {zoomImg && (
-        <div className="zoom-overlay" onClick={() => setZoomImg(null)}>
-          <img src={zoomImg} alt="zoomed" className="zoomed-img" />
+        <div className="zoom-overlay" 
+          onClick={() => setZoomImg(null)} 
+        >
+          <div  style={{ width: '100%', height: '100%' }}>
+            <TransformWrapper wheel={{ step: 0.2 }} >
+              <TransformComponent 
+                wrapperStyle={{ width: "100%", height: "100%" }}
+                contentStyle={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <img src={zoomImg} 
+                  alt="zoomed" 
+                  className="zoomed-img" 
+                  style={{ maxHeight: "90vh", maxWidth: "90vw" }} 
+                />
+              </TransformComponent>
+            </TransformWrapper>
+          </div>
         </div>
       )}
     </div>

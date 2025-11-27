@@ -2,7 +2,7 @@
 import express from 'express';
 import { addProductToCart, numberCart, getCart, updateCartQuantity, deleteCartItem, buyNow, checkout
  } from '../controllers/cartController.js';
-import { jwtAuth } from '../middleware/jwtAuth.js';
+import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
 const router = express.Router();
 
 const cartRoutes = (app) => {

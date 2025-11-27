@@ -1,10 +1,12 @@
 import * as authService from '../services/authService.js';
 import dotenv from 'dotenv';
 dotenv.config();
+import { matchedData } from 'express-validator';
 // ==================== REGISTER ====================
 export const register = async (req, res) => {
   try {
-    const { email, name, password } = req.body;
+    const dataRegister = matchedData(req);
+    const { email, name, password } = dataRegister;
     await authService.register(email, name, password);
     return res.status(200).json({
       EM: 'Registration successful', EC: 0
@@ -19,7 +21,8 @@ export const register = async (req, res) => {
 // ==================== LOGIN ====================
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const dataLogin = matchedData(req);
+    const { email, password } = dataLogin;
     const user = await authService.validateUser(email, password);
     if (!user) {
         return res.status(401).json({ EM: 'Email hoặc mật khẩu không chính xác', EC: 1 });
@@ -203,7 +206,8 @@ export const sendResetPassword = async (req, res) => {
 // ==================== RESET PASSWORD ====================
 export const resetPassword = async (req, res) => {
     try {
-        const { email, code, newPassword } = req.body;
+        const dataResetPassword = matchedData(req);
+        const { email, code, newPassword } = dataResetPassword;
         await authService.resetPassword(email, code, newPassword);
         return res.status(200).json({
             EM: 'Password reset successfully', EC: 0

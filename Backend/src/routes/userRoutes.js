@@ -9,8 +9,10 @@ import {
   countUsers,
   countUsersThisMonth
 } from '../controllers/userController.js';
-import { jwtAuth } from '../middleware/jwtAuth.js';
-import { authorizeRole } from '../middleware/authorizeRole.js';
+import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
+import { authorizeRole } from '../middleware/Auth/authorizeRole.js';
+import { changePasswordValidator } from '../middleware/Validator/ruleValidator.js';
+import { validate } from '../middleware/Validator/validatorInput.js';
 
 const router = express.Router();
 
@@ -26,7 +28,7 @@ const userRoutes = (app) => {
   router.post('/user', jwtAuth, authorizeRole(['ADMIN']), createUser);
 
   // Đổi mật khẩu người dùng
-  router.patch('/change-password', jwtAuth, changePassword);
+  router.patch('/change-password', jwtAuth, changePasswordValidator, validate, changePassword);
 
   // Thay đổi vai trò người dùng
   router.patch('/user-role/:id', jwtAuth, authorizeRole(['ADMIN']), changeRoleUser);

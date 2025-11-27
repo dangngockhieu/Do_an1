@@ -1,5 +1,6 @@
 'use strict';
 import * as productService from '../services/productService.js';
+import { matchedData } from 'express-validator';
 
 export const getProductsWithPaginate = async (req, res) => {
   try {
@@ -172,8 +173,10 @@ export const createReview = async (req, res) => {
     const productID = +req.params.productID;
     const orderItemID = +req.body.orderItemID;
     const userID = req.user?.id;
-    const comment = req.body.comment;
     const rating = +req.body.rating;
+
+    const dataCreateReview = matchedData(req);
+    const comment = dataCreateReview.comment;
 
     if (!userID) return res.status(401).json({ EC: 1, EM: 'Unauthorized' });
 

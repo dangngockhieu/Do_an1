@@ -85,7 +85,6 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  //  Hàm điều hướng đến trang chi tiết
   const handleNavigate = (product) => {
     navigate(`/product/${product.id}`);
   };

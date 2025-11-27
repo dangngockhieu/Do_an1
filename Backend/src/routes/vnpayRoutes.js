@@ -7,6 +7,7 @@ dotenv.config();
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
+// import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -16,9 +17,12 @@ const router = express.Router();
 const vnpayRoutes = (app) => {
 
   // Tạo URL thanh toán VNPay
-  router.post("/create", async (req, res) => {
+  router.post("/create", 
+    // jwtAuth,
+     async (req, res) => {
     try {
       const { orderID } = req.body;
+      // const userID = +req.user.id;
       if (!orderID) {
         return res.status(400).json({ EC: 1, EM: "Thiếu orderID" });
       }

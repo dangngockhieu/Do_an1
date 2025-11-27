@@ -7,6 +7,7 @@ import {
   deleteProductImage,
 } from "../../../services/apiServices";
 import { toast } from "react-toastify";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import "./ProductEdit.scss";
 import { RiFolderUploadFill } from "react-icons/ri";
 
@@ -373,8 +374,23 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
       </div>
 
       {zoomImg && (
-        <div className="zoom-overlay" onClick={() => setZoomImg(null)}>
-          <img src={zoomImg} alt="zoomed" />
+        <div className="zoom-overlay" 
+          onClick={() => setZoomImg(null)} 
+        >
+          <div  style={{ width: '100%', height: '100%' }}>
+            <TransformWrapper wheel={{ step: 0.2 }} >
+              <TransformComponent 
+                wrapperStyle={{ width: "100%", height: "100%" }}
+                contentStyle={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <img src={zoomImg} 
+                  alt="zoomed" 
+                  className="zoomed-img" 
+                  style={{ maxHeight: "90vh", maxWidth: "90vw" }} 
+                />
+              </TransformComponent>
+            </TransformWrapper>
+          </div>
         </div>
       )}
     </div>

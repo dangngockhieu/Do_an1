@@ -11,7 +11,6 @@
     align-items: flex-start;
     margin-bottom: 40px;
 
-    // KHỐI CỘT TRÁI - CHỨA ẢNH VÀ CHÍNH SÁCH
     .left-column {
       flex: 1;
       display: flex;
@@ -62,7 +61,6 @@
       }
     }
     
-    // KHỐI CHÍNH SÁCH
     .product-policies {
         width: 100%;
         max-width: 600px;
@@ -190,7 +188,6 @@
         }
       }
       
-      // === KHỐI DESCRIPTION MỚI (TRONG PRODUCT-INFO) ===
       .description {
         background: #fff;
         border-radius: 12px;
@@ -209,9 +206,7 @@
           font-size: 0.95rem;
         }
       }
-      // ===============================================
 
-      // === KHỐI ACTIONS MỚI (TRONG PRODUCT-INFO) ===
       .actions {
         display: flex;
         gap: 16px;
@@ -247,7 +242,6 @@
           }
         }
       }
-      // =====================================
 
       .specs {
         display: grid;
@@ -443,7 +437,6 @@
   }
 }
 
-// --- PHẦN RESPONSIVE ---
 @media (max-width: 1050px) {
   .product-detail {
     padding: 20px;

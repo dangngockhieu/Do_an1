@@ -21,7 +21,6 @@ export const jwtAuth = (req, res, next) => {
     };
     return next();
   } catch (err) {
-    // If token is expired, return 401 so client can attempt to refresh using refresh_token
     if (err && err.name === 'TokenExpiredError') {
       return res.status(401).json({ EM: 'Access token expired', EC: -1 });
     }

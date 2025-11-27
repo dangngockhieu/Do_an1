@@ -1,10 +1,13 @@
 'use strict';
 import * as orderService from '../services/orderService.js';
+import { matchedData } from 'express-validator';
 
 export const createOrder = async (req, res) => {
     try {
         const userID = +req.user.id;
-        const { recipientName, address, phone, items, totalPrice, paymentMethod } = req.body;
+        const { items, totalPrice, paymentMethod } = req.body;
+        const dataCcreateOrder = matchedData(req);
+        const { recipientName, address, phone } = dataCcreateOrder;
         const newOrder = await orderService.createOrder(userID, recipientName, address, phone, 
             items, totalPrice, paymentMethod
         );

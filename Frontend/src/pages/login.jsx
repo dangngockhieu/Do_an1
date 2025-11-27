@@ -38,6 +38,30 @@ const Login = () => {
       return;
     }
 
+    const validateEmail = (email) => {
+      return String(email).toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+    };
+    if (!validateEmail(email)) {
+      toast.error("Vui lòng nhập đúng định dạng email.");
+      return;
+    }
+
+    // const validatePassword = (pw) => {
+    // return /[A-Z]/       .test(pw) &&
+    //        /[a-z]/       .test(pw) &&
+    //        /[0-9]/       .test(pw) &&
+    //        /[^A-Za-z0-9]/.test(pw) &&
+    //        pw.length > 6 && pw.length < 20;
+
+    // };
+    // if (!validatePassword(password)) {
+    //   toast.error("Mật khẩu phải chứa chữ hoa, chữ thường, số, ký tự đặc biệt và từ 6-20 ký tự.");
+    //   return;
+    // }
+
     if (isLoading) return;
     setIsLoading(true);
 

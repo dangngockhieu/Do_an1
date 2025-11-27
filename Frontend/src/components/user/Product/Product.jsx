@@ -228,8 +228,15 @@ const handleBuyNow = async (productID) => {
         setData(res.DT.products || []);
         setCountFn(res.DT.count || 0);
       }
+      else {
+    const msg = typeof res?.EM === 'object'
+      ? res.EM.error
+      : res?.EM;
+
+    toast.error(msg || `Lỗi tải sản phẩm`);
+}
     } catch (e) {
-      console.error(`Error fetching ${type}:`, e);
+      toast.error(`Error fetching ${type}:`, e);
     }
   };
 

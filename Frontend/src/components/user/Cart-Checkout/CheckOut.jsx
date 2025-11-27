@@ -55,7 +55,7 @@ const Checkout = () => {
       price: item.price
     }));
 
-    // 1. Tạo Order
+    //  Tạo Order
     const response = await createOrder(
       recipient.name,
       recipient.address,
