@@ -1,5 +1,6 @@
 'use strict';
 import prisma from '../lib/prisma.js';
+import XLSX from "xlsx";
 import fs from 'fs';
 import path from 'path';
 import dayjs from 'dayjs';
@@ -458,6 +459,64 @@ export const createProduct = async (data, files) => {
   }
 
   return product;
+};
+
+// =========================== Thêm nhiều sản phẩm từ file Excel ==========================
+export const importProducts = async (filePath) => {
+  const workbook = XLSX.readFile(filePath);
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet);
+
+  if (!rows.length) {
+    throw new Error("File Excel không có dữ liệu");
+  }
+
+  for (const row of rows) {
+
+    // ========  ÉP FIELD DATA TỪ EXCEL ========
+    const data = {
+      name: row.name || "",
+      originalPrice: +row.originalPrice || 0,
+      quantity: +row.quantity || 0,
+      coupon: +row.coupon || 0,
+
+      // String fields
+      warranty: row.warranty?.toString() || "",
+      infor: row.infor?.toString() || "",
+      cpu: row.cpu?.toString() || "",
+      ram: row.ram?.toString() || "",
+      storage: row.storage?.toString() || "",
+      screen: row.screen?.toString() || "",
+      graphicsCard: row.graphicsCard?.toString() || "",
+      battery: row.battery?.toString() || "",
+      weight: row.weight?.toString() || "",
+      releaseYear: row.releaseYear?.toString() || "",
+      category: row.category?.toString() || "",
+      factory: row.factory?.toString() || "",
+    };
+
+    let finalPrice = data.originalPrice;
+    const couponValue = data.coupon;
+
+    let roundedPrice = data.originalPrice;
+    if (couponValue > 0) {
+      finalPrice = data.originalPrice - (data.originalPrice * couponValue / 100);
+      roundedPrice = Math.floor(finalPrice / 10000) * 10000;
+    }
+
+    // ========  INSERT TRONG PRISMA ========
+    await prisma.product.create({
+      data: {
+        ...data,
+        sold: 0,
+        price: roundedPrice,
+        originalPrice: data.originalPrice,
+        coupon: data.coupon,
+      },
+    });
+  }
+
+  return { total: rows.length };
 };
 
 // =========================== Cập nhật thông tin sản phẩm ==========================

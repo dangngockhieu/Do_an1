@@ -11,6 +11,7 @@ import {
   deleteProductFeature,
   getProductById,
   createProduct,
+  uploadExcel,
   updateProduct,
   addProductImages,
   deleteProductImage,
@@ -71,6 +72,9 @@ const productRoutes = (app) => {
 
   // Tạo mới sản phẩm (có ảnh)
   router.post('/product', jwtAuth, authorizeRole(['ADMIN']), upload.array('images', 10), createProduct);
+
+  // Upload file Excel để nhập nhiều sản phẩm
+  router.post('/upload-excel', jwtAuth, authorizeRole(['ADMIN']), upload.single('excel'), uploadExcel);
 
   // Cập nhật thông tin sản phẩm (không ảnh)
   router.put('/products/:id', jwtAuth, authorizeRole(['ADMIN']), updateProduct);

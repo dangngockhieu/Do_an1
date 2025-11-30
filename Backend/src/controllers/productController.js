@@ -119,6 +119,31 @@ export const createProduct = async (req, res) => {
   }
 };
 
+export const uploadExcel = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        EM: "Vui lòng upload file Excel",
+        EC: 1,
+      });
+    }
+
+    const result = await productService.importProducts(req.file.path);
+
+    return res.status(200).json({
+      EM: "Import sản phẩm thành công",
+      EC: 0,
+      DT: { total: result.total },
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      EM: err.message || "Server Internal Error",
+      EC: -1,
+    });
+  }
+};
+
 export const updateProduct = async (req, res) => {
   try {
     const updated = await productService.updateProduct(+req.params.id, req.body);

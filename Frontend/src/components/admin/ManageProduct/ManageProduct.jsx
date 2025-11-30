@@ -9,7 +9,8 @@ import ProductAdd from "./ProductAdd";
 import ProductEdit from "./ProductEdit";
 import ProductDetail from "./ProductDetail";
 import ProductDelete from "./ProductDelete";
-import { getProductsWithPaginate, deleteProduct } from "../../../services/apiServices";
+import ImportExcel from "./ImportExcel";
+import { getProductsWithPaginate, deleteProduct, uploadExcel } from "../../../services/apiServices";
 import "./ManageProduct.scss";
 
 const ManageProduct = () => {
@@ -21,6 +22,7 @@ const ManageProduct = () => {
   const [categoryFilter, setCategoryFilter] = useState("LAPTOP");
   const [factoryFilter, setFactoryFilter] = useState("ALL");
 
+  const [showImport, setShowImport] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -29,6 +31,24 @@ const ManageProduct = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Import Excel
+  const handleUpload = async (file) => {
+    if (!file) return;
+
+    try {
+      const res = await uploadExcel(file);
+      if (res && res.EC === 0) {
+        toast.success(`Import thành công ${res.DT.total} sản phẩm`);
+        fetchProducts(1, "", categoryFilter);
+      } else {
+        toast.error(res?.EM || "Import thất bại");
+      }
+    } catch (err) {
+      console.error("Import lỗi:", err); 
+      toast.error("Lỗi hệ thống khi import");
+    }
+  };
 
   // ================= FETCH PRODUCTS =================
   const fetchProducts = async (page = 1, keyword = "", category = "LAPTOP", factory = "ALL") => {
@@ -185,7 +205,11 @@ const ManageProduct = () => {
               </button>
             )}
           </div>
-
+          <button className="btn-upload"
+            onClick={() => setShowImport(true)}
+          >
+            Upload Excel
+          </button>
           <button className="btn-add" onClick={() => handleOpenModal("add")}>
             <FaPlus /> Thêm sản phẩm
           </button>
@@ -261,6 +285,12 @@ const ManageProduct = () => {
         show={showAdd}
         setShow={setShowAdd}
         onRefresh={() => fetchProducts(currentPage, searchTerm, categoryFilter)}
+      />
+
+      <ImportExcel 
+          show={showImport}
+          setShow={setShowImport}
+          onUpload={handleUpload} 
       />
 
       {selectedProduct && (

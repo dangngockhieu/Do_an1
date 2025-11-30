@@ -118,6 +118,18 @@ export const createProduct = (formData) => {
   });
 };
 
+// Upload file Excel để nhập nhiều sản phẩm
+export const uploadExcel = (file) => {
+  const formData = new FormData();
+  formData.append("excel", file);
+
+  return axios.post("/product/upload-excel", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
 // Cập nhật thông tin sản phẩm (không bao gồm ảnh)
 export const updateProduct = (id, data) => {
   const URL_BACKEND = `/product/products/${id}`;
