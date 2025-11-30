@@ -2,6 +2,7 @@
 import mysql from 'mysql2';
 import 'dotenv/config'
 const getConnection = async () => {
+    // Tạo kết nối đến database MySQL sử dụng mysql2
     const connection = await mysql.createPool({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,

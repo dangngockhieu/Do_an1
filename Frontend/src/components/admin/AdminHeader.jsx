@@ -18,6 +18,7 @@ const AdminHeader = ({ onToggleCollapse, onToggleMobile }) => {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+  // Xử lý đăng xuất
   const handleLogout = async () => {
     try {
         await logout(account.email);
