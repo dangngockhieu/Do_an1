@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { USER_LOGOUT_SUCCESS } from '../../redux/action/userAction';
+import {RESET_CART} from "../../redux/action/cartAction";
 import { logout } from "../../services/apiServices";
 import { toast } from 'react-toastify';
 import { BsJustify, BsList } from "react-icons/bs";
@@ -24,6 +25,7 @@ const AdminHeader = ({ onToggleCollapse, onToggleMobile }) => {
         toast.error('Logout request failed');
       }
     dispatch({ type: USER_LOGOUT_SUCCESS });
+    dispatch({ type: RESET_CART });
     navigate('/login');
   };
 

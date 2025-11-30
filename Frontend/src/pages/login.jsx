@@ -69,7 +69,7 @@ const Login = () => {
       const res = await login(email, password);
 
       if (!res || res.EC !== 0) {
-        toast.error(res?.EM || "Đăng nhập thất bại.");
+        toast.error("Đăng nhập thất bại.");
         return;
       }
 

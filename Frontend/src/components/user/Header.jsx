@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { FaUserCircle, FaMapMarkerAlt } from "react-icons/fa";
 import { BsCartPlusFill, BsEnvelopeFill, BsCaretDownFill } from "react-icons/bs";
 import { USER_LOGOUT_SUCCESS } from "../../redux/action/userAction";
+import {RESET_CART} from "../../redux/action/cartAction";
 import { logout } from "../../services/apiServices";
 import { useNavigate } from "react-router-dom";
 import "./Header.scss";
@@ -60,6 +61,7 @@ const Header = () => {
         console.error('Logout request failed', err);
       }
       dispatch({ type: USER_LOGOUT_SUCCESS });
+      dispatch({ type: RESET_CART });
       setShowMenu(false);
       navigate('/login');
   };
@@ -120,8 +122,17 @@ const Header = () => {
           <button
             className="icon-btn"
             onClick={() => setShowMenu((prev) => !prev)}
-          >
-            <FaUserCircle />
+          > 
+            {!isAuthenticated ? (
+              <FaUserCircle />
+            ) : (
+            <img
+              src={`https://ui-avatars.com/api/?name=${account.name}&background=70b147`}
+              alt="Avatar"
+              className="avatar"
+            />
+          )}
+            
           </button>
 
           {showMenu && (

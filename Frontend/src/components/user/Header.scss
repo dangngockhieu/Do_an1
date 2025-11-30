@@ -130,6 +130,13 @@
         position: relative;
         transition: transform 0.2s;
 
+        .avatar {
+          width: 38px;
+          height: 36px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+
         &:hover {
           transform: scale(1.1);
         }
