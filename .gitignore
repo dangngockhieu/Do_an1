@@ -1,2 +1,6 @@
 Backend/node_modules
+Backend/.env
+Backend/mysql.yml
+
 Frontend/node_modules
+Frontend/.env
