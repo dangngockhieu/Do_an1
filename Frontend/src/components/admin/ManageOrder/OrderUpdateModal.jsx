@@ -65,7 +65,7 @@ const OrderUpdateModal = ({ order, onClose, onSuccess }) => {
             <input value={trackingCode} onChange={e => setTrackingCode(e.target.value)} placeholder="Nhập mã vận đơn" />
           </div>
           <div className="form-row">
-            <label><FaCalendarCheck /> Ngày nhận</label>
+            <label><FaCalendarCheck /> Ngày dự kiến nhận</label>
             <input type="date" value={formatDateInput(expectedDate)} onChange={e => setExpectedDate(e.target.value)} />
           </div>
 
