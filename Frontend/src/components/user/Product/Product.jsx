@@ -151,8 +151,8 @@ const Product = () => {
 
   const [products, setProducts] = useState([]);
   const [count, setCount] = useState(0);
-  // Ban đầu hiển thị 24 sản phẩm
-  const [visibleCount, setVisibleCount] = useState(24);
+  // Ban đầu hiển thị 16 sản phẩm
+  const [visibleCount, setVisibleCount] = useState(16);
   const [initialLaptops, setInitialLaptops] = useState([]);
   const [initialLaptopCount, setInitialLaptopCount] = useState(0);
   const [initialPhones, setInitialPhones] = useState([]);
@@ -290,7 +290,7 @@ const handleBuyNow = async (productID) => {
     setSelectedFilters({});
     setSelectedPrice(null);
     setCustomPrice({ min: "", max: "" });
-    setVisibleCount(24);
+    setVisibleCount(16);
 
     if (category === "LAPTOP") {
       setCurrentFactories(FACTORIES.slice(0, 7));
@@ -363,7 +363,7 @@ const handleBuyNow = async (productID) => {
 
 
   const handleFilter = async () => {
-    setVisibleCount(24);
+    setVisibleCount(16);
     const processedSpecs = { ...selectedFilters };
     // Chuyển name → label cho CPU
     if (processedSpecs.CPU && processedSpecs.CPU.length > 0) {
@@ -453,7 +453,7 @@ const handleBuyNow = async (productID) => {
     setCustomPrice({ min: "", max: "" });
     setProducts(category === "LAPTOP" ? initialLaptops : initialPhones);
     setCount(category === "LAPTOP" ? initialLaptopCount : initialPhoneCount);
-    setVisibleCount(24);
+    setVisibleCount(16);
   };
 
   const toggleFactory = (id) => {
@@ -632,10 +632,10 @@ const handleBuyNow = async (productID) => {
               <button
                 className="load-more-button"
                 onClick={() =>
-                  setVisibleCount((prev) => prev + 24)
+                  setVisibleCount((prev) => prev + 16)
                 }
               >
-                Xem thêm {Math.min(24, products.length - visibleCount)} sản phẩm <FaAngleDown className="load-more-icon" />
+                Xem thêm {Math.min(16, products.length - visibleCount)} sản phẩm <FaAngleDown className="load-more-icon" />
               </button>
             </div>
           )}
