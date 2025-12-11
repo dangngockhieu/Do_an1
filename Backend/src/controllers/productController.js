@@ -85,7 +85,7 @@ export const getFilteredProducts = async (req, res) => {
     const { category } = req.query;
     const filters = req.body;
 
-    const products = await productService.getAllProducts(category, filters);
+    const products = await productService.getFilterProducts(category, filters);
 
     res.status(200).json({
       EC: 0,
@@ -96,6 +96,15 @@ export const getFilteredProducts = async (req, res) => {
       EC: 1,
       EM: "Lỗi khi lấy danh sách sản phẩm",
     });
+  }
+};
+
+export const getAllProducts = async (req, res) => {
+  try {
+    const products = await productService.getAllProducts();
+    return res.status(200).json({ EC: 0, DT: products });
+  } catch (err) {
+    return res.status(500).json({ EC: 1, EM: err.message });
   }
 };
 

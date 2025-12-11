@@ -19,7 +19,8 @@ import {
   getFilteredProducts,
   countProducts,
   getTopSellingProduct,
-  createReview 
+  createReview,
+  getAllProducts
 } from '../controllers/productController.js';
 import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
 import { authorizeRole } from '../middleware/Auth/authorizeRole.js';
@@ -63,6 +64,9 @@ const productRoutes = (app) => {
 
   // Lọc sp
   router.post("/filter-products", getFilteredProducts);
+
+  // Get all products
+  router.get('/all-products', jwtAuth, getAllProducts);
 
   // Thêm nhiều đặc điểm cho sản phẩm
   router.post('/product-features/:productID', jwtAuth, authorizeRole(['ADMIN']), addProductFeatures);

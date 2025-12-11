@@ -98,6 +98,12 @@ export const getFilteredProducts = async (category, filters) => {
   return await axios.post(URL_BACKEND, filters);
 };
 
+// Lấy tất cả sản phẩm
+export const getAllProducts = () => {
+  const URL_BACKEND = `/product/all-products`;
+  return axios.get(URL_BACKEND);
+};
+
 // Thêm nhiều đặc điểm cho sản phẩm
 export const addProductFeatures = (productID, featureIDs) => {
   const URL_BACKEND = `/product/product-features/${productID}`;
@@ -276,4 +282,15 @@ export const createVnpayPayment = async (orderID) => {
   return axios.post(URL_BACKEND, { orderID });
 };
 
+
+// ==================== AI CHAT API ====================
+export const askAiChat = async (question, context) => {
+  const URL_BACKEND = `/chat/ask`;
+  return axios.post(URL_BACKEND, { question: question, context: context });
+};
+
+export const getAiChatHistory = async () => {
+  const URL_BACKEND = `/chat/history`;
+  return axios.get(URL_BACKEND);
+}
 

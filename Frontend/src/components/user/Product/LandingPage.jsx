@@ -13,6 +13,7 @@ import { addProductToCart, getNumberCart, buyNow } from "../../../services/apiSe
 import { toast } from "react-toastify";
 import { FcCellPhone } from "react-icons/fc";
 import { ImFire } from "react-icons/im";
+import AiChatWidget from "./AiChatWidget";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -173,6 +174,7 @@ const LandingPage = () => {
           {topPhones.length ? renderProducts(topPhones) : <p>Đang tải dữ liệu...</p>}
         </div>
       </section>
+      <AiChatWidget />
     </div>
   );
 };

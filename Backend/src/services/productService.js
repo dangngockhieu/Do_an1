@@ -184,7 +184,7 @@ export const getTopSellingProduct = async () => {
 }
 
 // ============ Lấy tất cả sản phẩm với filter ===============
-export const getAllProducts = async (category, filters) => {
+export const getFilterProducts = async (category, filters) => {
   const whereClauses = [`p.category = '${category}'`];
 
   // --- Thương hiệu (factory) ---
@@ -318,6 +318,51 @@ if (filters?.specs) {
     FROM products p
     LEFT JOIN reviews r ON p.id = r.productID
     ${whereSQL}
+    GROUP BY p.id
+    ORDER BY p.sold DESC
+  `);
+
+  const safeProducts = products.map(p =>
+    Object.fromEntries(
+      Object.entries(p).map(([k, v]) => [
+        k,
+        typeof v === 'bigint' ? Number(v) : v
+      ])
+    )
+  );
+
+  safeProducts.forEach(p => {
+    if (typeof p.imageUrls === 'string') {
+      try {
+        p.imageUrls = JSON.parse(p.imageUrls);
+      } catch {
+        p.imageUrls = [];
+      }
+    }
+  });
+
+  return safeProducts;
+};
+
+// =================== Get All Products ===================
+// ============ Lấy tất cả sản phẩm với filter ===============
+export const getAllProducts = async () => {
+  const products = await prisma.$queryRawUnsafe(`
+    SELECT 
+      p.id, p.name, p.price, p.category, p.factory,
+      (
+        SELECT JSON_ARRAYAGG(pi.url)
+        FROM product_images pi 
+        WHERE pi.productId = p.id
+        LIMIT 1
+      ) AS image,
+      (
+        SELECT JSON_ARRAYAGG(f.name)
+        FROM features f 
+        JOIN product_features pf ON f.id = pf.featureID
+        WHERE pf.productID = p.id
+      ) AS features
+    FROM products p
     GROUP BY p.id
     ORDER BY p.sold DESC
   `);
