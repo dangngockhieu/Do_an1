@@ -349,7 +349,7 @@ if (filters?.specs) {
 export const getAllProducts = async () => {
   const products = await prisma.$queryRawUnsafe(`
     SELECT 
-      p.id, p.name, p.price, p.category, p.factory,
+      p.id, p.name, p.price, p.cpu, p.graphicsCard, p.category, p.factory,
       (
         SELECT JSON_ARRAYAGG(pi.url)
         FROM product_images pi 
