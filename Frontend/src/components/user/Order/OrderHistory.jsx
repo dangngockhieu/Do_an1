@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCartCount } from "../../../redux/action/cartAction";
 import './OrderHistory.scss';
 import img from '../../../assets/order.png';
-import { getMyOrders, updateOrderforUser, buyAgain, getNumberCart, createReview } from '../../../services/apiServices';
+import { getMyOrders, updateOrderforUser, buyAgain, getNumberCart, createReview, createVnpayPayment } from '../../../services/apiServices';
 import ConfirmReceive from './ConfirmRecieve.jsx';
-import { set } from 'nprogress';
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const OrderHistory = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -65,6 +65,20 @@ const OrderHistory = () => {
         setIsOpenConfirm(true);
     };
 
+    const handlePayment = async (orderID) => {
+        try {
+            const res = await createVnpayPayment(orderID);
+            if (res?.EC === 0 && res?.DT?.paymentUrl) {
+                window.location.href = res.DT.paymentUrl;
+            } else {
+                toast.error(res?.EM || 'Không thể tạo link thanh toán');
+            }
+        } catch (err) {
+            console.log(err);
+            toast.error('Lỗi kết nối server');
+        }
+    };
+
     const tabs = [
         { id: 'PENDING', label: 'Chờ xác nhận' },
         { id: 'SHIPPING', label: 'Chờ giao hàng' },
@@ -72,6 +86,22 @@ const OrderHistory = () => {
         { id: 'CANCELED', label: 'Đã hủy' },
     ];
    
+    useEffect(() => {
+        // Kiểm tra query param payment
+        const paymentStatus = searchParams.get('payment');
+        if (paymentStatus === 'success') {
+            toast.success('Thanh toán thành công! Đơn hàng đang được xử lý.');
+            // Xóa query param sau khi hiển thị
+            setSearchParams({});
+        } else if (paymentStatus === 'failed') {
+            toast.error('Thanh toán thất bại. Vui lòng thử lại!');
+            setSearchParams({});
+        } else if (paymentStatus === 'error') {
+            toast.error('Có lỗi xảy ra trong quá trình thanh toán.');
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
+
     useEffect(() => {
         fetchOrders();
     }, [activeTab]);
@@ -189,6 +219,9 @@ const OrderHistory = () => {
                                                 Tổng tiền: <span>{formatCurrency(item.totalPrice)}</span>
                                             </div>
                                             <div className="action-buttons">
+                                                {item.status === 'PENDING' && item.paymentMethod === 'BANK' && item.paymentStatus === 'UNPAID' && (
+                                                    <button className="btn btn-payment" onClick={() => handlePayment(item.orderID)}>Thanh toán</button>
+                                                )}
                                                 {item.status === 'COMPLETED' && (
                                                     <button className="btn btn-buy-again" onClick={() => handleBuyAgain(item.products)}>Mua Lại</button>
                                                 )}

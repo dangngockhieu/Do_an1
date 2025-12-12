@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./ProductDetail.scss";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { IoMdClose } from "react-icons/io";
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ProductDetail = ({ show, setShow, product }) => {
@@ -35,6 +36,9 @@ const ProductDetail = ({ show, setShow, product }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-box">
+        <button className="modal-close-btn" onClick={() => setShow(false)}>
+          <IoMdClose />
+        </button>
         <h4>Chi tiết sản phẩm</h4>
 
         {/* ========== ẢNH SẢN PHẨM ========== */}

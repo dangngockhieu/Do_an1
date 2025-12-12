@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { IoMdCloudUpload } from "react-icons/io";
+import { IoMdCloudUpload, IoMdClose } from "react-icons/io";
 import { FaFileExcel, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import './ImportExcel.scss'; 
@@ -47,6 +47,9 @@ const ImportExcel = ({ show, setShow, onUpload }) => {
     return (
         <div className="modal-overlay">
             <div className="modal-content">
+                <button className="modal-close-btn" onClick={handleClose}>
+                    <IoMdClose />
+                </button>
                 <div className="modal-header">
                     <h3>Import Sản Phẩm (Excel)</h3>
                 </div>

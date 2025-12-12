@@ -5,6 +5,7 @@ import {
 } from "../../../services/apiServices";
 import { toast } from "react-toastify";
 import { RiFolderUploadFill } from "react-icons/ri";
+import { IoMdClose } from "react-icons/io";
 import "./ProductAdd.scss";
 
 const FEATURE_NAMES = [
@@ -154,7 +155,11 @@ const ProductAdd = ({ show, setShow, onRefresh }) => {
 
   return (
     <div className="modal-overlay">
+      
       <div className="modal-box">
+        <button className="modal-close-btn" onClick={handleClose}>
+          <IoMdClose />
+        </button>
         <h4>Thêm sản phẩm mới</h4>
         <form onSubmit={handleSubmit} className="form-add-product">
           {Object.entries({

@@ -169,7 +169,7 @@ const Dashboard = () => {
         },
         {
             title: "Tăng trưởng doanh thu",
-            value: `+ ${growth}%`,
+            value: `${growth > 0 ? '+' : ''}${growth}%`,
             icon: <FaChartLine />,
             color: "#3b82f6",
         },

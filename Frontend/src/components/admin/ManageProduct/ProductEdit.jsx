@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import "./ProductEdit.scss";
 import { RiFolderUploadFill } from "react-icons/ri";
+import { IoMdClose } from "react-icons/io";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -192,6 +193,9 @@ const ProductEdit = ({ show, setShow, product, onRefresh }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-box">
+        <button className="modal-close-btn" onClick={handleClose}>
+          <IoMdClose />
+        </button>
         <h4>Cập nhật sản phẩm</h4>
 
         {/* === FORM CHÍNH === */}

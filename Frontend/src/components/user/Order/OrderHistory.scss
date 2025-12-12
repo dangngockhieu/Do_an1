@@ -194,6 +194,16 @@
           font-weight: 600;
           cursor: pointer;
 
+          &.btn-payment {
+            background: #28a745;
+            color: #fff;
+            border: none;
+
+            &:hover {
+              background: #218838;
+            }
+          }
+
           &.btn-buy-again {
             background: #0048ff;
             color: #fff;

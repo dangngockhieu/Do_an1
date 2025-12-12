@@ -151,7 +151,6 @@ const Product = () => {
 
   const [products, setProducts] = useState([]);
   const [count, setCount] = useState(0);
-  // Ban đầu hiển thị 16 sản phẩm
   const [visibleCount, setVisibleCount] = useState(16);
   const [initialLaptops, setInitialLaptops] = useState([]);
   const [initialLaptopCount, setInitialLaptopCount] = useState(0);
@@ -171,42 +170,42 @@ const Product = () => {
   });
 
   const handleAddToCart = async (productID) => {
-  if (!isAuthenticated) {
-    toast.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
-    return;
-  }
+    if (!isAuthenticated) {
+      toast.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
+      return;
+    }
 
     const res = await addProductToCart(productID);
     try{
-    if (res?.EC === 0) {
-      toast.success("Đã thêm vào giỏ hàng!");
-      const cartRes = await getNumberCart();
-      if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
-    } else {
-      toast.error(res?.EM || "Không thể thêm vào giỏ hàng");
-    }
+      if (res?.EC === 0) {
+        toast.success("Đã thêm vào giỏ hàng!");
+        const cartRes = await getNumberCart();
+        if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
+      } else {
+        toast.error(res?.EM || "Không thể thêm vào giỏ hàng");
+      }
     } catch (err){
       toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
     }
-};
+  };
 
-const handleBuyNow = async (productID) => {
-  if (!isAuthenticated) {
-    toast.warning("Vui lòng đăng nhập để mua sản phẩm!");
-    return;
-  }
+  const handleBuyNow = async (productID) => {
+    if (!isAuthenticated) {
+      toast.warning("Vui lòng đăng nhập để mua sản phẩm!");
+      return;
+    }
 
     const res = await buyNow(productID);
     try{
-    if (res?.EC === 0) {
-      const cartRes = await getNumberCart();
-      if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
-      navigate('/cart');
-    } 
+      if (res?.EC === 0) {
+        const cartRes = await getNumberCart();
+        if (cartRes?.EC === 0) dispatch(setCartCount(cartRes.DT));
+        navigate('/cart');
+      } 
     } catch (err){
       toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
     }
-};
+  };
 
   const toggleSection = (key) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -229,12 +228,11 @@ const handleBuyNow = async (productID) => {
         setCountFn(res.DT.count || 0);
       }
       else {
-    const msg = typeof res?.EM === 'object'
-      ? res.EM.error
-      : res?.EM;
-
-    toast.error(msg || `Lỗi tải sản phẩm`);
-}
+        const msg = typeof res?.EM === 'object'
+          ? res.EM.error
+          : res?.EM;
+        toast.error(msg || `Lỗi tải sản phẩm`);
+      }
     } catch (e) {
       toast.error(`Error fetching ${type}:`, e);
     }
@@ -320,52 +318,37 @@ const handleBuyNow = async (productID) => {
   const filterKeys = Object.keys(currentFilters);
 
   const toggleOption = (key, value) => {
-  setSelectedFilters((prev) => {
-    const current = prev[key] || [];
+    setSelectedFilters((prev) => {
+      const current = prev[key] || [];
 
-    // Xử lý riêng CPU & Cạc đồ họa rời (có name)
-    if (key === "CPU" || key === "Cạc đồ họa rời" || key ==="Kích thước màn hình (inch)" || key ==="PIN (mAh)") {
-      const isAll = value === null || value === "all";
-
-      if (isAll) {
-        // chọn "Tất cả" → reset chỉ còn "all" (null)
-        return { ...prev, [key]: [null] };
+      if (key === "CPU" || key === "Cạc đồ họa rời" || key ==="Kích thước màn hình (inch)" || key ==="PIN (mAh)") {
+        const isAll = value === null || value === "all";
+        if (isAll) {
+          return { ...prev, [key]: [null] };
+        }
+        const cleaned = current.filter((v) => v !== null && v !== "all");
+        const updated = cleaned.includes(value)
+          ? cleaned.filter((v) => v !== value)
+          : [...cleaned, value];
+        return { ...prev, [key]: updated };
       }
 
-      // loại bỏ "Tất cả" nếu đang có
-      const cleaned = current.filter((v) => v !== null && v !== "all");
-
-      // toggle giá trị hiện tại
+      const isAll = value === "Tất cả";
+      if (isAll) {
+        return { ...prev, [key]: ["Tất cả"] };
+      }
+      const cleaned = current.filter((v) => v !== "Tất cả");
       const updated = cleaned.includes(value)
         ? cleaned.filter((v) => v !== value)
         : [...cleaned, value];
-
       return { ...prev, [key]: updated };
-    }
-
-    // Các filter còn lại (RAM, Bộ nhớ, v.v.)
-    const isAll = value === "Tất cả";
-
-    if (isAll) {
-      return { ...prev, [key]: ["Tất cả"] };
-    }
-
-    const cleaned = current.filter((v) => v !== "Tất cả");
-    const updated = cleaned.includes(value)
-      ? cleaned.filter((v) => v !== value)
-      : [...cleaned, value];
-
-    return { ...prev, [key]: updated };
-  });
-};
-
-
-
+    });
+  };
 
   const handleFilter = async () => {
     setVisibleCount(16);
     const processedSpecs = { ...selectedFilters };
-    // Chuyển name → label cho CPU
+    
     if (processedSpecs.CPU && processedSpecs.CPU.length > 0) {
       processedSpecs.CPU = processedSpecs.CPU.map((v) => {
         const found = LAPTOP_FILTERS.CPU.find((opt) => opt.name === v);
@@ -380,7 +363,6 @@ const handleBuyNow = async (productID) => {
       });
     }
 
-    // Chuyển name → label cho Cạc đồ họa rời
     if (processedSpecs["Cạc đồ họa rời"] && processedSpecs["Cạc đồ họa rời"].length > 0) {
       processedSpecs["Cạc đồ họa rời"] = processedSpecs["Cạc đồ họa rời"].map((v) => {
         const found = LAPTOP_FILTERS["Cạc đồ họa rời"].find((opt) => opt.name === v);
@@ -389,37 +371,34 @@ const handleBuyNow = async (productID) => {
     }
 
     if (processedSpecs["Kích thước màn hình (inch)"]?.length > 0) {
-      // lấy đúng nguồn filter theo category
-      const source =
-      category === "LAPTOP"
+      const source = category === "LAPTOP"
         ? LAPTOP_FILTERS["Kích thước màn hình (inch)"]
         : PHONE_FILTERS["Kích thước màn hình (inch)"];
 
       processedSpecs["Kích thước màn hình (inch)"] = processedSpecs["Kích thước màn hình (inch)"].map((v) => {
-      const found = source.find((opt) => opt.name === v);
-      return found ? found.label : v;
+        const found = source.find((opt) => opt.name === v);
+        return found ? found.label : v;
       });
     }
 
     const normalizeSpecs = (filters) => {
-    const mapped = {};
-    Object.entries(filters).forEach(([key, value]) => {
-      if (key === "Cạc đồ họa rời") mapped["GPU"] = value;
-      else if (key === "Bộ nhớ") mapped["Storage"] = value;
-      else if (key === "Kích thước màn hình (inch)") mapped["ScreenSize"] = value;
-      else if (key === "PIN (mAh)") mapped["PIN"] = value;
-      else if (key === "Màn Hình") mapped["Screen"] = value;
-      else mapped[key] = value;
-    });
-    return mapped;
-  };
+      const mapped = {};
+      Object.entries(filters).forEach(([key, value]) => {
+        if (key === "Cạc đồ họa rời") mapped["GPU"] = value;
+        else if (key === "Bộ nhớ") mapped["Storage"] = value;
+        else if (key === "Kích thước màn hình (inch)") mapped["ScreenSize"] = value;
+        else if (key === "PIN (mAh)") mapped["PIN"] = value;
+        else if (key === "Màn Hình") mapped["Screen"] = value;
+        else mapped[key] = value;
+      });
+      return mapped;
+    };
 
-  const filters = {
-    factories: selectedFactories.map(id => currentFactories.find(b => b.id === id).name),
-    product_features: selectedFeatures.map(id => currentFeatures.find(f => f.id === id).id),
-    specs: normalizeSpecs(selectedFilters),
-      price:
-        customPrice.min || customPrice.max
+    const filters = {
+      factories: selectedFactories.map(id => currentFactories.find(b => b.id === id).name),
+      product_features: selectedFeatures.map(id => currentFeatures.find(f => f.id === id).id),
+      specs: normalizeSpecs(selectedFilters),
+      price: customPrice.min || customPrice.max
           ? customPrice
           : selectedPrice
           ? {
@@ -489,7 +468,7 @@ const handleBuyNow = async (productID) => {
           {headers.map((_, i) => (
             <span key={i} className={`dot ${currentBanner === i ? "active" : ""}`} onClick={() => setCurrentBanner(i)}></span>
           ))}
-        </div>
+      </div>
 
       <div className="main-content">
         <div className="filter-section">
@@ -502,123 +481,119 @@ const handleBuyNow = async (productID) => {
           </div>
           <hr/>
           <div className="filter-divider">
-          {/* Hãng */}
-          <div className="filter-item">
-            <div className="filter-title" onClick={() => toggleSection("brand")}>
-              <label>Hãng sản xuất</label>
-              {expandedSections.brand ? <FaChevronUp /> : <FaChevronDown />}
-            </div>
-            {expandedSections.brand && (
-              <div className="brand-grid">
-                {currentFactories.map((brand) => (
-                  <div
-                    key={brand.id}
-                    className={`brand-item ${selectedFactories.includes(brand.id) ? "selected" : ""}`}
-                    onClick={() => toggleFactory(brand.id)}
-                  >
-                    <img src={brand.image} alt={brand.name} />
-                  </div>
-                ))}
+            <div className="filter-item">
+              <div className="filter-title" onClick={() => toggleSection("brand")}>
+                <label>Hãng sản xuất</label>
+                {expandedSections.brand ? <FaChevronUp /> : <FaChevronDown />}
               </div>
-            )}
-          </div>
-
-          {/* Nhu cầu */}
-          <div className="filter-item">
-            <div className="filter-title" onClick={() => toggleSection("feature")}>
-              <label>Nhu cầu sử dụng</label>
-              {expandedSections.feature ? <FaChevronUp /> : <FaChevronDown />}
-            </div>
-            {expandedSections.feature && (
-              <div className="feature-grid">
-                {currentFeatures.map((f) => (
-                  <div
-                    key={f.id}
-                    className={`feature-item ${selectedFeatures.includes(f.id) ? "selected" : ""}`}
-                    onClick={() => toggleFeature(f.id)}
-                  >
-                    {f.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Giá */}
-          <div className="filter-item">
-            <div className="filter-title" onClick={() => toggleSection("price")}>
-              <label>Khoảng giá (VNĐ)</label>
-              {expandedSections.price ? <FaChevronUp /> : <FaChevronDown />}
-            </div>
-            {expandedSections.price && (
-              <>
-                <div className="option-grid">
-              {currentPrices.map((p) => {
-              const isSelected =
-                selectedPrice === p.id ||
-                (p.label === "Tất cả" && selectedPrice === null);
-              return (
-                <div
-                  key={p.id}
-                  className={`option-item ${isSelected ? "selected" : ""}`}
-                  onClick={() => handlePriceSelect(p.id)}
-                >
-                  {p.label}
-                </div>
-              );
-            })}
-            </div>
-
-                <div className="price-inputs">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={customPrice.min}
-                    onChange={(e) => handleClickInputMin(e)}
-                  />
-                  <span>-</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={customPrice.max}
-                    onChange={(e) => handleClickInputMax(e)}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* --- Các phần lọc --- */}
-          {filterKeys.map((key) => (
-            <div className="filter-item" key={key}>
-              <div className="filter-title" onClick={() => toggleSpecSection(key)}>
-                <label>{key}</label>
-                {expandedSections.specs[key] ? <FaChevronUp /> : <FaChevronDown />}
-              </div>
-              {expandedSections.specs[key] && (
-                <div className="option-grid">
-                  {currentFilters[key].map((option) => {
-                    const display = typeof option === "object" ? option.label : option;
-                    const value = typeof option === "object" ? option.name : option;
-                    const isSelected = key === "CPU" || key === "Cạc đồ họa rời" || key === "Kích thước màn hình (inch)" || key ==="PIN (mAh)"
-                      ? selectedFilters[key]?.includes(value) ||
-                      (value === null && (!selectedFilters[key] || selectedFilters[key].length === 0))
-                      : selectedFilters[key]?.includes(value) ||
-                      (value === "Tất cả" && (!selectedFilters[key] || selectedFilters[key].length === 0));
-                    return (
-                      <div
-                        key={value}
-                        className={`option-item ${isSelected ? "selected" : ""}`}
-                        onClick={() => toggleOption(key, value)}
-                      >
-                        {display}
-                      </div>
-                    );
-                  })}
+              {expandedSections.brand && (
+                <div className="brand-grid">
+                  {currentFactories.map((brand) => (
+                    <div
+                      key={brand.id}
+                      className={`brand-item ${selectedFactories.includes(brand.id) ? "selected" : ""}`}
+                      onClick={() => toggleFactory(brand.id)}
+                    >
+                      <img src={brand.image} alt={brand.name} />
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-          ))}
+
+            <div className="filter-item">
+              <div className="filter-title" onClick={() => toggleSection("feature")}>
+                <label>Nhu cầu sử dụng</label>
+                {expandedSections.feature ? <FaChevronUp /> : <FaChevronDown />}
+              </div>
+              {expandedSections.feature && (
+                <div className="feature-grid">
+                  {currentFeatures.map((f) => (
+                    <div
+                      key={f.id}
+                      className={`feature-item ${selectedFeatures.includes(f.id) ? "selected" : ""}`}
+                      onClick={() => toggleFeature(f.id)}
+                    >
+                      {f.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="filter-item">
+              <div className="filter-title" onClick={() => toggleSection("price")}>
+                <label>Khoảng giá (VNĐ)</label>
+                {expandedSections.price ? <FaChevronUp /> : <FaChevronDown />}
+              </div>
+              {expandedSections.price && (
+                <>
+                  <div className="option-grid">
+                    {currentPrices.map((p) => {
+                      const isSelected =
+                        selectedPrice === p.id ||
+                        (p.label === "Tất cả" && selectedPrice === null);
+                      return (
+                        <div
+                          key={p.id}
+                          className={`option-item ${isSelected ? "selected" : ""}`}
+                          onClick={() => handlePriceSelect(p.id)}
+                        >
+                          {p.label}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="price-inputs">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      value={customPrice.min}
+                      onChange={(e) => handleClickInputMin(e)}
+                    />
+                    <span>-</span>
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      value={customPrice.max}
+                      onChange={(e) => handleClickInputMax(e)}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {filterKeys.map((key) => (
+              <div className="filter-item" key={key}>
+                <div className="filter-title" onClick={() => toggleSpecSection(key)}>
+                  <label>{key}</label>
+                  {expandedSections.specs[key] ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
+                {expandedSections.specs[key] && (
+                  <div className="option-grid">
+                    {currentFilters[key].map((option) => {
+                      const display = typeof option === "object" ? option.label : option;
+                      const value = typeof option === "object" ? option.name : option;
+                      const isSelected = key === "CPU" || key === "Cạc đồ họa rời" || key === "Kích thước màn hình (inch)" || key ==="PIN (mAh)"
+                        ? selectedFilters[key]?.includes(value) ||
+                        (value === null && (!selectedFilters[key] || selectedFilters[key].length === 0))
+                        : selectedFilters[key]?.includes(value) ||
+                        (value === "Tất cả" && (!selectedFilters[key] || selectedFilters[key].length === 0));
+                      return (
+                        <div
+                          key={value}
+                          className={`option-item ${isSelected ? "selected" : ""}`}
+                          onClick={() => toggleOption(key, value)}
+                        >
+                          {display}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
