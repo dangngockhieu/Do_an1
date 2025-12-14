@@ -2,7 +2,7 @@
 import * as userService from '../services/userService.js';
 import { matchedData } from 'express-validator';
 
-// ==================== GET USERS WITH PAGINATION ====================
+// GET USERS WITH PAGINATION
 export const getUsersWithPaginate = async (req, res) => {
   try {
     const page = +req.query.page || 1;
@@ -16,7 +16,7 @@ export const getUsersWithPaginate = async (req, res) => {
 };
 
 
-// ==================== CHANGE PASSWORD ====================
+// CHANGE PASSWORD 
 export const changePassword = async (req, res) => {
   try {
     const dataChangePassword = matchedData(req);
@@ -32,7 +32,7 @@ export const changePassword = async (req, res) => {
   }
 };
 
-// ==================== FIND USER BY EMAIL ====================
+// FIND USER BY EMAIL 
 export const findUserByEmail = async (req, res) => {
   try {
     const email = req.query.email;
@@ -43,7 +43,7 @@ export const findUserByEmail = async (req, res) => {
   }
 };
 
-// ==================== ADMIN CREATE USER ====================
+// ADMIN CREATE USER
 export const createUser = async (req, res) => {
   try {
     const { email, name, password, role } = req.body;
@@ -54,7 +54,7 @@ export const createUser = async (req, res) => {
   }
 };
 
-// ==================== ADMIN UPDATE USER ROLE ====================
+// ADMIN UPDATE USER ROLE 
 export const changeRoleUser = async (req, res) => {
   try {
     const id = +req.params.id;
@@ -66,7 +66,7 @@ export const changeRoleUser = async (req, res) => {
   }
 };
 
-// ==================== COUNT USERS ====================
+// COUNT USERS 
 export const countUsers = async (req, res) => {
   try {
     const count = await userService.countUser();
@@ -76,7 +76,7 @@ export const countUsers = async (req, res) => {
   }
 };
 
-// ==================== COUNT USERS this MONTH ====================
+// COUNT USERS this MONTH 
 export const countUsersThisMonth = async (req, res) => {
   try {
     const count = await userService.countUsersThisMonth();

@@ -1,6 +1,7 @@
 import model from "../config/geminiConfig.js";
 import prisma from "../lib/prisma.js";
 
+// Tạo phản hồi chat 
 export const generateChatResponse = async (question, productContext) => {
     try {
         const contextString = productContext && productContext.length > 0 
@@ -49,6 +50,7 @@ export const generateChatResponse = async (question, productContext) => {
     }
 };
 
+// Lấy lịch sử chat của người dùng
 export const getChatHistory = async (userID) => {
     const historyChat = await prisma.chatMessage.findMany({ 
         where: { userID: userID },

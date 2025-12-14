@@ -1,7 +1,7 @@
 'use strict';
 import express from 'express';
 import { createOrder, getOrderPendingforAdmin, getOrderforAdmin, getOrderItem, getUserOrders, buyAgain,
-  updateOrderforUser, updatePendingtoShipping, countOrders, getRevenueThisMonth, getRevenueByMonth
+  updateOrderforUser, updatePendingtoShipping, countOrders, getRevenueThisMonth, getRevenueByMonth, deleteOrder
  } from '../controllers/orderController.js';
 import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
 import { authorizeRole } from '../middleware/Auth/authorizeRole.js';
@@ -28,6 +28,9 @@ const orderRoutes = (app) => {
 
   // Cập nhật trạng thái đơn hàng sang quá trình hoàn thành
   router.patch('/order', jwtAuth, updateOrderforUser);
+
+  // Xóa đơn hàng
+  router.delete('/order', jwtAuth, authorizeRole(['ADMIN']), deleteOrder);
 
   // Lấy danh sách đơn hàng của người dùng
   router.get('/my-orders', jwtAuth, getUserOrders);

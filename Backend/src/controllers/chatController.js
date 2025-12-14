@@ -7,6 +7,8 @@ import timezone from "dayjs/plugin/timezone.js";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+// Tạo phản hồi chat 
 export const handleChat = async (req, res) => {
     try {
         const nowVN = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
@@ -54,6 +56,7 @@ export const handleChat = async (req, res) => {
     }
 };
 
+// Lấy lịch sử chat của người dùng
 export const getChatHistory = async (req, res) => {
     try {
         const userID = req.user ? req.user.id : null;

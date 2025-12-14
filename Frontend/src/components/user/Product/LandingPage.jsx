@@ -26,6 +26,8 @@ const LandingPage = () => {
   const [topLaptops, setTopLaptops] = useState([]);
   const [topPhones, setTopPhones] = useState([]);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const handleAddToCart = async (productID) => {
   if (!isAuthenticated) {
     toast.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
@@ -174,7 +176,7 @@ const LandingPage = () => {
           {topPhones.length ? renderProducts(topPhones) : <p>Đang tải dữ liệu...</p>}
         </div>
       </section>
-      <AiChatWidget />
+      <AiChatWidget isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 };

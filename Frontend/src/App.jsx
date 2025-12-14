@@ -23,6 +23,7 @@ import OrderHistory from './components/user/Order/OrderHistory.jsx';
 
 import Warranty from './components/term/Warranty.jsx';
 import Privacy from './components/term/Privacy.jsx';
+import PaymentSuccess from './components/user/Order/PaymentSuccess.jsx';
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         <Route path="checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
         <Route path="orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} />
+        <Route path="payment-success" element={<PrivateRoute><PaymentSuccess /></PrivateRoute>} />
         <Route path="warranty" element={<Warranty />} />
         <Route path="privacy" element={<Privacy />} />
       </Route>

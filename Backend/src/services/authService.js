@@ -14,7 +14,7 @@ dotenv.config();
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// ==================== GỬI EMAIL XÁC THỰC ====================
+// GỬI EMAIL XÁC THỰC 
 const sendVerificationEmail = async (email, name, token) => {
     const baseUrl = process.env.VERIFY_BASE_URL;
     const separator = baseUrl.includes('?') ? '&' : '?';
@@ -123,7 +123,7 @@ export const resendVerificationEmail = async (email) => {
   await sendVerificationEmail(email, user.name, codeId);
 };
 
-// ==================== GỬI EMAIL XÁC THỰC ====================
+// GỬI EMAIL XÁC THỰC 
 export const sendPasswordResetEmail = async (email) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error('User not found');
@@ -210,7 +210,7 @@ export const sendPasswordResetEmail = async (email) => {
     await transporter.sendMail(mailOptions);
   }
 
-// ==================== RESET MẬT KHẨU ====================
+// RESET MẬT KHẨU 
 export const resetPassword = async (email, code, newPassword) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error('User not found');
@@ -230,7 +230,7 @@ export const resetPassword = async (email, code, newPassword) => {
     });
 }
 
-// ==================== REGISTER ====================
+// REGISTER 
 export const register = async (email, name, password) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) throw new Error('Email đã được đăng ký!');
@@ -255,7 +255,7 @@ export const register = async (email, name, password) => {
     await sendVerificationEmail(email, name, token);
   }
 
-  // ==================== XÁC THỰC USER ====================
+// XÁC THỰC USER 
 export const validateUser = async (email, password) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.password) return null;
@@ -266,7 +266,7 @@ export const validateUser = async (email, password) => {
     return user;
   }
 
-  // ==================== TẠO TOKEN ====================
+// TẠO TOKEN 
 export const generateToken = async (user) => {
     const payload = { sub: user.id, email: user.email, name: user.name, role: user.role };
     const access_token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRED });
@@ -274,7 +274,7 @@ export const generateToken = async (user) => {
     return { access_token, refresh_token };
   }
 
-  // ==================== LOGIN ====================
+// LOGIN 
 export const login = async (user) => {
     const { access_token, refresh_token } = await generateToken(user);
 
@@ -290,7 +290,7 @@ export const login = async (user) => {
     };
   }
 
-  // ==================== LOGOUT ====================
+// LOGOUT
 export const logout = async (email) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error('User not found');
@@ -298,7 +298,7 @@ export const logout = async (email) => {
     await prisma.user.update({ where: { email }, data: { refresh_token: null } });
   }
 
-  // ==================== REFRESH TOKEN ====================
+// REFRESH TOKEN 
 export const postrefresh_token = async (refresh_token) => {
     let payload;
     try {
@@ -333,7 +333,7 @@ export const postrefresh_token = async (refresh_token) => {
     };
   }
 
-  // ==================== XÁC THỰC EMAIL ====================
+// XÁC THỰC EMAIL 
 export const verifyByToken = async (token, email) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || user.verification_code !== token)

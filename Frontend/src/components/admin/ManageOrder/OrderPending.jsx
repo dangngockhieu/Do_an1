@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import './OrderPending.scss';
-import { FaBoxes } from 'react-icons/fa';
+import { FaBoxes, FaTrash, FaExclamationTriangle } from 'react-icons/fa';
 import OrderViewModal from './OrderViewModal';
 import OrderUpdateModal from './OrderUpdateModal';
 import ReactPaginate from "react-paginate";
 import { BsArrowRightCircleFill } from "react-icons/bs";
+import { deleteOrder } from '../../../services/apiServices';
+import { toast } from 'react-toastify';
 
 const OrderPending = ({ orders = [], pagination = {}, setPage, onRefresh }) => {
   const [viewOrder, setViewOrder] = useState(null);
   const [updateOrder, setUpdateOrder] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const ordersList = Array.isArray(orders) ? orders : [];
   const handlePageClick = (event) => {
     const newPage = event.selected + 1;
@@ -17,6 +21,27 @@ const OrderPending = ({ orders = [], pagination = {}, setPage, onRefresh }) => {
 
   const getSerialNumber = (index) => {
     return (pagination.page - 1) * pagination.limit + index + 1;
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!deleteConfirm) return;
+    
+    setIsDeleting(true);
+    try {
+      const res = await deleteOrder(deleteConfirm.orderID);
+      if (res?.EC === 0) {
+        toast.success('Đã hủy đơn hàng thành công!');
+        onRefresh?.();
+      } else {
+        toast.error(res?.EM || 'Không thể hủy đơn hàng');
+      }
+      setDeleteConfirm(null);
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi hủy đơn hàng');
+      setDeleteConfirm(null);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -68,6 +93,9 @@ const OrderPending = ({ orders = [], pagination = {}, setPage, onRefresh }) => {
                       <button className="btn edit" onClick={() => setUpdateOrder(order)}>
                         Cập nhật
                       </button>
+                      <button className="btn delete" onClick={() => setDeleteConfirm(order)}>
+                        Xóa
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -114,6 +142,36 @@ const OrderPending = ({ orders = [], pagination = {}, setPage, onRefresh }) => {
             onRefresh?.();
           }}
         />
+      )}
+
+      {deleteConfirm && (
+        <div className="modal-overlay" onClick={() => !isDeleting && setDeleteConfirm(null)}>
+          <div className="delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">
+              <FaExclamationTriangle />
+            </div>
+            <h2>Xác nhận hủy đơn hàng</h2>
+            <p>Bạn có chắc chắn muốn hủy đơn hàng này của <strong>{deleteConfirm.recipientName}</strong> không?</p>
+            <p className="warning-text">Hành động này không thể hoàn tác và số lượng sản phẩm sẽ được hoàn lại vào kho.</p>
+            
+            <div className="modal-actions">
+              <button 
+                className="btn-cancel" 
+                onClick={() => setDeleteConfirm(null)}
+                disabled={isDeleting}
+              >
+                Không, giữ lại
+              </button>
+              <button 
+                className="btn-confirm" 
+                onClick={handleDeleteOrder}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Đang hủy...' : 'Có, hủy đơn'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

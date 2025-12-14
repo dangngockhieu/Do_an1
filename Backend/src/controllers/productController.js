@@ -2,6 +2,7 @@
 import * as productService from '../services/productService.js';
 import { matchedData } from 'express-validator';
 
+// Get products with pagination and filters
 export const getProductsWithPaginate = async (req, res) => {
   try {
     const page = +req.query.page || 1;
@@ -16,6 +17,7 @@ export const getProductsWithPaginate = async (req, res) => {
   }
 };
 
+// Get top selling Laptop
 export const getTopSellingLaptop = async (req,res) => {
   try {
     const products = await productService.getTopSellingLaptop();
@@ -26,6 +28,7 @@ export const getTopSellingLaptop = async (req,res) => {
   }
 };
 
+// Get top selling Phone
 export const getTopSellingPhone = async (req, res) => {
   try {
     const products = await productService.getTopSellingPhone();
@@ -36,6 +39,7 @@ export const getTopSellingPhone = async (req, res) => {
   }
 };
 
+// Get top selling Product
 export const getTopSellingProduct = async (req, res) => {
   try {
     const products = await productService.getTopSellingProduct();
@@ -46,6 +50,7 @@ export const getTopSellingProduct = async (req, res) => {
   }
 };
 
+// Thêm tính năng cho sản phẩm
 export const addProductFeatures = async (req, res) => {
   try {
     let { featureIDs } = req.body;
@@ -61,6 +66,7 @@ export const addProductFeatures = async (req, res) => {
   }
 };
 
+// Xóa tính năng khỏi sản phẩm
 export const deleteProductFeature = async (req, res) => {
   try {
     await productService.deleteProductFeature(+req.query.productID, +req.query.featureID);
@@ -70,6 +76,7 @@ export const deleteProductFeature = async (req, res) => {
   }
 };
 
+// Lấy chi tiết sản phẩm theo ID
 export const getProductById = async (req, res) => {
   try {
     const {product, reviews} = await productService.getProductById(+req.params.id);
@@ -78,8 +85,9 @@ export const getProductById = async (req, res) => {
   } catch (err) {
     res.status(500).json({ EC: 1, EM: err.message });
   }
-}
+};
 
+// Lấy sản phẩm theo bộ lọc
 export const getFilteredProducts = async (req, res) => {
   try {
     const { category } = req.query;
@@ -99,6 +107,7 @@ export const getFilteredProducts = async (req, res) => {
   }
 };
 
+// Lấy tất cả sản phẩm
 export const getAllProducts = async (req, res) => {
   try {
     const products = await productService.getAllProducts();
@@ -108,6 +117,7 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+// Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
   try {
     const body = {};
@@ -128,6 +138,7 @@ export const createProduct = async (req, res) => {
   }
 };
 
+// Tạo sản phẩm từ file Excel
 export const uploadExcel = async (req, res) => {
   try {
     if (!req.file) {
@@ -153,6 +164,7 @@ export const uploadExcel = async (req, res) => {
   }
 };
 
+// Cập nhật sản phẩm
 export const updateProduct = async (req, res) => {
   try {
     const updated = await productService.updateProduct(+req.params.id, req.body);
@@ -162,6 +174,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
+// Thêm hình ảnh cho sản phẩm
 export const addProductImages = async (req, res) => {
   try {
     await productService.addProductImages(+req.params.id, req.files);
@@ -171,7 +184,7 @@ export const addProductImages = async (req, res) => {
   }
 };
 
-
+// Xóa hình ảnh sản phẩm
 export const deleteProductImage = async (req, res) => {
   try {
     await productService.deleteProductImage(+req.params.imageId);
@@ -181,6 +194,7 @@ export const deleteProductImage = async (req, res) => {
   }
 };
 
+// Xóa sản phẩm
 export const deleteProduct = async (req, res) => {
   try {
     await productService.deleteProduct(+req.params.id);
@@ -191,7 +205,7 @@ export const deleteProduct = async (req, res) => {
 };
 
 
-// ==================== Count Products ====================
+// Count Products 
 export const countProducts = async (req, res) => {
   try {
     const count = await productService.countProducts();
@@ -201,7 +215,7 @@ export const countProducts = async (req, res) => {
   }
 };
 
-// ==================== Create Review ====================
+// Create Review 
 export const createReview = async (req, res) => {
   try {
     const productID = +req.params.productID;

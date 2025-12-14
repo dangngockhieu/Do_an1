@@ -2,6 +2,7 @@
 import * as orderService from '../services/orderService.js';
 import { matchedData } from 'express-validator';
 
+// Tạo đơn hàng
 export const createOrder = async (req, res) => {
     try {
         const userID = +req.user.id;
@@ -25,6 +26,7 @@ export const createOrder = async (req, res) => {
     }
 };
 
+// Lấy danh sách đơn hàng chờ xử lý cho admin
 export const getOrderPendingforAdmin = async (req, res) => {
     try {
         const page = +req.query.page || 1;
@@ -43,6 +45,7 @@ export const getOrderPendingforAdmin = async (req, res) => {
     }
 };
 
+// Lấy danh sách đơn hàng cho admin theo trạng thái
 export const getOrderforAdmin = async (req, res) => {
     try {
         const page = +req.query.page || 1;
@@ -62,6 +65,7 @@ export const getOrderforAdmin = async (req, res) => {
     }
 };
 
+// Lấy danh sách sản phẩm trong đơn hàng
 export const getOrderItem = async (req, res) => {
     try {
         const orderID = +req.query.orderID;
@@ -79,6 +83,7 @@ export const getOrderItem = async (req, res) => {
     }
 };
 
+// Lấy danh sách đơn hàng của người dùng
 export const getUserOrders = async (req, res) => {
     try {
         const userID = +req.user.id;
@@ -97,6 +102,7 @@ export const getUserOrders = async (req, res) => {
     }
 };
 
+// Update đơn hàng từ Pending to Shipping
 export const updatePendingtoShipping = async (req, res) => {
     try {
         const orderID = Number(req.query.orderID);
@@ -115,6 +121,7 @@ export const updatePendingtoShipping = async (req, res) => {
     }
 };
 
+// Update đơn hàng cho người dùng
 export const updateOrderforUser = async (req, res) => {
     try {
         const orderID = +req.query.orderID;
@@ -134,7 +141,24 @@ export const updateOrderforUser = async (req, res) => {
     }
 };
 
-// ==================== COUNT ORDERS ====================
+// Xóa đơn hàng
+export const deleteOrder = async (req, res) => {
+    try {
+        const orderID = +req.query.orderID;
+        await orderService.deleteOrder(orderID);
+        return res.status(200).json({
+            EC: 0,
+            EM: "Xóa đơn hàng thành công!"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            EC: 1,
+            EM: "Lỗi xóa đơn hàng"
+        });
+    }
+};
+
+// COUNT ORDERS 
 export const countOrders = async (req, res) => {
   try {
     const {count, countPending, countShipping, countCompleted} = await orderService.countOrders();
@@ -145,7 +169,7 @@ export const countOrders = async (req, res) => {
   }
 };
 
-// ==================== Revenue ====================
+// Revenue This Month
 export const getRevenueThisMonth = async (req, res) => {
   try {
     const {currentMonthRevenue, growth} = await orderService.getRevenueThisMonth();
@@ -155,6 +179,7 @@ export const getRevenueThisMonth = async (req, res) => {
   }
 };
 
+// Revenue By Month
 export const getRevenueByMonth = async (req, res) => {
   try {
     const data = await orderService.getRevenueByMonth();
@@ -164,6 +189,7 @@ export const getRevenueByMonth = async (req, res) => {
   }
 };
 
+// Mua lại đơn hàng
 export const buyAgain = async (req, res) => {
   try {
     const userID = +req.user.id;

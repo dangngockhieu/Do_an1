@@ -10,7 +10,7 @@ import timezone from "dayjs/plugin/timezone.js";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// ============ Lấy tất cả sản phẩm ===============
+// Lấy tất cả sản phẩm 
 export const getProductsWithPaginate = async (page = 1, limit = 10, keyword = "", category, factory) => {
   page = +page || 1;
   limit = +limit || 10;
@@ -76,7 +76,7 @@ export const getProductsWithPaginate = async (page = 1, limit = 10, keyword = ""
   return { products: safeProducts, total };
 };
 
-// ============ Lấy 5 sp Laptop bán chạy nhất ===============
+// Lấy 5 sp Laptop bán chạy nhất 
 export const getTopSellingLaptop = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
@@ -119,7 +119,7 @@ export const getTopSellingLaptop = async () => {
 };
 
 
-// =================== Lấy 5 sp Phone bán chạy nhất ===================
+// Lấy 5 sp Phone bán chạy nhất 
 export const getTopSellingPhone = async () => {
   const products = await prisma.$queryRaw`
     SELECT 
@@ -161,7 +161,7 @@ export const getTopSellingPhone = async () => {
   return safeProducts;
 }
 
-// =================== Lấy 5 sp bán chạy nhất trong tháng ===================
+// Lấy 5 sp bán chạy nhất trong tháng 
 export const getTopSellingProduct = async () => {
   const vnNow = dayjs().tz("Asia/Ho_Chi_Minh");
   const startOfMonth = vnNow.startOf('month').toDate();
@@ -183,7 +183,7 @@ export const getTopSellingProduct = async () => {
   return products;
 }
 
-// ============ Lấy tất cả sản phẩm với filter ===============
+// Lấy tất cả sản phẩm với filter 
 export const getFilterProducts = async (category, filters) => {
   const whereClauses = [`p.category = '${category}'`];
 
@@ -344,12 +344,11 @@ if (filters?.specs) {
   return safeProducts;
 };
 
-// =================== Get All Products ===================
-// ============ Lấy tất cả sản phẩm với filter ===============
+// Get All Products 
 export const getAllProducts = async () => {
   const products = await prisma.$queryRawUnsafe(`
     SELECT 
-      p.id, p.name, p.price, p.cpu, p.graphicsCard, p.category, p.factory,
+      p.*,
       (
         SELECT JSON_ARRAYAGG(pi.url)
         FROM product_images pi 
@@ -441,7 +440,7 @@ export const getProductById = async (id) => {
   return {product, reviews};
 }
 
-// =========================== Add đặc điểm cho sản phẩm ==========================
+// Add đặc điểm cho sản phẩm 
 export const addProductFeatures = async (productID, featureIDs) => {
   if (!Array.isArray(featureIDs) || featureIDs.length === 0) {
         throw new Error("featureIDs must be a non-empty array.");
@@ -471,7 +470,7 @@ export const deleteProductFeature = async (productID, featureID) => {
   });
 };
 
-// =========================== Tạo sản phẩm mới ==========================
+// Tạo sản phẩm mới 
 export const createProduct = async (data, files) => {
   let finalPrice = +data.originalPrice;
   const couponValue = +data.coupon;
@@ -506,7 +505,7 @@ export const createProduct = async (data, files) => {
   return product;
 };
 
-// =========================== Thêm nhiều sản phẩm từ file Excel ==========================
+// Thêm nhiều sản phẩm từ file Excel 
 export const importProducts = async (filePath) => {
   const workbook = XLSX.readFile(filePath);
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -564,7 +563,7 @@ export const importProducts = async (filePath) => {
   return { total: rows.length };
 };
 
-// =========================== Cập nhật thông tin sản phẩm ==========================
+// Cập nhật thông tin sản phẩm 
 export const updateProduct = async (id, data) => {
   // Ép kiểu cho các trường số
   if ('originalPrice' in data)
@@ -589,8 +588,7 @@ export const updateProduct = async (id, data) => {
   });
 };
 
-
-// =========================== Thêm nhiều ảnh (khi edit muốn thêm ảnh mới) ==========================
+// Thêm nhiều ảnh (khi edit muốn thêm ảnh mới) 
 export const addProductImages = async (productID, files) => {
   if (!files?.length) return;
   const imagesData = files.map((f) => ({
@@ -599,7 +597,6 @@ export const addProductImages = async (productID, files) => {
   }));
   await prisma.productImage.createMany({ data: imagesData });
 };
-
 
 // Xóa 1 ảnh
 export const deleteProductImage = async (imageId) => {
@@ -612,9 +609,13 @@ export const deleteProductImage = async (imageId) => {
   await prisma.productImage.delete({ where: { id: imageId } });
 };
 
-// =================== Xóa sản phẩm + ảnh ===================
+// Xóa sản phẩm + ảnh 
 export const deleteProduct = async (id) => {
   try {
+    const item = await prisma.orderItem.findMany({ where: { productID:id } });
+    if (item && item.length > 0) {
+      return { EC: 2, EM: "Sản phẩm đã có trong đơn hàng, không thể xóa" };
+    }
     // Lấy toàn bộ ảnh của sản phẩm
     const images = await prisma.productImage.findMany({ where: { productID: id } });
 
@@ -646,14 +647,13 @@ export const deleteProduct = async (id) => {
   }
 };
 
-
-// ==================== Count Products ====================
+// Count Products 
 export const countProducts = async () => {
   const count = await prisma.product.count();
   return count;
 }
 
-// =================== Tạo đánh giá cho sản phẩm (user đã mua và hoàn thành đơn) ===================
+// Tạo đánh giá cho sản phẩm (user đã mua và hoàn thành đơn) 
 export const createReview = async (productID, userID, rating, comment, orderItemID) => {
 
   const purchased = await prisma.$queryRaw`

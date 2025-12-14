@@ -8,13 +8,13 @@ import timezone from "dayjs/plugin/timezone.js";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// ==================== CHECK EMAIL EXIST ====================
+// CHECK EMAIL EXIST 
 export const isEmailExist = async (email) => {
   const user = await prisma.user.findUnique({ where: { email } });
   return !!user;
 };
 
-// ==================== GET USERS WITH PAGINATION ====================
+// GET USERS WITH PAGINATION 
 export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => {
   page = +page || 1;
   limit = +limit || 10;
@@ -81,7 +81,7 @@ export const getUserWithPaginate = async (page = 1, limit = 10, search = '') => 
   return { users: safeUsers, total };
 };
 
-// ==================== FIND USER BY EMAIL ====================
+// FIND USER BY EMAIL 
 export const findUserByEmail = async (email) => {
   const user = await prisma.user.findUnique({ 
     where: { email },
@@ -96,7 +96,7 @@ export const findUserByEmail = async (email) => {
   return user;
 };
 
-// ==================== CREATE USER (ADMIN) ====================
+// CREATE USER (ADMIN) 
 export const postUserForAdmin = async (email, name, password, role) => {
   const existingUser = await isEmailExist(email);
   if (existingUser) throw new Error('Email đã được đăng ký!');
@@ -113,7 +113,7 @@ export const postUserForAdmin = async (email, name, password, role) => {
   });
 };
 
-// ==================== CHANGE PASSWORD ====================
+// CHANGE PASSWORD
 export const changePassword = async (email, oldPassword, newPassword) => {
   const user = await prisma.user.findFirst({ where: { email } });
   if (!user) throw new Error('User không tồn tại!');
@@ -129,7 +129,7 @@ export const changePassword = async (email, oldPassword, newPassword) => {
   });
 };
 
-// ==================== CHANGE ROLE USER ====================
+// CHANGE ROLE USER 
 export const changeRoleUser = async (id, role) => {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new Error('User không tồn tại!');
@@ -140,8 +140,7 @@ export const changeRoleUser = async (id, role) => {
   });
 };
 
-
-// ==================== Count User ====================
+// Count User
 export const countUser = async () => {
   const count = await prisma.user.count({
     where: { isVerified: true },
@@ -149,6 +148,7 @@ export const countUser = async () => {
   return count;
 };
 
+// Count Users This Month
 export const countUsersThisMonth = async () => {
   const vnNow = dayjs().tz("Asia/Ho_Chi_Minh").toDate();
 

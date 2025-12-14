@@ -80,7 +80,7 @@ const Checkout = () => {
         const res = await deleteCartItem(item.id);
         if (res.EC === 0) dispatch(decrementCart());
       }
-      return navigate('/orders');
+      return navigate('/payment-success');
     }
 
     // BANK → VNPay

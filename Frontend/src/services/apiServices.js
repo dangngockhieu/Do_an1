@@ -231,6 +231,11 @@ export const updateOrderforUser = (orderID, status) => {
   return axios.patch(URL_BACKEND, data);
 }
 
+export const deleteOrder = (orderID) => {
+  const URL_BACKEND = `/order/order?orderID=${orderID}`;
+  return axios.delete(URL_BACKEND);
+}
+
 export const getMyOrders = (status) => {
   const URL_BACKEND = `/order/my-orders?status=${status}`; 
   return axios.get(URL_BACKEND);

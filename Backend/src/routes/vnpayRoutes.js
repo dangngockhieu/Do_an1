@@ -1,5 +1,6 @@
+'use strict';
 import express from "express";
-import vnpay from "../lib/vnpay.js";
+import vnpay from "../config/vnpay.js"
 import prisma from "../lib/prisma.js";
 import { ProductCode, VnpLocale } from "vnpay";
 import dotenv from "dotenv";
@@ -7,7 +8,7 @@ dotenv.config();
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
-// import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
+import { jwtAuth } from '../middleware/Auth/jwtAuth.js';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -17,18 +18,17 @@ const router = express.Router();
 const vnpayRoutes = (app) => {
 
   // Tạo URL thanh toán VNPay
-  router.post("/create", 
-    // jwtAuth,
-     async (req, res) => {
+  router.post("/create", jwtAuth,
+    async (req, res) => {
     try {
       const { orderID } = req.body;
-      // const userID = +req.user.id;
+      const userID = +req.user.id;
       if (!orderID) {
         return res.status(400).json({ EC: 1, EM: "Thiếu orderID" });
       }
 
       const order = await prisma.order.findUnique({
-        where: { id: Number(orderID) },
+        where: { id: Number(orderID), userID: userID },
         include: { payment: true },
       });
 
@@ -87,7 +87,7 @@ const vnpayRoutes = (app) => {
       const query = req.query || {};
       const isValid = vnpay.verifyReturnUrl(query);
       if (!isValid) {
-        return res.redirect(`${frontendURL}/orders?payment=error&reason=checksum`);
+        return res.redirect(`${frontendURL}/orders`);
       }
 
       const code = query.vnp_ResponseCode;
@@ -111,14 +111,14 @@ const vnpayRoutes = (app) => {
         
         console.log("Thanh toán thành công đơn hàng:", orderID);
 
-        return res.redirect(`${frontendURL}/orders?payment=success`);
+        return res.redirect(`${frontendURL}/payment-success`);
       }
 
       // Trường hợp thanh toán thất bại hoặc hủy
-      return res.redirect(`${frontendURL}/orders?payment=failed`);
+      return res.redirect(`${frontendURL}/orders`);
       
     } catch (err) {
-      return res.redirect(`${frontendURL}/orders?payment=error`);
+      return res.redirect(`${frontendURL}/orders`);
     }
 });
   app.use("/vnpay", router);

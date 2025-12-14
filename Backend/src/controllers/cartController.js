@@ -1,6 +1,7 @@
 'use strict';
 import * as cartService from '../services/cartService.js';
 
+// Thêm sản phẩm vào giỏ hàng
 export const addProductToCart = async (req, res) => {
     try {
         const userID = +req.user.id;
@@ -12,6 +13,7 @@ export const addProductToCart = async (req, res) => {
     }
 };
 
+// Lấy số lượng sản phẩm trong giỏ hàng
 export const numberCart = async (req, res) => {
     try {
         const userID = +req.user.id;
@@ -22,6 +24,7 @@ export const numberCart = async (req, res) => {
     }
 };
 
+// Lấy thông tin giỏ hàng
 export const getCart = async (req, res) => {
     try {
         const userID = +req.user.id;
@@ -32,6 +35,7 @@ export const getCart = async (req, res) => {
     }
 };
 
+// Cập nhật số lượng của sản phẩm trong giỏ hàng
 export const updateCartQuantity = async (req, res) => {
     try {
         const newNumber  = +req.body.newNumber;
@@ -60,7 +64,7 @@ export const updateCartQuantity = async (req, res) => {
     }
 };
 
-
+// Xoá sản phẩm khỏi giỏ hàng
 export const deleteCartItem = async (req, res) => {
     try {
         const userID = +req.user.id;
@@ -72,6 +76,7 @@ export const deleteCartItem = async (req, res) => {
     }
 };
 
+// Mua ngay sản phẩm
 export const buyNow = async (req, res) => {
     try {
         const userID = +req.user.id;
@@ -83,6 +88,7 @@ export const buyNow = async (req, res) => {
     }
 };
 
+// Thanh toán giỏ hàng
 export const checkout = async (req, res) => {
     try {
         const userID = +req.user.id;

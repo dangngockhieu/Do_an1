@@ -2,7 +2,8 @@ import * as authService from '../services/authService.js';
 import dotenv from 'dotenv';
 dotenv.config();
 import { matchedData } from 'express-validator';
-// ==================== REGISTER ====================
+
+// REGISTER 
 export const register = async (req, res) => {
   try {
     const dataRegister = matchedData(req);
@@ -18,7 +19,7 @@ export const register = async (req, res) => {
   }
 };
 
-// ==================== LOGIN ====================
+// LOGIN
 export const login = async (req, res) => {
   try {
     const dataLogin = matchedData(req);
@@ -59,7 +60,7 @@ export const login = async (req, res) => {
   }
 };
 
-// ==================== LOGOUT  ====================
+// LOGOUT  
 export const logout = async (req, res) => {
   try {
     const email = req.user.email;
@@ -84,7 +85,7 @@ export const logout = async (req, res) => {
   }      
 };
 
-// ==================== REFRESH TOKEN ====================
+// REFRESH TOKEN 
 export const refreshToken = async (req, res) => {
   try {
     const refresh_token = req.cookies?.refresh_token;
@@ -102,7 +103,7 @@ export const refreshToken = async (req, res) => {
   }
 };
 
-// ==================== VERIFY EMAIL ====================
+// VERIFY EMAIL 
 export const verifyEmail = async (req, res) => {
     try {
         const { email, token } = req.query;
@@ -173,7 +174,7 @@ export const verifyEmail = async (req, res) => {
     }
 };
 
-// ==================== RESEND VERIFY EMAIL ====================
+// RESEND VERIFY EMAIL
 export const resendVerificationEmail = async (req, res) => {
   try {
     const { email } = req.body;
@@ -188,7 +189,7 @@ export const resendVerificationEmail = async (req, res) => {
   }
 };
 
-// ==================== SEND RESET PASSWORD ====================
+// SEND RESET PASSWORD 
 export const sendResetPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -203,7 +204,7 @@ export const sendResetPassword = async (req, res) => {
   }
 };
 
-// ==================== RESET PASSWORD ====================
+// RESET PASSWORD 
 export const resetPassword = async (req, res) => {
     try {
         const dataResetPassword = matchedData(req);

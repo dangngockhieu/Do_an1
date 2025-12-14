@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCartCount } from "../../../redux/action/cartAction";
 import './OrderHistory.scss';
@@ -12,7 +12,6 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const OrderHistory = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -85,22 +84,6 @@ const OrderHistory = () => {
         { id: 'COMPLETED', label: 'Hoàn thành' },
         { id: 'CANCELED', label: 'Đã hủy' },
     ];
-   
-    useEffect(() => {
-        // Kiểm tra query param payment
-        const paymentStatus = searchParams.get('payment');
-        if (paymentStatus === 'success') {
-            toast.success('Thanh toán thành công! Đơn hàng đang được xử lý.');
-            // Xóa query param sau khi hiển thị
-            setSearchParams({});
-        } else if (paymentStatus === 'failed') {
-            toast.error('Thanh toán thất bại. Vui lòng thử lại!');
-            setSearchParams({});
-        } else if (paymentStatus === 'error') {
-            toast.error('Có lỗi xảy ra trong quá trình thanh toán.');
-            setSearchParams({});
-        }
-    }, [searchParams, setSearchParams]);
 
     useEffect(() => {
         fetchOrders();
@@ -112,7 +95,7 @@ const OrderHistory = () => {
             let res = await getMyOrders(activeTab);
             if (res && res.EC === 0) {
                 const sortedOrders = res.DT.sort(
-                    (a, b) => new Date(a.orderDate) - new Date(b.orderDate)
+                    (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
                 );
                 setOrders(sortedOrders);
             } else {

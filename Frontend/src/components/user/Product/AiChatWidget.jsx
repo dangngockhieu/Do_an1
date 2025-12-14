@@ -7,9 +7,8 @@ import { toast } from "react-toastify";
 import { askAiChat, getAiChatHistory, getAllProducts } from "../../../services/apiServices"; 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 import { useNavigate } from "react-router-dom";
-const AiChatWidget = () => {
+const AiChatWidget = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputStr, setInputStr] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,18 +48,15 @@ const AiChatWidget = () => {
   // LOAD LỊCH SỬ CHAT HOẶC HIỂN THỊ CHÀO MỪNG
   useEffect(() => {
     if (isOpen) {
-      if (!isAuthenticated){
-        toast.info("Đăng nhập để có trải nghiệm AI tốt hơn nhé!");
-      }
-      else if (isAuthenticated) {
-            fetchHistory();
+      if (isAuthenticated) {
+        fetchHistory();
       } else if (messages.length === 0) {
-          setMessages([{
-              role: 'AI',
-              content: 'Xin chào! Bitu có thể giúp gì cho bạn hôm nay? ',
-              productData: []
-          }]);
-        }
+        setMessages([{
+          role: 'AI',
+          content: 'Xin chào! Bitu có thể giúp gì cho bạn hôm nay? ',
+          productData: []
+        }]);
+      }
     }
   }, [isOpen, isAuthenticated]);
 
@@ -112,6 +108,14 @@ const AiChatWidget = () => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleSendMessage();
   }
+
+  const handleOpenModal = () => {
+    if (!isAuthenticated) {
+      toast.warning("Vui lòng đăng nhập để sử dụng tính năng AI Chat!");
+      return;
+    }
+    setIsOpen(true);
+  };
 
   // Render danh sách sản phẩm (Carousel)
   const renderProductCarousel = (products) => {
@@ -221,7 +225,7 @@ const AiChatWidget = () => {
       </div>
 
       {!isOpen && (
-        <button className="ai-floating-btn" onClick={() => setIsOpen(true)}>
+        <button className="ai-floating-btn" onClick={handleOpenModal}>
           <FaRobot className="icon-robot" />
           <span className="pulse-ring"></span>
         </button>
