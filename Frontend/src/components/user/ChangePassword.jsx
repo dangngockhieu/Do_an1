@@ -26,11 +26,16 @@ const ChangePassword = ({ onClose }) => {
 
     setLoading(true);
     try {
-      await changePassword(oldPassword, newPassword);
-      toast.success('Đổi mật khẩu thành công.');
-      onClose();
+      const res = await changePassword(oldPassword, newPassword);
+      if (res?.EC === 0) {
+        toast.success('Đổi mật khẩu thành công.');
+        onClose();
+        return;
+      }
+
+      toast.error(res?.EM || 'Đổi mật khẩu thất bại');
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.message || 'Đổi mật khẩu thất bại';
+      const msg = err?.EM || err?.response?.data?.EM || err?.message || 'Đổi mật khẩu thất bại';
       toast.error(msg);
     } finally {
       setLoading(false);
